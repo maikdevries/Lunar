@@ -3,6 +3,8 @@ const client = new Discord.Client();
 
 const config = require('./config.json');
 
+const welcomeMessage = require('./features/welcomeMessage.js');
+
 
 client.on('ready', async () => {
 	if (config.username) {
@@ -25,6 +27,17 @@ client.on('ready', async () => {
 	}
 
 	console.log(`${client.user.username} has loaded successfully and is now online!`);
+});
+
+
+// Sends out a welcome message when a new user joins the server
+client.on('guildMemberAdd', (member) => {
+	welcomeMessage.memberAdd(member);
+});
+
+// Sends out a leave message when an user leaves the server
+client.on('guildMemberRemove', (member) => {
+	welcomeMessage.memberRemove(member);
 });
 
 

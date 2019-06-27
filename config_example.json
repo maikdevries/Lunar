@@ -2,5 +2,10 @@
 	"token": "",
 
 	"username": "",
-	"activity": ""
+	"activity": "",
+
+	"welcomeMessageAdd": true,
+	"welcomeMessageRemove": true,
+	"welcomeMessageChannelID": "",
+	"welcomeMessageChannelName": ""
 }
