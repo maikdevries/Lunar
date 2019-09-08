@@ -17,7 +17,7 @@ function memberAdd (member) {
 	else if (config.welcomeMessageChannelName) channel = member.guild.channels.find((ch) => ch.name === config.welcomeMessageChannelName);
 	else channel = member.guild.channels.find((ch) => ch.name === 'welcome');
 
-	if (channel) return channel.send(`${member.user.username} has joined the Discord server! Give a warm welcome!`);
+	if (channel) return channel.send(`**${member.user.username}** has joined the Discord server! Give a warm welcome!`);
 
 	console.error(`Cannot find welcome channel, couldn't send welcome message.`);
 }
@@ -31,7 +31,7 @@ function memberRemove (member) {
 	else if (config.welcomeMessageChannelName) channel = member.guild.channels.find((ch) => ch.name === config.welcomeMessageChannelName);
 	else channel = member.guild.channels.find((ch) => ch.name === 'welcome');
 
-	if (channel) return channel.send(`${member.user.username} has left the Discord server! What a shame!`);
+	if (channel) return channel.send(`**${member.user.username}** has left the Discord server! What a shame!`);
 
 	console.error(`Cannot find welcome channel, couldn't send leave message.`);
 }

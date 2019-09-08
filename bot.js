@@ -47,7 +47,7 @@ client.on('ready', async () => {
 client.on('message', (message) => {
 	if (!message.content.startsWith(prefix) || message.author.bot) return;
 
-	if (message.channel.type !== 'text') return message.channel.send(`Sorry! Unfortunately, I can't help you with that in direct messages.`);
+	if (message.channel.type !== 'text') return message.channel.send(`**Sorry**! Unfortunately, I can't help you with that in direct messages.`);
 
 	const args = message.content.slice(prefix.length).split(/ +/);
 	const commandName = args.shift().toLowerCase();
@@ -58,7 +58,7 @@ client.on('message', (message) => {
 
 	// If command arguments were expected but not given, return an error message to the user
 	if (command.args && !args.length) {
-		let reply = `Oh no! You didn't provide any arguments for this command to work properly!`;
+		let reply = `**Oh no**! You didn't provide any arguments for this command to work properly!`;
 
 		if (command.usage) reply += ` The proper usage would be: \`${command.usage}\``;
 
@@ -69,7 +69,7 @@ client.on('message', (message) => {
 		command.execute(message, args);
 	} catch (error) {
 		console.error(`An error occured executing one of the commands, ${error}`);
-		message.channel.send('Oops! Something went terribly wrong! Please try again later.').then((msg) => msg.delete({ timeout: 3500 }));
+		message.channel.send('**Oops**! Something went terribly wrong! Please try again later.').then((msg) => msg.delete({ timeout: 3500 }));
 	}
 });
 

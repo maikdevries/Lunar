@@ -9,13 +9,13 @@ module.exports = {
 };
 
 function execute (message, args) {
-	if (!message.member.hasPermission('MANAGE_MESSAGES')) return message.channel.send(`Oh no! You don't have the right perks to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
+	if (!message.member.hasPermission('MANAGE_MESSAGES')) return message.channel.send(`**Oh no**! You don't have the right perks to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	const userToPurge = parseInt(args[0]) ? false : message.mentions.users.first();
 	let numberOfMessages = userToPurge ? 99 : parseInt(args[0]);
 
-	if (isNaN(numberOfMessages)) return message.channel.send(`Oops! That doesn't seem to be a number! Please try again later.`).then((msg) => msg.delete({ timeout: 3500 }));
-	if (numberOfMessages < 1 || numberOfMessages > 99) return message.channel.send(`Oops! That doesn't seem to work! Please try again with a number between 1 and 99!`).then((msg) => msg.delete({ timeout: 3500 }));
+	if (isNaN(numberOfMessages)) return message.channel.send(`**Oops**! That doesn't seem to be a number! Please try again later.`).then((msg) => msg.delete({ timeout: 3500 }));
+	if (numberOfMessages < 1 || numberOfMessages > 99) return message.channel.send(`**Oops**! That doesn't seem to work! Please try again with a number between 1 and 99!`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	// Fetches the messages if not in cache and attempts to delete them in bulk
 	message.channel.messages.fetch({ limit: numberOfMessages + 1 })
@@ -34,9 +34,9 @@ function execute (message, args) {
 			message.channel.bulkDelete(filteredMessages || messages, true)
 				.catch((error) => {
 					console.error(`An error occured when deleting messages in bulk, ${error}`);
-					message.channel.send('Oh no! Something went terribly wrong! Please try again later.').then((msg) => msg.delete({ timeout: 3500 }));
+					message.channel.send('**Oh no**! Something went terribly wrong! Please try again later.').then((msg) => msg.delete({ timeout: 3500 }));
 				});
 
-			return message.channel.send(`Yay! I successfully cleared ${numberOfMessages} message(s) for you!`).then((msg) => msg.delete({ timeout: 3500 }));
+			return message.channel.send(`**Yay**! I successfully cleared ${numberOfMessages} message(s) for you!`).then((msg) => msg.delete({ timeout: 3500 }));
 		});
 }
