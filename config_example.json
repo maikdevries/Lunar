@@ -3,6 +3,7 @@
 
 	"username": "",
 	"activity": "",
+	"commandPrefix": "",
 
 	"welcomeMessageAdd": true,
 	"welcomeMessageRemove": true,

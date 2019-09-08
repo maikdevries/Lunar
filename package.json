@@ -1,6 +1,6 @@
 {
   "name": "source",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A modular Discord bot written in NodeJS to be used in private servers.",
   "main": "bot.js",
   "repository": {
@@ -13,8 +13,10 @@
     "url": "https://github.com/maikdevries/Source/issues"
   },
   "homepage": "https://github.com/maikdevries/Source#readme",
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^6.3.0"
+  },
   "dependencies": {
-    "discord.js": "^12.0.0-dev"
+    "discord.js": "github:discordjs/discord.js"
   }
 }

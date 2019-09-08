@@ -11,6 +11,7 @@ A Discord bot written in [Node.js](https://nodejs.org) to be used in private ser
 - [Features](#features)
   - [Welcome Message](#welcome-message)
   - [Leave Message](#leave-message)
+  - [Commands](#commands)
 
 
 ## Installation
@@ -28,6 +29,7 @@ Open `config.json` and **make sure to adjust** the following configuration optio
 The following configuration options are **optional** and do not need to be tweaked for the bot to work. Leave the options empty, like this `"username": ""` if you would like to make use of the defaults.
 - `username` [Default is *Source*] - Change the username of the bot.
 - `activity` [Default is *with Admin perks*] - Change the game that the bot is playing. This activity is always preceded by `Playing ...` where `...` illustrates `activity`.
+- `commandPrefix` [Default is *!*] - Change the prefix used to trigger a command.
 
 ### Changing the avatar
 The bot's avatar can be changed as well. This is done by replacing the `avatar.png` file with an image of choice. The image of choice needs to be a **PNG** file and named `avatar.png`.
@@ -55,3 +57,14 @@ The following configuration settings affect the behaviour of this feature:
 - `welcomeMessageAdd` [Default is *true*] - This enables/disables this specific feature.
 - `welcomeMessageChannelName` [Default is *empty*] - This overrides the default channel name to send the leave message in.
 - `welcomeMessageChannelID` [Default is *empty*] - This overrides the default channel to send the leave message in, this takes priority over the `welcomeMessageChannelName` setting. Set this setting to a specific channel ID. **Only** set this setting if you have a Discord in which there are multiple channels with the same name.
+
+### Commands
+Source supports a select few commands as of now but will be updated to offer a variety of commands for every day use.
+
+The default way to trigger a command is as follows: `![command] [argument]`, where the behaviour of `[argument]` could vary between the different commands. The command prefix can be changed in `config.json`, more information [here](#optional-configuration-settings).
+
+The following command behaviour is currently natively supported:
+- `clear/purge/remove/delete [number]` - This will delete as many messages of the past in the current channel with a minimum of *1* and a maximum of up to *99* messages at a time.
+- `clear/purge/remove/delete @[user]` - This will delete all messages sent by `[user]` out of the last *99* messages sent in the current channel.
+
+One could even add commands of their own if they possess the means to do so, please do keep in mind that this is not supported code, things could be wonky or not function the way initially visioned.
