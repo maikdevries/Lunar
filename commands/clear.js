@@ -33,7 +33,7 @@ function execute (message, args) {
 
 			message.channel.bulkDelete(filteredMessages || messages, true)
 				.catch((error) => {
-					console.error(`An error occured when deleting messages in bulk, ${error}`);
+					console.error(`An error occurred when deleting messages in bulk, ${error}`);
 					message.channel.send('**Oh no**! Something went terribly wrong! Please try again later.').then((msg) => msg.delete({ timeout: 3500 }));
 				});
 

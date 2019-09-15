@@ -24,7 +24,7 @@ client.on('ready', async () => {
 		await client.user.setUsername(config.username)
 			.catch((error) => console.error(`An error occurred when setting the username, ${error}`));
 	} else {
-		await client.user.setUsername('Source')
+		await client.user.setUsername('Lunar')
 			.catch((error) => console.error(`An error occurred when setting the username, ${error}`));
 	}
 
@@ -68,7 +68,7 @@ client.on('message', (message) => {
 	try {
 		command.execute(message, args);
 	} catch (error) {
-		console.error(`An error occured executing one of the commands, ${error}`);
+		console.error(`An error occurred executing one of the commands, ${error}`);
 		message.channel.send('**Oops**! Something went terribly wrong! Please try again later.').then((msg) => msg.delete({ timeout: 3500 }));
 	}
 });

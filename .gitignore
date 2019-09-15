@@ -3,3 +3,6 @@
 
 # Ignore configuration files
 **/config.json
+
+# Ignore package-lock.json
+**/package-lock.json
