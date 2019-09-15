@@ -9,9 +9,9 @@ A Discord bot written in [Node.js](https://nodejs.org) to be used in private ser
   - [Changing the avatar](#changing-the-avatar)
 - [Running the bot](#running-the-bot)
 - [Features](#features)
-  - [Welcome Message](#welcome-message)
-  - [Leave Message](#leave-message)
+  - [Welcome Message - Leave Message](#welcome-message---leave-message)
   - [Commands](#commands)
+  - [Reaction Role](#reaction-role)
 
 
 ## Installation
@@ -22,8 +22,8 @@ Download all of the necessary files by cloning the GitHub repository or download
 If done incorrectly, the bot will not operate the way you want it to or not work at all. Make sure to double-check the adjustments you made before running the bot, it could lead to unintended behaviour otherwise. The correct syntax for the configuration options explained with an example: `"activity": "with Admin perks",`. Do not forget the comma at the end of each line!
 
 ### Mandatory configuration settings
-Open `config.json` and **make sure to adjust** the following configuration options, if not, the bot will not work. Therefore, do not leave these options empty, like this `"token": ""`.
-- `token` - This is the Discord Bot token you will need to run the bot, without it, it will not be able to interact with the Discord API. This token can be found by accessing your [Discord Applications](https://discordapp.com/developers/applications/). If no such application has been created yet, read [this guide](https://discordpy.readthedocs.io/en/latest/discord.html) on how to do so.
+Open `config.json` and **make sure to adjust** the following configuration options. The bot will not work otherwise. Therefore, do not leave these options empty, like this `"token": ""`.
+- `token` - This is the Discord Bot token you will need to run the bot. Without it, it will not be able to interact with the Discord API. This token can be found by accessing your [Discord Applications](https://discordapp.com/developers/applications/). If no such application has been created yet, read [this guide](https://discordpy.readthedocs.io/en/latest/discord.html) on how to do so.
 
 ### Optional configuration settings
 The following configuration options are **optional** and do not need to be tweaked for the bot to work. Leave the options empty, like this `"username": ""` if you would like to make use of the defaults.
@@ -42,21 +42,14 @@ The bot can be shut down by terminating the command line or using the following 
 ## Features
 This bot offers a bunch of features that are all optional. These features can be enabled and disabled individually without affecting another feature. All of these features can be tweaked in the `config.json` file.
 
-### Welcome Message
-The 'Welcome Message' feature sends out a message to a Discord channel called `welcome` whenever a new user joins the Discord server.
+### Welcome Message - Leave Message
+This feature sends out a message to a Discord channel called `welcome` whenever a user joins/leaves the Discord server.
 
 The following configuration settings affect the behaviour of this feature:
-- `welcomeMessageAdd` [Default is *true*] - This enables/disables this specific feature.
-- `welcomeMessageChannelName` [Default is *empty*] - This overrides the default channel name to send the welcome message in.
-- `welcomeMessageChannelID` [Default is *empty*] - This overrides the default channel to send the welcome message in, this takes priority over the `welcomeMessageChannelName` setting. Set this setting to a specific channel ID. **Only** set this setting if you have a Discord in which there are multiple channels with the same name.
-
-### Leave Message
-The 'Leave Message' feature sends out a message to a Discord channel called `welcome` whenever an user leaves the Discord server.
-
-The following configuration settings affect the behaviour of this feature:
-- `welcomeMessageAdd` [Default is *true*] - This enables/disables this specific feature.
-- `welcomeMessageChannelName` [Default is *empty*] - This overrides the default channel name to send the leave message in.
-- `welcomeMessageChannelID` [Default is *empty*] - This overrides the default channel to send the leave message in, this takes priority over the `welcomeMessageChannelName` setting. Set this setting to a specific channel ID. **Only** set this setting if you have a Discord in which there are multiple channels with the same name.
+- `welcomeMessageAdd` [Default is *false*] - This enables/disables sending out a message on a user joining.
+- `welcomeMessageRemove` [Default is *false*] - This enables/disables sending out a message on a user leaving.
+- `welcomeMessageChannelName` [Default is *empty*] - This overrides the default channel name to send the message in.
+- `welcomeMessageChannelID` [Default is *empty*] - This overrides the default channel to send the message in, this takes priority over the `welcomeMessageChannelName` setting. Set this setting to a specific channel ID. **Only** set this setting if you have a Discord in which there are multiple channels with the same name.
 
 ### Commands
 Lunar supports a select few commands as of now but will be updated to offer a variety of commands for every day use.
@@ -68,3 +61,45 @@ The following command behaviour is currently natively supported:
 - `clear/purge/remove/delete @[user]` - This will delete all messages sent by `[user]` out of the last *99* messages sent in the current channel.
 
 One could even add commands of their own if they possess the means to do so, please do keep in mind that this is not supported code, things could be wonky or not function the way initially envisioned.
+
+### Reaction Role
+Reaction role functionality is natively supported through the use of the following data structure in `config.json`, explained with an example:
+```JSON
+"reactionRole": {
+	"enabled": true,
+	"messages": {
+		"622739516528263168": {
+			"👍": [
+				"610032704704217092"
+			]
+		}
+	}
+}
+```
+
+This will add the role with ID `610032704704217092` to the user that reacted with '👍' on the message with ID `622739516528263168` if `enabled` is set to `true`.
+
+If the user removes the '👍' reaction from the message with ID `622739516528263168`, the role with ID `610032704704217092` will be removed from the user.
+
+The following configuration options must be tweaked to make use of this feature:
+- `enabled` [Default is *false*] - Enables/disables this specific feature.
+- As well as adding the reaction role to the data structure. The template is as follows:
+```JSON
+"reactionRole": {
+	"enabled": true,
+	"messages": {
+		"[Message ID]": {
+			"[Emoji ID/Name]": [
+				"[Role ID]",
+				...
+			],
+			...
+		},
+		...
+	}
+}
+```
+
+This structure allows the case of multiple roles per reaction, multiple reactions per message and multiple messages per server.
+
+For now, each reaction role has to be set up manually. In the near future, a set of commands will be implemented to achieve the same end result with minimal effort.

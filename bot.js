@@ -7,6 +7,7 @@ const config = require('./config.json');
 const prefix = config.commandPrefix || '!';
 
 const welcomeMessage = require('./features/welcomeMessage.js');
+const reactionRole = require('./features/reactionRole.js');
 
 
 // Create a Discord Collection from all the 'command modules' in the 'commands' folder
@@ -72,6 +73,41 @@ client.on('message', (message) => {
 		message.channel.send('**Oops**! Something went terribly wrong! Please try again later.').then((msg) => msg.delete({ timeout: 3500 }));
 	}
 });
+
+
+const events = {
+	MESSAGE_REACTION_ADD: 'messageReactionAdd',
+	MESSAGE_REACTION_REMOVE: 'messageReactionRemove',
+};
+
+// Emits 'messageReactionAdd' and 'messageReactionRemove' events on non-cached messages
+client.on('raw', (event) => {
+	if (!Object.prototype.hasOwnProperty.call(events, event.t)) return;
+
+	const { d: data } = event;
+	const user = client.users.get(data.user_id);
+	const channel = client.channels.get(data.channel_id);
+
+	if (channel.messages.has(data.message_id)) return;
+
+	channel.messages.fetch(data.message_id).then((message) => {
+		const emojiKey = data.emoji.id || data.emoji.name;
+		const reaction = message.reactions.get(emojiKey) || message.reactions.add(data);
+
+		client.emit(events[event.t], reaction, user);
+	});
+});
+
+// Adds role to user based on reaction added to message
+client.on('messageReactionAdd', (reaction, user) => {
+	reactionRole.roleAdd(reaction, user);
+});
+
+// Removes role from user based on reaction removed from message
+client.on('messageReactionRemove', (reaction, user) => {
+	reactionRole.roleRemove(reaction, user);
+});
+
 
 // Sends out a welcome message when a new user joins the server
 client.on('guildMemberAdd', (member) => {
