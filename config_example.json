@@ -5,10 +5,10 @@
 	"activity": "",
 	"commandPrefix": "",
 
-	"welcomeMessageAdd": false,
-	"welcomeMessageRemove": false,
-	"welcomeMessageChannelID": "",
-	"welcomeMessageChannelName": "",
+	"welcomeMessage": {
+		"enabled": false,
+		"channelID": ""
+	},
 
 	"reactionRole": {
 		"enabled": false,

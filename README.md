@@ -46,10 +46,8 @@ This bot offers a bunch of features that are all optional. These features can be
 This feature sends out a message to a Discord channel called `welcome` whenever a user joins/leaves the Discord server.
 
 The following configuration settings affect the behaviour of this feature:
-- `welcomeMessageAdd` [Default is *false*] - This enables/disables sending out a message on a user joining.
-- `welcomeMessageRemove` [Default is *false*] - This enables/disables sending out a message on a user leaving.
-- `welcomeMessageChannelName` [Default is *empty*] - This overrides the default channel name to send the message in.
-- `welcomeMessageChannelID` [Default is *empty*] - This overrides the default channel to send the message in, this takes priority over the `welcomeMessageChannelName` setting. Set this setting to a specific channel ID. **Only** set this setting if you have a Discord in which there are multiple channels with the same name.
+- `enabled` [Default is *false*] - This enables/disables sending out a message on a user joining/leaving the server.
+- `welcomeMessageChannelID` [Default is *empty*] - This overrides the default channel to send the message in. Set this setting to a specific channel ID.
 
 ### Commands
 Lunar supports a select few commands as of now but will be updated to offer a variety of commands for every day use.
@@ -91,11 +89,8 @@ The following configuration options must be tweaked to make use of this feature:
 		"[Message ID]": {
 			"[Emoji ID/Name]": [
 				"[Role ID]",
-				...
 			],
-			...
 		},
-		...
 	}
 }
 ```

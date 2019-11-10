@@ -10,11 +10,10 @@ module.exports = {
 
 // Sends out a welcome message when a new user joins the server
 function memberAdd (member) {
-	if (!config.welcomeMessageAdd) return;
+	if (!config.welcomeMessage.enabled) return;
 
 	let channel;
-	if (config.welcomeMessageChannelID) channel = member.guild.channels.get(config.welcomeMessageChannelID);
-	else if (config.welcomeMessageChannelName) channel = member.guild.channels.find((ch) => ch.name === config.welcomeMessageChannelName);
+	if (config.welcomeMessage.channelID) channel = member.guild.channels.get(config.welcomeMessage.channelID);
 	else channel = member.guild.channels.find((ch) => ch.name === 'welcome');
 
 	if (channel) return channel.send(`**${member.user.username}** has joined the Discord server! Give a warm welcome!`);
@@ -24,11 +23,10 @@ function memberAdd (member) {
 
 // Sends out a leave message when an user leaves the server
 function memberRemove (member) {
-	if (!config.welcomeMessageRemove) return;
+	if (!config.welcomeMessage.enabled) return;
 
 	let channel;
-	if (config.welcomeMessageChannelID) channel = member.guild.channels.get(config.welcomeMessageChannelID);
-	else if (config.welcomeMessageChannelName) channel = member.guild.channels.find((ch) => ch.name === config.welcomeMessageChannelName);
+	if (config.welcomeMessage.channelID) channel = member.guild.channels.get(config.welcomeMessage.channelID);
 	else channel = member.guild.channels.find((ch) => ch.name === 'welcome');
 
 	if (channel) return channel.send(`**${member.user.username}** has left the Discord server! What a shame!`);
