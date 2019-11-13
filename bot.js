@@ -8,6 +8,7 @@ const prefix = config.commandPrefix || '!';
 
 const welcomeMessage = require('./features/welcomeMessage.js');
 const reactionRole = require('./features/reactionRole.js');
+const twitch = require('./features/twitch.js');
 
 
 // Create a Discord Collection from all the 'command modules' in the 'commands' folder
@@ -29,16 +30,23 @@ client.on('ready', async () => {
 			.catch((error) => console.error(`An error occurred when setting the username, ${error}`));
 	}
 
-	client.user.setAvatar('./avatar.png')
+	await client.user.setAvatar('./avatar.png')
 		.catch((error) => console.error(`An error occurred when setting the avatar, ${error}`));
 
 	if (config.activity) {
-		client.user.setActivity(config.activity, { type: 'PLAYING' })
+		await client.user.setActivity(config.activity, { type: 'PLAYING' })
 			.catch((error) => console.error(`An error occurred when setting the default activity, ${error}`));
 	} else {
-		client.user.setActivity('with Admin perks', { type: 'PLAYING' })
+		await client.user.setActivity('with Admin perks', { type: 'PLAYING' })
 			.catch((error) => console.error(`An error occurred when setting the default activity, ${error}`));
 	}
+
+
+	// Set an interval to poll all APIs every 60 seconds
+	setInterval(() => {
+		twitch.fetchStream(client);
+	}, 60000);
+
 
 	console.log(`${client.user.username} has loaded successfully and is now online!`);
 });

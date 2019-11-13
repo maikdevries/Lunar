@@ -12,6 +12,7 @@ A Discord bot written in [Node.js](https://nodejs.org) to be used in private ser
   - [Welcome Message - Leave Message](#welcome-message---leave-message)
   - [Commands](#commands)
   - [Reaction Role](#reaction-role)
+  - [Twitch Livestream Announcements](#twitch-livestream-announcements)
 
 
 ## Installation
@@ -98,3 +99,17 @@ The following configuration options must be tweaked to make use of this feature:
 This structure allows the case of multiple roles per reaction, multiple reactions per message and multiple messages per server.
 
 For now, each reaction role has to be set up manually. In the near future, a set of commands will be implemented to achieve the same end result with minimal effort.
+
+### Twitch Livestream Announcements
+Lunar has built-in support for Twitch livestream announcements by polling the Twitch API every 60 seconds to check whether the specified Twitch channel in `config.json` is currently live.
+
+The following configuration options must be changed in order to make use of this feature:
+- `enabled` [Default is *false*] - Enables/disables this feature.
+- `client-ID` [Default is *empty*] - Twitch client ID that is needed to make use of the Twitch API. Follow [Step 1: Setup](https://dev.twitch.tv/docs/api#step-1-setup) of the Twitch API documentation to get one.
+- `username` [Default is *empty*] - The username of the Twitch channel.
+- `announcementChannelID` [Default is *empty*] - The Discord channel to send the livestream announcements in.
+
+Optional configuration options that can be set:
+- `announcementMessage` [Default is *empty*] - Message that will be attached to the embed.
+
+In the future, updating of the announcement message to reflect current stream statistics as well as updating of the announcement message to redirect to the VOD of the stream when the stream goes offline, will be added.

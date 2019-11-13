@@ -14,5 +14,14 @@
 		"enabled": false,
 		"messages": {
 		}
+	},
+
+	"twitch": {
+		"enabled": false,
+		"client-ID": "",
+		"username": "",
+
+		"announcementChannelID": "",
+		"announcementMessage": ""
 	}
 }
