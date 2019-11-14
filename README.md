@@ -112,4 +112,4 @@ The following configuration options must be changed in order to make use of this
 Optional configuration options that can be set:
 - `announcementMessage` [Default is *empty*] - Message that will be attached to the embed.
 
-In the future, updating of the announcement message to reflect current stream statistics as well as updating of the announcement message to redirect to the VOD of the stream when the stream goes offline, will be added.
+In the future, updating of the announcement message to redirect to the VOD of the stream when the stream goes offline, will be added.

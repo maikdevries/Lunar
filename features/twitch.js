@@ -5,6 +5,7 @@ const config = require('./../config.json');
 
 
 let streamStatus = false;
+let updateInterval;
 
 
 module.exports = {
@@ -20,7 +21,10 @@ function fetchStream (client) {
 	const path = `streams?user_login=${config.twitch.username}`;
 
 	callAPI(path).then((streamInfo) => {
-		if (!streamInfo.data || !streamInfo.data[0]) streamStatus = false;
+		if (!streamInfo.data || !streamInfo.data[0]) {
+			streamStatus = false;
+			clearInterval(updateInterval);
+		}
 		else {
 			if (streamStatus) return;
 
@@ -62,7 +66,35 @@ function sendAnnouncement (client, streamInfo, userInfo, gameInfo) {
 		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
 		.setTimestamp(new Date(streamInfo.data[0].started_at));
 
-	return channel.send(config.twitch.announcementMessage, { embed });
+	return channel.send(config.twitch.announcementMessage, { embed }).then((msg) => update(msg));
+}
+
+// Updates the livestream announcement every 3 minutes with current stream statistics
+function update (message) {
+	updateInterval = setInterval(() => {
+		fetchUpdatedData().then(([streamInfo, gameInfo]) => {
+			if (!streamInfo.data || !gameInfo.data) return;
+			else {
+				const editedEmbed = new Discord.MessageEmbed(message.embeds[0])
+					.setTitle(streamInfo.data[0].title)
+					.setDescription(`**${streamInfo.data[0].user_name}** is playing **${gameInfo.data[0].name}** with **${streamInfo.data[0].viewer_count}** people watching!\n\n[**Come watch the stream!**](https://twitch.tv/${streamInfo.data[0].user_name})`)
+					.setThumbnail((gameInfo.data[0].box_art_url).replace('{width}', '300').replace('{height}', '400'));
+
+				return message.edit(config.twitch.announcementMessage, editedEmbed);
+			}
+		});
+	}, 180000);
+}
+
+// Fetches required data to be used in update livestream announcement with current stream statistics
+async function fetchUpdatedData () {
+	let path = `streams?user_login=${config.twitch.username}`;
+	const streamInfo = await callAPI(path);
+
+	path = `games?id=${streamInfo.data[0].game_id}`;
+	const gameInfo = await callAPI(path);
+
+	return [streamInfo, gameInfo];
 }
 
 // Template HTTPS get function that interacts with the Twitch API, wrapped in a Promise
