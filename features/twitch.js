@@ -6,6 +6,7 @@ const config = require('./../config.json');
 
 let streamStatus = false;
 let updateInterval;
+let sentAnnouncementMessage;
 
 
 module.exports = {
@@ -21,11 +22,15 @@ function fetchStream (client) {
 	const path = `streams?user_login=${config.twitch.username}`;
 
 	callAPI(path).then((streamInfo) => {
-		if (!streamInfo.data || !streamInfo.data[0]) {
-			streamStatus = false;
-			clearInterval(updateInterval);
-		}
-		else {
+		if (!streamInfo.data) return;
+
+		if (!streamInfo.data[0]) {
+			if (streamStatus) {
+				streamStatus = false;
+				clearInterval(updateInterval);
+				streamOffline();
+			}
+		} else {
 			if (streamStatus) return;
 
 			streamStatus = true;
@@ -38,7 +43,7 @@ function fetchStream (client) {
 	});
 }
 
-// Fetches additional required data to construct embed
+// Fetches additional data required to construct embed
 async function fetchData (streamInfo) {
 	let path = `users?login=${config.twitch.username}`;
 	const userInfo = await callAPI(path);
@@ -66,27 +71,26 @@ function sendAnnouncement (client, streamInfo, userInfo, gameInfo) {
 		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
 		.setTimestamp(new Date(streamInfo.data[0].started_at));
 
-	return channel.send(config.twitch.announcementMessage, { embed }).then((msg) => update(msg));
+	return channel.send(config.twitch.announcementMessage, { embed }).then((msg) => { sentAnnouncementMessage = msg; update(); });
 }
 
 // Updates the livestream announcement every 3 minutes with current stream statistics
-function update (message) {
+function update () {
 	updateInterval = setInterval(() => {
 		fetchUpdatedData().then(([streamInfo, gameInfo]) => {
 			if (!streamInfo.data || !gameInfo.data) return;
-			else {
-				const editedEmbed = new Discord.MessageEmbed(message.embeds[0])
-					.setTitle(streamInfo.data[0].title)
-					.setDescription(`**${streamInfo.data[0].user_name}** is playing **${gameInfo.data[0].name}** with **${streamInfo.data[0].viewer_count}** people watching!\n\n[**Come watch the stream!**](https://twitch.tv/${streamInfo.data[0].user_name})`)
-					.setThumbnail((gameInfo.data[0].box_art_url).replace('{width}', '300').replace('{height}', '400'));
 
-				return message.edit(config.twitch.announcementMessage, editedEmbed);
-			}
+			const editedEmbed = new Discord.MessageEmbed(sentAnnouncementMessage.embeds[0])
+				.setTitle(streamInfo.data[0].title)
+				.setDescription(`**${streamInfo.data[0].user_name}** is playing **${gameInfo.data[0].name}** with **${streamInfo.data[0].viewer_count}** people watching!\n\n[**Come watch the stream!**](https://twitch.tv/${streamInfo.data[0].user_name})`)
+				.setThumbnail((gameInfo.data[0].box_art_url).replace('{width}', '300').replace('{height}', '400'));
+
+			return sentAnnouncementMessage.edit(config.twitch.announcementMessage, editedEmbed);
 		});
 	}, 180000);
 }
 
-// Fetches required data to be used in update livestream announcement with current stream statistics
+// Fetches required data needed to update the livestream announcement with current stream statistics
 async function fetchUpdatedData () {
 	let path = `streams?user_login=${config.twitch.username}`;
 	const streamInfo = await callAPI(path);
@@ -95,6 +99,33 @@ async function fetchUpdatedData () {
 	const gameInfo = await callAPI(path);
 
 	return [streamInfo, gameInfo];
+}
+
+// Updates the livestream announcement to reflect that the stream went offline
+function streamOffline () {
+	fetchOfflineData().then(([userInfo, videoInfo]) => {
+		if (!userInfo.data || !videoInfo.data) streamStatus = true;
+		else {
+			const editedEmbed = new Discord.MessageEmbed(sentAnnouncementMessage.embeds[0])
+				.setAuthor(`${userInfo.data[0].display_name} was LIVE on Twitch!`, userInfo.data[0].profile_image_url)
+				.setTitle(videoInfo.data[0].title)
+				.setURL(videoInfo.data[0].url)
+				.setDescription(`Today's stream is **over** but you can watch the **VOD**!\n\n[**Watch the VOD!**](${videoInfo.data[0].url})`);
+
+			return sentAnnouncementMessage.edit(config.twitch.announcementMessage, editedEmbed);
+		}
+	});
+}
+
+// Fetches required data needed to update livestream announcement with link to VOD
+async function fetchOfflineData () {
+	let path = `users?login=${config.twitch.username}`;
+	const userInfo = await callAPI(path);
+
+	path = `videos?user_id=${userInfo.data[0].id}&first=1&type=archive`;
+	const videoInfo = await callAPI(path);
+
+	return [userInfo, videoInfo];
 }
 
 // Template HTTPS get function that interacts with the Twitch API, wrapped in a Promise
