@@ -9,6 +9,7 @@ const prefix = config.commandPrefix || '!';
 const welcomeMessage = require('./features/welcomeMessage.js');
 const reactionRole = require('./features/reactionRole.js');
 const twitch = require('./features/twitch.js');
+const youtube = require('./features/youtube.js');
 
 
 // Create a Discord Collection from all the 'command modules' in the 'commands' folder
@@ -45,7 +46,8 @@ client.on('ready', async () => {
 	// Set an interval to poll all APIs every 60 seconds
 	setInterval(() => {
 		twitch.fetchStream(client);
-	}, 60000);
+		youtube.fetchVideo(client);
+	}, 90000);
 
 
 	console.log(`${client.user.username} has loaded successfully and is now online!`);

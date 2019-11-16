@@ -23,5 +23,14 @@
 
 		"announcementChannelID": "",
 		"announcementMessage": ""
+	},
+
+	"youtube": {
+		"enabled": false,
+		"APIkey": "",
+		"channel": "",
+
+		"announcementChannelID": "",
+		"announcementMessage": ""
 	}
 }

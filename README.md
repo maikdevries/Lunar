@@ -13,6 +13,7 @@ A Discord bot written in [Node.js](https://nodejs.org) to be used in private ser
   - [Commands](#commands)
   - [Reaction Role](#reaction-role)
   - [Twitch Livestream Announcements](#twitch-livestream-announcements)
+  - [YouTube Video Announcements](#youtube-video-announcements)
 
 
 ## Installation
@@ -101,7 +102,7 @@ This structure allows the case of multiple roles per reaction, multiple reaction
 For now, each reaction role has to be set up manually. In the near future, a set of commands will be implemented to achieve the same end result with minimal effort.
 
 ### Twitch Livestream Announcements
-Lunar has built-in support for Twitch livestream announcements by polling the Twitch API every 60 seconds to check whether the specified Twitch channel in `config.json` is currently live.
+Lunar has built-in support for Twitch livestream announcements by polling the Twitch API every 90 seconds to check whether the specified Twitch channel in `config.json` is currently live. The announcement will have a message, if this is set, with an embed which has the title, game being played, viewer count and thumbnail of the stream together with a direct link to the stream. This embed is updated every 3 minutes with the latest stream statistics, as long as the stream is online. When the stream goes offline, the embed will change to display information about the latest VOD and link to it.
 
 The following configuration options must be changed in order to make use of this feature:
 - `enabled` [Default is *false*] - Enables/disables this feature.
@@ -113,3 +114,15 @@ Optional configuration options that can be set:
 - `announcementMessage` [Default is *empty*] - Message that will be attached to the embed.
 
 In the future, updating of the stream preview thumbnail to the latest snapshot will be added.
+
+### YouTube Video Announcements
+If this feature is enabled, an announcement is send out every time the YouTube channel being 'watched' uploads a new video. The announcement will consist of a message, if specified, and a modern embed which contains the title, part of the description and thumbnail of the video, together with a link to YouTube.
+
+Please set the following settings to make use of this:
+- `enabled` [Default is *false*] - Enables/disables this feature.
+- `APIkey` [Default is *empty*] - YouTube API key that is required to contact the YouTube services. Follow [these steps](https://developers.google.com/youtube/v3/getting-started) to get your YouTube API key, make sure to also enable the YouTube API! Your key will **not** work without explicitly enabling the YouTube API.
+- `channel` [Default is *empty*] - The YouTube channel ID you want to send out notifications for.
+- `announcementChannelID` [Default is *empty*] - The Discord channel to send the video release announcements in.
+
+Optional settings you can change:
+- `announcementMessage` [Default is *empty*] - Message that will be sent along with the embed.
