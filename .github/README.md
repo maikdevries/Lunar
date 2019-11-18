@@ -54,11 +54,12 @@ The following configuration settings affect the behaviour of this feature:
 ### Commands
 Lunar supports a select few commands as of now but will be updated to offer a variety of commands for every day use.
 
-The default way to trigger a command is as follows: `![command] [argument]`, where the behaviour of `[argument]` could vary between the different commands. The command prefix can be changed in `config.json`, more information [here](#optional-configuration-settings).
+The default way to trigger a command is as follows: `![command] [argument]`, where the behaviour of `[argument]` could vary between the different commands. Arguments listed within parenthesis `([argument])` are optional and therefore not required. The command prefix can be changed in `config.json`, more information [here](#optional-configuration-settings).
 
 The following command behaviour is currently natively supported:
 - `clear/purge/remove/delete [number]` - This will delete as many messages of the past in the current channel with a minimum of *1* and a maximum of up to *99* messages at a time.
 - `clear/purge/remove/delete @[user]` - This will delete all messages sent by `[user]` out of the last *99* messages sent in the current channel.
+- `kick @[user] ([reason])` - This will kick `[user]` from the current server with `([reason])` as reason.
 
 One could even add commands of their own if they possess the means to do so, please do keep in mind that this is not supported code, things could be wonky or not function the way initially envisioned.
 
