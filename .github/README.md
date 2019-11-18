@@ -60,6 +60,7 @@ The following command behaviour is currently natively supported:
 - `clear/purge/remove/delete [number]` - This will delete as many messages of the past in the current channel with a minimum of *1* and a maximum of up to *99* messages at a time.
 - `clear/purge/remove/delete @[user]` - This will delete all messages sent by `[user]` out of the last *99* messages sent in the current channel.
 - `kick @[user] ([reason])` - This will kick `[user]` from the current server with `([reason])` as reason.
+- `ban @[user] ([reason])` - This will ban `[user]` from the current server with `([reason])` as reason.
 
 One could even add commands of their own if they possess the means to do so, please do keep in mind that this is not supported code, things could be wonky or not function the way initially envisioned.
 
