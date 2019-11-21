@@ -43,11 +43,12 @@ client.on('ready', async () => {
 	}
 
 
-	// Set an interval to poll all APIs every 60 seconds
-	setInterval(() => {
-		twitch.fetchStream(client);
-		youtube.fetchVideo(client);
-	}, 90000);
+	// Set an interval to poll the Twitch API repeatedly
+	setInterval(() => twitch.fetchStream(client), 60000);
+
+	// Set intervals to poll the YouTube API repeatedly
+	setInterval(() => youtube.fetchVideo(client), 600000);
+	setInterval(() => youtube.fetchStream(client), 1200000);
 
 
 	console.log(`${client.user.username} has loaded successfully and is now online!`);

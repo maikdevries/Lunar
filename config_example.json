@@ -29,11 +29,20 @@
 	},
 
 	"youtube": {
-		"enabled": false,
 		"APIkey": "",
 		"channel": "",
 
-		"announcementChannelID": "",
-		"announcementMessage": ""
+		"video": {
+			"enabled": false,
+
+			"announcementChannelID": "",
+			"announcementMessage": ""
+		},
+		"stream": {
+			"enabled": false,
+
+			"announcementChannelID": "",
+			"announcementMessage": ""
+		}
 	}
 }
