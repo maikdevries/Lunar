@@ -17,6 +17,8 @@ function execute (message, args) {
 	const userToKick = message.guild.members.find((member) => member.id === user.id);
 	if (!userToKick) return message.channel.send(`**Uhm**... The person you're trying to kick has already left this server.`).then((msg) => msg.delete({ timeout: 3500 }));
 
+	if (userToKick.hasPermission('KICK_MEMBERS') || userToKick.hasPermission('BAN_MEMBERS')) return message.channel.send(`**Uhm**... You can't kick someone with the same privileges as yourself!`).then((msg) => msg.delete({ timeout: 3500 }));
+
 	userToKick.kick(args[1])
 		.then((member) => {
 			message.delete();

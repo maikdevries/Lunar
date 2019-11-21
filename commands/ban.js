@@ -17,6 +17,8 @@ function execute (message, args) {
 	const userToBan = message.guild.members.find((member) => member.id === user.id);
 	if (!userToBan) return message.channel.send(`**Uhm**... The person you're trying to ban has already left this server.`).then((msg) => msg.delete({ timeout: 3500 }));
 
+	if (userToBan.hasPermission('BAN_MEMBERS')) return message.channel.send(`**Uhm**... You can't ban someone with the same privileges as yourself!`).then((msg) => msg.delete({ timeout: 3500 }));
+
 	userToBan.ban({ days: 7, reason: args[1] })
 		.then((member) => {
 			message.delete();
