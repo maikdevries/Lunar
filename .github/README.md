@@ -45,11 +45,13 @@ The bot can be shut down by terminating the command line or using the following 
 This bot offers a bunch of features that are all optional. These features can be enabled and disabled individually without affecting another feature. All of these features can be tweaked in the `config.json` file.
 
 ### Welcome Message - Leave Message
-This feature sends out a message to a Discord channel called `welcome` whenever a user joins/leaves the Discord server.
+This feature sends out a message to a Discord channel called `welcome` whenever a user joins/leaves the Discord server. It also allows for a direct message to be sent when a user joins the server.
 
 The following configuration settings affect the behaviour of this feature:
 - `enabled` [Default is *false*] - This enables/disables sending out a message on a user joining/leaving the server.
 - `welcomeMessageChannelID` [Default is *empty*] - This overrides the default channel to send the message in. Set this setting to a specific channel ID.
+- `DM-enabled` [Default is *false*] - This enables/disables sending a direct message when a new member joins the server.
+- `DM-message` [Default is *empty*] - This overrides the direct message that will be sent to the new member. If empty, a default message will be sent instead.
 
 ### Commands
 Lunar supports a select few commands as of now but will be updated to offer a variety of commands for every day use.

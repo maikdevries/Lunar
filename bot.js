@@ -122,6 +122,7 @@ client.on('messageReactionRemove', (reaction, user) => {
 // Sends out a welcome message when a new user joins the server
 client.on('guildMemberAdd', (member) => {
 	welcomeMessage.memberAdd(member);
+	welcomeMessage.memberAddDM(member);
 });
 
 // Sends out a leave message when an user leaves the server

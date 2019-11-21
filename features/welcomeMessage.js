@@ -4,6 +4,7 @@ const config = require('./../config.json');
 module.exports = {
 	description: `Handles both the 'guildMemberAdd' & 'guildMemberRemove' events`,
 	memberAdd,
+	memberAddDM,
 	memberRemove
 };
 
@@ -21,7 +22,7 @@ function memberAdd (member) {
 	console.error(`Cannot find welcome channel, couldn't send welcome message.`);
 }
 
-// Sends out a leave message when an user leaves the server
+// Sends out a leave message when a user leaves the server
 function memberRemove (member) {
 	if (!config.welcomeMessage.enabled) return;
 
@@ -32,4 +33,12 @@ function memberRemove (member) {
 	if (channel) return channel.send(`**${member.user.username}** has left the Discord server! What a shame!`);
 
 	console.error(`Cannot find welcome channel, couldn't send leave message.`);
+}
+
+// Sends direct message to newly joined member of the server
+function memberAddDM (member) {
+	if (!config.welcomeMessage['DM-enabled']) return;
+
+	if (config.welcomeMessage['DM-message']) member.send(config.welcomeMessage['DM-message']);
+	else member.send(`**Thanks for joining the Discord server**!\n*If you see this message, contact the server owner.*`);
 }
