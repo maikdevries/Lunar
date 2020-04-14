@@ -19,7 +19,7 @@ A Discord bot written in [Node.js](https://nodejs.org) to be used in private ser
 
 
 # Installation
-**Node.js 10.0.0 or newer is required.**
+**Node.js 12.0.0 or newer is required.**
 Download all of the necessary files by cloning the GitHub repository or downloading the ZIP folder. Open the command line in the root folder or use `cd C:\insert\path\to\folder\here\` to navigate there. When arrived, run the `npm install` command. Create a new copy of `config_example.json` and rename it to `config.json` or rename the original `config_example.json` to `config.json`.
 
 ## Configuring the bot
@@ -64,7 +64,7 @@ The following command behaviour is currently natively supported:
 - `clear/purge/remove/delete [number]` - This will delete as many messages of the past in the current channel with a minimum of *1* and a maximum of up to *99* messages at a time.
 - `clear/purge/remove/delete @[user]` - This will delete all messages sent by `[user]` out of the last *99* messages sent in the current channel.
 - `kick @[user] ([reason])` - This will kick `[user]` from the current server with `([reason])` as reason.
-- `ban @[user] ([reason])` - This will ban `[user]` from the current server with `([reason])` as reason.
+- `ban @[user] ([reason])` - This will ban `[user]` from the current server for 7 days with `([reason])` as reason.
 
 One could even add commands of their own if they possess the means to do so, please do keep in mind that this is not supported code, things could be wonky or not function the way initially envisioned.
 
@@ -105,7 +105,7 @@ The following configuration options must be tweaked to make use of this feature:
 
 This structure allows the case of multiple roles per reaction, multiple reactions per message and multiple messages per server.
 
-For now, each reaction role has to be set up manually. In the near future, a set of commands will be implemented to achieve the same end result with minimal effort.
+For now, each reaction role has to be set up manually. In the near future, a set of commands will be implemented to achieve the same result with minimal effort.
 
 ## Twitch Livestream Announcements
 Lunar has built-in support for Twitch livestream announcements by polling the Twitch API every 60 seconds to check whether the specified Twitch channel in `config.json` is currently live. The announcement will have a message, if this is set, with an embed which has the title, game being played, viewer count and thumbnail of the stream together with a direct link to the stream. This embed is updated every 3 minutes with the latest stream statistics, as long as the stream is online. When the stream goes offline, the embed will change to display information about the latest VOD and link to it.

@@ -14,8 +14,8 @@ function memberAdd (member) {
 	if (!config.welcomeMessage.enabled) return;
 
 	let channel;
-	if (config.welcomeMessage.channelID) channel = member.guild.channels.get(config.welcomeMessage.channelID);
-	else channel = member.guild.channels.find((ch) => ch.name === 'welcome');
+	if (config.welcomeMessage.channelID) channel = member.guild.channels.cache.get(config.welcomeMessage.channelID);
+	else channel = member.guild.channels.cache.find((ch) => ch.name === 'welcome');
 
 	if (channel) return channel.send(`**${member.user.username}** has joined the Discord server! Give a warm welcome!`);
 
@@ -27,8 +27,8 @@ function memberRemove (member) {
 	if (!config.welcomeMessage.enabled) return;
 
 	let channel;
-	if (config.welcomeMessage.channelID) channel = member.guild.channels.get(config.welcomeMessage.channelID);
-	else channel = member.guild.channels.find((ch) => ch.name === 'welcome');
+	if (config.welcomeMessage.channelID) channel = member.guild.channels.cache.get(config.welcomeMessage.channelID);
+	else channel = member.guild.channels.cache.find((ch) => ch.name === 'welcome');
 
 	if (channel) return channel.send(`**${member.user.username}** has left the Discord server! What a shame!`);
 

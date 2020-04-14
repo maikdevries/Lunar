@@ -13,7 +13,7 @@ function roleAdd (reaction, user) {
 	if (!config.reactionRole.enabled || config.reactionRole.messages[reaction.message.id] == null) return;
 
 	const roles = config.reactionRole.messages[reaction.message.id][reaction.emoji.id || reaction.emoji.name];
-	const member = reaction.message.guild.members.find((mbr) => mbr.id === user.id);
+	const member = reaction.message.guild.members.cache.get(user.id);
 
 	if (roles) member.roles.add(roles).catch((error) => console.error(`Cannot add roles, ${error}`));
 }
@@ -23,7 +23,7 @@ function roleRemove (reaction, user) {
 	if (!config.reactionRole.enabled || config.reactionRole.messages[reaction.message.id] == null) return;
 
 	const roles = config.reactionRole.messages[reaction.message.id][reaction.emoji.id || reaction.emoji.name];
-	const member = reaction.message.guild.members.find((mbr) => mbr.id === user.id);
+	const member = reaction.message.guild.members.cache.get(user.id);
 
 	if (roles) member.roles.remove(roles).catch((error) => console.error(`Cannot remove roles, ${error}`));
 }

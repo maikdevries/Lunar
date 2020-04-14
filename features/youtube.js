@@ -22,16 +22,15 @@ function fetchVideo (client) {
 
 	fetchData().then((videoInfo) => {
 		if (videoInfo.error) return;
-		if (videoInfo.items[0].snippet.resourceId.videoId !== latestVideo) {
+		if (videoInfo.items[0].snippet.resourceId.videoId === latestVideo) return;
 
-			const path = `channels?part=snippet&id=${config.youtube.channel}&key=${config.youtube.APIkey}`;
-			callAPI(path).then((channelInfo) => {
-				if (channelInfo.error) return;
+		const path = `channels?part=snippet&id=${config.youtube.channel}&key=${config.youtube.APIkey}`;
+		callAPI(path).then((channelInfo) => {
+			if (channelInfo.error) return;
 
-				sendVideoAnnouncement(client, videoInfo, channelInfo);
-				latestVideo = videoInfo.items[0].snippet.resourceId.videoId;
-			});
-		}
+			sendVideoAnnouncement(client, videoInfo, channelInfo);
+			latestVideo = videoInfo.items[0].snippet.resourceId.videoId;
+		});
 	});
 }
 
@@ -57,7 +56,7 @@ async function fetchData () {
 
 // Constructs a MessageEmbed and sends it to new video announcements channel
 function sendVideoAnnouncement (client, videoInfo, channelInfo) {
-	const channel = client.channels.find((ch) => ch.id === config.youtube.video.announcementChannelID);
+	const channel = client.channels.cache.get(config.youtube.video.announcementChannelID);
 
 	if (!channel) return console.error(`Couldn't send YouTube new video announcement because the channel couldn't be found.`);
 
@@ -95,7 +94,7 @@ function fetchStream (client) {
 
 // Constructs a MessageEmbed and sends it to livestream announcements channel
 function sendStreamAnnouncement (client, streamInfo) {
-	const channel = client.channels.find((ch) => ch.id === config.youtube.stream.announcementChannelID);
+	const channel = client.channels.cache.get(config.youtube.stream.announcementChannelID);
 
 	if (!channel) return console.error(`Couldn't send YouTube livestream announcement because the announcement channel couldn't be found.`);
 

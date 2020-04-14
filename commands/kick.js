@@ -14,7 +14,7 @@ function execute (message, args) {
 	const user = message.mentions.users.first();
 	if (!user) return message.channel.send(`**Oh snap**! You forgot to mention the person you would like to kick! Try again.`).then((msg) => msg.delete({ timeout: 3500 }));
 
-	const userToKick = message.guild.members.find((member) => member.id === user.id);
+	const userToKick = message.guild.members.cache.get(user.id);
 	if (!userToKick) return message.channel.send(`**Uhm**... The person you're trying to kick has already left this server.`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	if (userToKick.hasPermission('KICK_MEMBERS') || userToKick.hasPermission('BAN_MEMBERS')) return message.channel.send(`**Uhm**... You can't kick someone with the same privileges as yourself!`).then((msg) => msg.delete({ timeout: 3500 }));

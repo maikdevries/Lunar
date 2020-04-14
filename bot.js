@@ -96,14 +96,14 @@ client.on('raw', (event) => {
 	if (!Object.prototype.hasOwnProperty.call(events, event.t)) return;
 
 	const { d: data } = event;
-	const user = client.users.get(data.user_id);
-	const channel = client.channels.get(data.channel_id);
+	const user = client.users.cache.get(data.user_id);
+	const channel = client.channels.cache.get(data.channel_id);
 
-	if (channel.messages.has(data.message_id)) return;
+	if (channel.messages.cache.has(data.message_id)) return;
 
 	channel.messages.fetch(data.message_id).then((message) => {
 		const emojiKey = data.emoji.id || data.emoji.name;
-		const reaction = message.reactions.get(emojiKey) || message.reactions.add(data);
+		const reaction = message.reactions.cache.get(emojiKey) || message.reactions.add(data);
 
 		client.emit(events[event.t], reaction, user);
 	});
@@ -138,6 +138,10 @@ client.on('error', (error) => {
 
 client.login(config.token);
 
+
+process.on('unhandledRejection', (error) => {
+	console.error('Unhandled promise rejection:', error);
+});
 
 process.on('SIGINT', () => {
 	client.destroy();

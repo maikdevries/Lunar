@@ -56,7 +56,7 @@ async function fetchData (streamInfo) {
 
 // Constructs a MessageEmbed and sends it to livestream announcements channel
 function sendAnnouncement (client, streamInfo, userInfo, gameInfo) {
-	const channel = client.channels.find((ch) => ch.id === config.twitch.announcementChannelID);
+	const channel = client.channels.cache.get(config.twitch.announcementChannelID);
 
 	if (!channel) return console.error(`Couldn't send Twitch livestream announcement because the announcement channel couldn't be found.`);
 

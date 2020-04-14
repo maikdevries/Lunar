@@ -14,7 +14,7 @@ function execute (message, args) {
 	const user = message.mentions.users.first();
 	if (!user) return message.channel.send(`**Oh snap**! You forgot to mention the person you would like to ban! Try again.`).then((msg) => msg.delete({ timeout: 3500 }));
 
-	const userToBan = message.guild.members.find((member) => member.id === user.id);
+	const userToBan = message.guild.members.cache.get(user.id);
 	if (!userToBan) return message.channel.send(`**Uhm**... The person you're trying to ban has already left this server.`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	if (userToBan.hasPermission('BAN_MEMBERS')) return message.channel.send(`**Uhm**... You can't ban someone with the same privileges as yourself!`).then((msg) => msg.delete({ timeout: 3500 }));

@@ -22,7 +22,7 @@ function execute (message, args) {
 		.then((messages) => {
 			let filteredMessages;
 			if (userToPurge) {
-				filteredMessages = messages.filter((msg) => msg.author.id === userToPurge.id).array();
+				filteredMessages = messages.filter((msg) => msg.author.id === userToPurge.id);
 
 				// Delete the message that invoked the command to keep the channel nice and clean
 				message.delete();
