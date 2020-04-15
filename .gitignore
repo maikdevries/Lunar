@@ -6,3 +6,6 @@
 
 # Ignore package-lock.json
 **/package-lock.json
+
+# Ignore feature asset files
+**/features/assets/
