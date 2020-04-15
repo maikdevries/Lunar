@@ -24,6 +24,9 @@ function fetchVideo (client) {
 		if (videoInfo.error) return;
 		if (videoInfo.items[0].snippet.resourceId.videoId === latestVideo) return;
 
+		// Return if the video hasn't been uploaded in the last 12 hours
+		if (Math.abs(Date.parse(videoInfo.items[0].snippet.publishedAt) - Date.now()) >= 43200000) return;
+
 		const path = `channels?part=snippet&id=${config.youtube.channel}&key=${config.youtube.APIkey}`;
 		callAPI(path).then((channelInfo) => {
 			if (channelInfo.error) return;
