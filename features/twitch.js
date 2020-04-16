@@ -89,7 +89,8 @@ function update () {
 			const editedEmbed = new MessageEmbed(sentAnnouncementMessage.embeds[0])
 				.setTitle(streamInfo.data[0].title)
 				.setDescription(`**${streamInfo.data[0].user_name}** is playing **${gameInfo.data[0].name}** with **${streamInfo.data[0].viewer_count}** people watching!\n\n[**Come watch the stream!**](https://twitch.tv/${streamInfo.data[0].user_name})`)
-				.setThumbnail((gameInfo.data[0].box_art_url).replace('{width}', '300').replace('{height}', '400'));
+				.setThumbnail((gameInfo.data[0].box_art_url).replace('{width}', '300').replace('{height}', '400'))
+				.setImage('attachment://twitchThumbnail.png');
 
 			return sentAnnouncementMessage.edit(config.twitch.announcementMessage, editedEmbed);
 		});
