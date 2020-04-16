@@ -108,7 +108,7 @@ This structure allows the case of multiple roles per reaction, multiple reaction
 For now, each reaction role has to be set up manually. In the near future, a set of commands will be implemented to achieve the same result with minimal effort.
 
 ## Twitch Livestream Announcements
-Lunar has built-in support for Twitch livestream announcements by polling the Twitch API every 60 seconds to check whether the specified Twitch channel in `config.json` is currently live. The announcement will have a message, if this is set, with an embed which has the title, game being played, viewer count and thumbnail of the stream together with a direct link to the stream. This embed is updated every 3 minutes with the latest stream statistics, as long as the stream is online. When the stream goes offline, the embed will change to display information about the latest VOD and link to it.
+Lunar has built-in support for Twitch livestream announcements by polling the Twitch API every 60 seconds to check whether the specified Twitch channel in `config.json` is currently live. The announcement will have a message, if this is set, with an embed which has the title, game being played, viewer count and thumbnail of the stream together with a direct link to the stream. This embed is updated every 3 minutes with the latest stream statistics and thumbnail, as long as the stream is online. When the stream goes offline, the embed will change to display information about the latest VOD and link to it.
 
 The following configuration options must be changed in order to make use of this feature:
 - `enabled` [Default is *false*] - Enables/disables this feature.
@@ -118,8 +118,6 @@ The following configuration options must be changed in order to make use of this
 
 Optional configuration options that can be set:
 - `announcementMessage` [Default is *empty*] - Message that will be attached to the embed.
-
-In the future, updating of the stream preview thumbnail to the latest snapshot will be added.
 
 ## YouTube
 Lunar has support for both YouTube video announcements and YouTube livestream announcements. The settings for these two independent features can be tinkered with individually, but they do share a number of settings. In order to make use of either feature, please set the following configuration settings:

@@ -1,5 +1,4 @@
 const https = require('https');
-const fs = require('fs');
 const { MessageEmbed } = require('discord.js');
 
 const config = require('./../config.json');
@@ -61,23 +60,18 @@ function sendAnnouncement (client, streamInfo, userInfo, gameInfo) {
 
 	if (!channel) return console.error(`Couldn't send Twitch livestream announcement because the announcement channel couldn't be found.`);
 
-	const thumbnailPath = (streamInfo.data[0].thumbnail_url).replace('{width}', '1920').replace('{height}', '1080');
+	const embed = new MessageEmbed()
+		.setAuthor(`${streamInfo.data[0].user_name} is now LIVE on Twitch!`, userInfo.data[0].profile_image_url)
+		.setTitle(streamInfo.data[0].title)
+		.setURL(`https://twitch.tv/${streamInfo.data[0].user_name}`)
+		.setDescription(`**${streamInfo.data[0].user_name}** is playing **${gameInfo.data[0].name}** with **${streamInfo.data[0].viewer_count}** people watching!\n\n[**Come watch the stream!**](https://twitch.tv/${streamInfo.data[0].user_name})`)
+		.setColor('#6441A5')
+		.setThumbnail((gameInfo.data[0].box_art_url).replace('{width}', '300').replace('{height}', '400'))
+		.setImage(`${(streamInfo.data[0].thumbnail_url).replace('{width}', '1920').replace('{height}', '1080')}?date=${Date.now()}`)
+		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
+		.setTimestamp(new Date(streamInfo.data[0].started_at));
 
-	downloadThumbnail(thumbnailPath).then(() => {
-		const embed = new MessageEmbed()
-			.setAuthor(`${streamInfo.data[0].user_name} is now LIVE on Twitch!`, userInfo.data[0].profile_image_url)
-			.setTitle(streamInfo.data[0].title)
-			.setURL(`https://twitch.tv/${streamInfo.data[0].user_name}`)
-			.setDescription(`**${streamInfo.data[0].user_name}** is playing **${gameInfo.data[0].name}** with **${streamInfo.data[0].viewer_count}** people watching!\n\n[**Come watch the stream!**](https://twitch.tv/${streamInfo.data[0].user_name})`)
-			.setColor('#6441A5')
-			.setThumbnail((gameInfo.data[0].box_art_url).replace('{width}', '300').replace('{height}', '400'))
-			.attachFiles('./features/assets/twitchThumbnail.png')
-			.setImage('attachment://twitchThumbnail.png')
-			.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
-			.setTimestamp(new Date(streamInfo.data[0].started_at));
-
-		return channel.send(config.twitch.announcementMessage, { embed }).then((msg) => { sentAnnouncementMessage = msg; update(); });
-	});
+	return channel.send(config.twitch.announcementMessage, { embed }).then((msg) => { sentAnnouncementMessage = msg; update(); });
 }
 
 // Updates the livestream announcement every 3 minutes with current stream statistics
@@ -90,7 +84,7 @@ function update () {
 				.setTitle(streamInfo.data[0].title)
 				.setDescription(`**${streamInfo.data[0].user_name}** is playing **${gameInfo.data[0].name}** with **${streamInfo.data[0].viewer_count}** people watching!\n\n[**Come watch the stream!**](https://twitch.tv/${streamInfo.data[0].user_name})`)
 				.setThumbnail((gameInfo.data[0].box_art_url).replace('{width}', '300').replace('{height}', '400'))
-				.setImage('attachment://twitchThumbnail.png');
+				.setImage(`${(streamInfo.data[0].thumbnail_url).replace('{width}', '1920').replace('{height}', '1080')}?date=${Date.now()}`);
 
 			return sentAnnouncementMessage.edit(config.twitch.announcementMessage, editedEmbed);
 		});
@@ -117,7 +111,8 @@ function streamOffline () {
 				.setAuthor(`${userInfo.data[0].display_name} was LIVE on Twitch!`, userInfo.data[0].profile_image_url)
 				.setTitle(videoInfo.data[0].title)
 				.setURL(videoInfo.data[0].url)
-				.setDescription(`Today's stream is **over** but you can watch the **VOD**!\n\n[**Watch the VOD!**](${videoInfo.data[0].url})`);
+				.setDescription(`Today's stream is **over** but you can watch the **VOD**!\n\n[**Watch the VOD!**](${videoInfo.data[0].url})`)
+				.setImage(`${(videoInfo.data[0].thumbnail_url).replace('{width}', '1920').replace('{height}', '1080')}?date=${Date.now()}`);
 
 			return sentAnnouncementMessage.edit(config.twitch.announcementMessage, editedEmbed);
 		}
@@ -133,27 +128,6 @@ async function fetchOfflineData () {
 	const videoInfo = await callAPI(path);
 
 	return [userInfo, videoInfo];
-}
-
-// Downloads image from path to be used as stream preview in livestream announcement
-function downloadThumbnail (path) {
-	return new Promise((resolve) => {
-		https.get(path, (res) => {
-			if (res.statusCode !== 200) return;
-
-			fs.promises.access('./features/assets/').then(() => {
-				res.pipe(fs.createWriteStream('./features/assets/twitchThumbnail.png'));
-				res.on('end', () => resolve());
-			})
-				.catch(() => {
-					fs.promises.mkdir('./features/assets/').then(() => {
-						res.pipe(fs.createWriteStream('./features/assets/twitchThumbnail.png'));
-						res.on('end', () => resolve());
-					})
-						.catch((error) => console.error(`Error occurred while creating assets directory, ${error}`));
-				});
-		}).on('error', (error) => console.error(`Error occurred while downloading the Twitch thumbnail, ${error}`));
-	});
 }
 
 // Template HTTPS get function that interacts with the Twitch API, wrapped in a Promise
