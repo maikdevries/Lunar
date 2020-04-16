@@ -1,5 +1,5 @@
 const https = require('https');
-const Discord = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 
 const config = require('./../config.json');
 
@@ -66,7 +66,7 @@ function sendVideoAnnouncement (client, videoInfo, channelInfo) {
 	// Regex to cut off the video description at the last whole word at 237 characters
 	const description = (videoInfo.items[0].snippet.description).replace(/^([\s\S]{237}[^\s]*)[\s\S]*/, '$1');
 
-	const embed = new Discord.MessageEmbed()
+	const embed = new MessageEmbed()
 		.setAuthor(`${channelInfo.items[0].snippet.title} has uploaded a new YouTube video!`, channelInfo.items[0].snippet.thumbnails.high.url)
 		.setTitle(videoInfo.items[0].snippet.title)
 		.setURL(`https://www.youtube.com/watch?v=${videoInfo.items[0].snippet.resourceId.videoId}`)
@@ -104,7 +104,7 @@ function sendStreamAnnouncement (client, streamInfo) {
 	// Regex to cut off the video description at the last whole word at 237 characters
 	const description = (streamInfo.items[0].snippet.description).replace(/^([\s\S]{237}[^\s]*)[\s\S]*/, '$1');
 
-	const embed = new Discord.MessageEmbed()
+	const embed = new MessageEmbed()
 		.setAuthor(`${streamInfo.items[0].snippet.channelTitle} is now LIVE on YouTube!`)
 		.setTitle(streamInfo.items[0].snippet.title)
 		.setURL(`https://www.youtube.com/watch?v=${streamInfo.items[0].id.videoId}`)

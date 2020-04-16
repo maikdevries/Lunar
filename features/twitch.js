@@ -1,6 +1,6 @@
 const https = require('https');
 const fs = require('fs');
-const Discord = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 
 const config = require('./../config.json');
 
@@ -64,7 +64,7 @@ function sendAnnouncement (client, streamInfo, userInfo, gameInfo) {
 	const thumbnailPath = (streamInfo.data[0].thumbnail_url).replace('{width}', '1920').replace('{height}', '1080');
 
 	downloadThumbnail(thumbnailPath).then(() => {
-		const embed = new Discord.MessageEmbed()
+		const embed = new MessageEmbed()
 			.setAuthor(`${streamInfo.data[0].user_name} is now LIVE on Twitch!`, userInfo.data[0].profile_image_url)
 			.setTitle(streamInfo.data[0].title)
 			.setURL(`https://twitch.tv/${streamInfo.data[0].user_name}`)
@@ -86,7 +86,7 @@ function update () {
 		fetchUpdatedData().then(([streamInfo, gameInfo]) => {
 			if (!streamInfo.data || !gameInfo.data) return;
 
-			const editedEmbed = new Discord.MessageEmbed(sentAnnouncementMessage.embeds[0])
+			const editedEmbed = new MessageEmbed(sentAnnouncementMessage.embeds[0])
 				.setTitle(streamInfo.data[0].title)
 				.setDescription(`**${streamInfo.data[0].user_name}** is playing **${gameInfo.data[0].name}** with **${streamInfo.data[0].viewer_count}** people watching!\n\n[**Come watch the stream!**](https://twitch.tv/${streamInfo.data[0].user_name})`)
 				.setThumbnail((gameInfo.data[0].box_art_url).replace('{width}', '300').replace('{height}', '400'));
@@ -112,7 +112,7 @@ function streamOffline () {
 	fetchOfflineData().then(([userInfo, videoInfo]) => {
 		if (!userInfo.data || !videoInfo.data) streamStatus = true;
 		else {
-			const editedEmbed = new Discord.MessageEmbed(sentAnnouncementMessage.embeds[0])
+			const editedEmbed = new MessageEmbed(sentAnnouncementMessage.embeds[0])
 				.setAuthor(`${userInfo.data[0].display_name} was LIVE on Twitch!`, userInfo.data[0].profile_image_url)
 				.setTitle(videoInfo.data[0].title)
 				.setURL(videoInfo.data[0].url)
