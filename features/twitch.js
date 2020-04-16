@@ -140,10 +140,17 @@ function downloadThumbnail (path) {
 		https.get(path, (res) => {
 			if (res.statusCode !== 200) return;
 
-			res.pipe(fs.createWriteStream('./features/assets/twitchThumbnail.png'));
-
-			res.on('end', () => resolve());
-
+			fs.promises.access('./features/assets/').then(() => {
+				res.pipe(fs.createWriteStream('./features/assets/twitchThumbnail.png'));
+				res.on('end', () => resolve());
+			})
+				.catch(() => {
+					fs.promises.mkdir('./features/assets/').then(() => {
+						res.pipe(fs.createWriteStream('./features/assets/twitchThumbnail.png'));
+						res.on('end', () => resolve());
+					})
+						.catch((error) => console.error(`Error occurred while creating assets directory, ${error}`));
+				});
 		}).on('error', (error) => console.error(`Error occurred while downloading the Twitch thumbnail, ${error}`));
 	});
 }
