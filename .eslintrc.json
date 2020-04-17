@@ -160,7 +160,7 @@
 			"error",
 			{
 				"allowShortCircuit": false,
-				"allowTernary": false,
+				"allowTernary": true,
 				"allowTaggedTemplates": false
 			}
 		],
@@ -198,7 +198,7 @@
 		"no-undefined": "warn",
 		"no-unused-vars": [
 			"error",
-			{ "vars": "all", "args": "all", "ignoreRestSiblings": true }
+			{ "vars": "all", "args": "all", "argsIgnorePattern": "[iI]gnore" , "ignoreRestSiblings": true }
 		],
 		"no-use-before-define": [
 			"error",

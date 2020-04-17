@@ -8,7 +8,7 @@ module.exports = {
 	execute
 };
 
-function execute (message, args) {
+function execute (ignore, message, args) {
 	if (!message.member.hasPermission('BAN_MEMBERS')) return message.channel.send(`**Oh no**! You don't have the right perks to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	const user = message.mentions.users.first();

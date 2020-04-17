@@ -61,6 +61,7 @@ Lunar supports a select few commands as of now but will be updated to offer a va
 The default way to trigger a command is as follows: `![command] [argument]`, where the behaviour of `[argument]` could vary between the different commands. Arguments listed within parenthesis `([argument])` are optional and therefore not required. The command prefix can be changed in `config.json`, more information [here](#optional-configuration-settings).
 
 The following command behaviour is currently natively supported:
+- `about/version` - This will return an embed with the latest technical information on the bot.
 - `clear/purge/remove/delete [number]` - This will delete as many messages of the past in the current channel with a minimum of *1* and a maximum of up to *99* messages at a time.
 - `clear/purge/remove/delete @[user]` - This will delete all messages sent by `[user]` out of the last *99* messages sent in the current channel.
 - `kick @[user] ([reason])` - This will kick `[user]` from the current server with `([reason])` as reason.

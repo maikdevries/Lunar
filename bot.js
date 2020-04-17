@@ -78,7 +78,7 @@ client.on('message', (message) => {
 	}
 
 	try {
-		command.execute(message, args);
+		command.execute(client, message, args);
 	} catch (error) {
 		console.error(`An error occurred executing one of the commands, ${error}`);
 		message.channel.send('**Oops**! Something went terribly wrong! Please try again later.').then((msg) => msg.delete({ timeout: 3500 }));
