@@ -112,7 +112,7 @@ function streamOffline () {
 				.setTitle(videoInfo.data[0].title)
 				.setURL(videoInfo.data[0].url)
 				.setDescription(`Today's stream is **over** but you can watch the **VOD**!\n\n[**Watch the VOD!**](${videoInfo.data[0].url})`)
-				.setImage(`${(videoInfo.data[0].thumbnail_url).replace('{width}', '1920').replace('{height}', '1080')}?date=${Date.now()}`);
+				.setImage(`${(videoInfo.data[0].thumbnail_url).replace('%{width}', '1920').replace('%{height}', '1080')}?date=${Date.now()}`);
 
 			return sentAnnouncementMessage.edit(config.twitch.announcementMessage, editedEmbed);
 		}
