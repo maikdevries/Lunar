@@ -24,11 +24,11 @@ function execute (client, message, ignore) {
 			.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
 			.setTimestamp(Date.now());
 
+		message.delete();
 		return message.channel.send({ embed });
 	});
 }
 
-// Returns the commit hash of the latest version
 function getCommit () {
 	return execSync('git rev-parse HEAD')
 		.toString()

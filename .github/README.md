@@ -62,10 +62,11 @@ The default way to trigger a command is as follows: `![command] [argument]`, whe
 
 The following command behaviour is currently natively supported:
 - `about/version` - This will return an embed with the latest technical information on the bot.
+- `ban @[user] ([reason])` - This will ban `[user]` from the current server for 7 days with `([reason])` as reason.
 - `clear/purge/remove/delete [number]` - This will delete as many messages of the past in the current channel with a minimum of *1* and a maximum of up to *99* messages at a time.
 - `clear/purge/remove/delete @[user]` - This will delete all messages sent by `[user]` out of the last *99* messages sent in the current channel.
+- `invite` - This will generate an invite link for the current channel which can be used for 24 hours.
 - `kick @[user] ([reason])` - This will kick `[user]` from the current server with `([reason])` as reason.
-- `ban @[user] ([reason])` - This will ban `[user]` from the current server for 7 days with `([reason])` as reason.
 
 One could even add commands of their own if they possess the means to do so, please do keep in mind that this is not supported code, things could be wonky or not function the way initially envisioned.
 
