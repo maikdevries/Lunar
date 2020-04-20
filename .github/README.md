@@ -56,9 +56,9 @@ The following configuration settings affect the behaviour of this feature:
 - `DM-message` [Default is *empty*] - This overrides the direct message that will be sent to the new member. If empty, a default message will be sent instead.
 
 ## Commands
-Lunar supports a select few commands as of now but will be updated to offer a variety of commands for every day use.
-
 The default way to trigger a command is as follows: `![command] [argument]`, where the behaviour of `[argument]` could vary between the different commands. Arguments listed within parenthesis `([argument])` are optional and therefore not required. The command prefix can be changed in `config.json`, more information [here](#optional-configuration-settings).
+
+Each individual command can be enabled or disabled based on needs. All commands are disabled by default, which can be changed in `config.js` under `commands`. If a disabled command is triggered, the user will be notified.
 
 The following command behaviour is currently natively supported:
 - `about/version` - This will return an embed with the latest technical information on the bot.

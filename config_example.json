@@ -5,6 +5,14 @@
 	"activity": "",
 	"commandPrefix": "",
 
+	"commands": {
+		"about": false,
+		"ban": false,
+		"clear": false,
+		"invite": false,
+		"kick": false
+	},
+
 	"welcomeMessage": {
 		"enabled": false,
 		"channelID": "",

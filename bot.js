@@ -68,6 +68,8 @@ client.on('message', (message) => {
 	const command = client.commands.get(commandName) || client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
 	if (!command) return;
 
+	if (!config.commands[command.name]) return message.channel.send(`**Err**... This command has been disabled by the server owner.`).then((msg) => msg.delete({ timeout: 3500 }));
+
 	// If command arguments were expected but not given, return an error message to the user
 	if (command.args && !args.length) {
 		let reply = `**Oh no**! You didn't provide any arguments for this command to work properly!`;
