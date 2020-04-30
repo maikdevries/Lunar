@@ -4,6 +4,7 @@ const { MessageEmbed } = require('discord.js');
 const config = require('./../config.json');
 
 
+let accessToken;
 let streamStatus = false;
 let updateInterval;
 let sentAnnouncementMessage;
@@ -19,27 +20,31 @@ module.exports = {
 function fetchStream (client) {
 	if (!config.twitch.enabled) return;
 
-	const path = `streams?user_login=${config.twitch.username}`;
+	if (!accessToken) return getAccessToken();
 
-	callAPI(path).then((streamInfo) => {
-		if (!streamInfo.data) return;
+	validateAccessToken().then(() => {
+		const path = `streams?user_login=${config.twitch.username}`;
 
-		if (!streamInfo.data[0]) {
-			if (streamStatus) {
-				streamStatus = false;
-				clearInterval(updateInterval);
-				streamOffline();
+		callAPI(path).then((streamInfo) => {
+			if (!streamInfo.data) return;
+
+			if (!streamInfo.data[0]) {
+				if (streamStatus) {
+					streamStatus = false;
+					clearInterval(updateInterval);
+					streamOffline();
+				}
+			} else {
+				if (streamStatus) return;
+
+				streamStatus = true;
+
+				fetchData(streamInfo).then(([userInfo, gameInfo]) => {
+					if (!userInfo.data || !gameInfo.data) streamStatus = false;
+					else sendAnnouncement(client, streamInfo, userInfo, gameInfo);
+				});
 			}
-		} else {
-			if (streamStatus) return;
-
-			streamStatus = true;
-
-			fetchData(streamInfo).then(([userInfo, gameInfo]) => {
-				if (!userInfo.data || !gameInfo.data) streamStatus = false;
-				else sendAnnouncement(client, streamInfo, userInfo, gameInfo);
-			});
-		}
+		});
 	});
 }
 
@@ -130,18 +135,57 @@ async function fetchOfflineData () {
 	return [userInfo, videoInfo];
 }
 
-// Template HTTPS get function that interacts with the Twitch API, wrapped in a Promise
+// Handler function that requests a new OAuth access token
+function getAccessToken () {
+	const options = {
+		host: 'id.twitch.tv',
+		path: `/oauth2/token?client_id=${config.twitch['client-ID']}&client_secret=${config.twitch['client-secret']}&grant_type=client_credentials`,
+		method: 'POST'
+	};
+
+	API(options).then((res) => {
+		accessToken = res.access_token;
+	});
+}
+
+// Handler function that validates OAuth access token
+function validateAccessToken () {
+	return new Promise((resolve) => {
+		const options = {
+			host: 'id.twitch.tv',
+			path: '/oauth2/validate',
+			method: 'GET',
+			headers: {
+				Authorization: `OAuth ${accessToken}`
+			}
+		};
+
+		API(options).then(() => resolve());
+	});
+}
+
+// Handler function for all Twitch API interactions
 function callAPI (path) {
 	return new Promise((resolve) => {
 		const options = {
 			host: 'api.twitch.tv',
 			path: `/helix/${path}`,
+			method: 'GET',
 			headers: {
-				'Client-ID': config.twitch['client-ID']
+				'Client-ID': config.twitch['client-ID'],
+				Authorization: `Bearer ${accessToken}`
 			}
 		};
 
-		https.get(options, (res) => {
+		API(options).then((res) => resolve(res));
+	});
+}
+
+// Template HTTPS request function, wrapped in a Promise
+function API (options) {
+	return new Promise((resolve) => {
+		https.request(options, (res) => {
+			if (res.statusCode === 401) return getAccessToken();
 			if (res.statusCode !== 200) return;
 
 			const rawData = [];
@@ -151,7 +195,7 @@ function callAPI (path) {
 					resolve(JSON.parse(rawData));
 				} catch (error) { console.error(`An error occurred parsing the API response to JSON, ${error}`); }
 			});
-
-		}).on('error', (error) => console.error(`Error occurred while polling Twitch API, ${error}`));
+		}).end()
+			.on('error', (error) => console.error(`Error occurred while polling Twitch API, ${error}`));
 	});
 }

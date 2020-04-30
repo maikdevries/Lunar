@@ -115,6 +115,7 @@ Lunar has built-in support for Twitch livestream announcements by polling the Tw
 The following configuration options must be changed in order to make use of this feature:
 - `enabled` [Default is *false*] - Enables/disables this feature.
 - `client-ID` [Default is *empty*] - Twitch client ID that is needed to make use of the Twitch API. Follow [Step 1: Setup](https://dev.twitch.tv/docs/api#step-1-setup) of the Twitch API documentation to get one.
+- `client-secret` [Default is *empty*] - Twitch client secret that is needed to generate OAuth tokens and make use of the Twitch API. It can be found on the same page as the `client-ID`.
 - `username` [Default is *empty*] - The username of the Twitch channel.
 - `announcementChannelID` [Default is *empty*] - The Discord channel to send the livestream announcements in.
 

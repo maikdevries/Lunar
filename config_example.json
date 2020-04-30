@@ -30,6 +30,7 @@
 	"twitch": {
 		"enabled": false,
 		"client-ID": "",
+		"client-secret": "",
 		"username": "",
 
 		"announcementChannelID": "",
