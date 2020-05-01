@@ -6,6 +6,7 @@
 	"commandPrefix": "",
 
 	"commands": {
+		"8ball": false,
 		"about": false,
 		"ban": false,
 		"clear": false,

@@ -61,6 +61,7 @@ The default way to trigger a command is as follows: `![command] [argument]`, whe
 Each individual command can be enabled or disabled based on needs. All commands are disabled by default, which can be changed in `config.js` under `commands`. If a disabled command is triggered, the user will be notified.
 
 The following command behaviour is currently natively supported:
+- `8ball [question]` - This will generate a random answer to the question being asked.
 - `about/version` - This will return an embed with the latest technical information on the bot.
 - `ban @[user] ([reason])` - This will ban `[user]` from the current server for 7 days with `([reason])` as reason.
 - `clear/purge/remove/delete [number]` - This will delete as many messages of the past in the current channel with a minimum of *1* and a maximum of up to *99* messages at a time.
