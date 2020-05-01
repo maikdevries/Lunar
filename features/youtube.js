@@ -135,7 +135,7 @@ function callAPI (path) {
 			res.on('end', () => {
 				try {
 					resolve(JSON.parse(rawData));
-				} catch (error) { console.error(`An error occurred parsing the API response to JSON, ${error}`); }
+				} catch (error) { console.error(`An error occurred parsing the YouTube API response to JSON, ${error}`); }
 			});
 
 		}).on('error', (error) => console.error(`Error occurred while polling YouTube API, ${error}`));

@@ -10,7 +10,7 @@ module.exports = {
 
 // Dynamically adds the role(s) of the emoji reaction added to the message specified in 'config.json'
 function roleAdd (reaction, user) {
-	if (!config.reactionRole.enabled || config.reactionRole.messages[reaction.message.id] == null) return;
+	if (!config.reactionRole.enabled || typeof config.reactionRole.messages[reaction.message.id] === 'undefined' || config.reactionRole.messages[reaction.message.id] === null) return;
 
 	const roles = config.reactionRole.messages[reaction.message.id][reaction.emoji.id || reaction.emoji.name];
 	const member = reaction.message.guild.members.cache.get(user.id);
@@ -20,7 +20,7 @@ function roleAdd (reaction, user) {
 
 // Dynamically removes the role(s) of the emoji reaction removed from the message specified in 'config.json'
 function roleRemove (reaction, user) {
-	if (!config.reactionRole.enabled || config.reactionRole.messages[reaction.message.id] == null) return;
+	if (!config.reactionRole.enabled || typeof config.reactionRole.messages[reaction.message.id] === 'undefined' || config.reactionRole.messages[reaction.message.id] === null) return;
 
 	const roles = config.reactionRole.messages[reaction.message.id][reaction.emoji.id || reaction.emoji.name];
 	const member = reaction.message.guild.members.cache.get(user.id);

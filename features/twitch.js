@@ -193,7 +193,7 @@ function API (options) {
 			res.on('end', () => {
 				try {
 					resolve(JSON.parse(rawData));
-				} catch (error) { console.error(`An error occurred parsing the API response to JSON, ${error}`); }
+				} catch (error) { console.error(`An error occurred parsing the Twitch API response to JSON, ${error}`); }
 			});
 		}).end()
 			.on('error', (error) => console.error(`Error occurred while polling Twitch API, ${error}`));
