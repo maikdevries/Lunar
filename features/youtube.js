@@ -134,7 +134,7 @@ function callAPI (path) {
 			res.on('data', (chunk) => rawData.push(chunk));
 			res.on('end', () => {
 				try {
-					resolve(JSON.parse(rawData));
+					resolve(JSON.parse(Buffer.concat(rawData)));
 				} catch (error) { console.error(`An error occurred parsing the YouTube API response to JSON, ${error}`); }
 			});
 
