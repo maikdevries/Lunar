@@ -1,7 +1,9 @@
+const { commandPrefix } = require('./../config.json');
+
 module.exports = {
 	name: 'invite',
 	description: 'A command to generate an invite link to the current channel',
-	usage: '!invite',
+	usage: `${commandPrefix}invite`,
 	aliases: [],
 
 	execute

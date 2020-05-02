@@ -1,7 +1,9 @@
+const { commandPrefix } = require('./../config.json');
+
 module.exports = {
 	name: '8ball',
 	description: 'A command that randomly answers the question it is asked',
-	usage: '!8ball [question]',
+	usage: `${commandPrefix}8ball [question]`,
 	args: true,
 	aliases: [],
 

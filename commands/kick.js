@@ -1,7 +1,9 @@
+const { commandPrefix } = require('./../config.json');
+
 module.exports = {
 	name: 'kick',
 	description: 'A command to kick a user from the server, with optional reason',
-	usage: '!kick @[user] - !kick @[user] [reason]',
+	usage: `${commandPrefix}kick @[user] - ${commandPrefix}kick @[user] [reason]`,
 	args: true,
 	aliases: [],
 
