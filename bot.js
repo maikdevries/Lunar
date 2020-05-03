@@ -4,7 +4,6 @@ const client = new Discord.Client();
 const fs = require('fs');
 
 const config = require('./config.json');
-const prefix = config.commandPrefix || '!';
 
 const welcomeMessage = require('./features/welcomeMessage.js');
 const reactionRole = require('./features/reactionRole.js');
@@ -23,24 +22,14 @@ for (const file of commandFiles) {
 
 
 client.on('ready', async () => {
-	if (config.username) {
-		await client.user.setUsername(config.username)
-			.catch((error) => console.error(`An error occurred when setting the username, ${error}`));
-	} else {
-		await client.user.setUsername('Lunar')
-			.catch((error) => console.error(`An error occurred when setting the username, ${error}`));
-	}
+	await client.user.setUsername(config.username)
+		.catch((error) => console.error(`An error occurred when setting the username, ${error}`));
 
 	await client.user.setAvatar('./avatar.png')
 		.catch((error) => console.error(`An error occurred when setting the avatar, ${error}`));
 
-	if (config.activity) {
-		await client.user.setActivity(config.activity, { type: 'PLAYING' })
-			.catch((error) => console.error(`An error occurred when setting the default activity, ${error}`));
-	} else {
-		await client.user.setActivity('with Admin perks', { type: 'PLAYING' })
-			.catch((error) => console.error(`An error occurred when setting the default activity, ${error}`));
-	}
+	await client.user.setActivity(config.activity, { type: 'PLAYING' })
+		.catch((error) => console.error(`An error occurred when setting the default activity, ${error}`));
 
 
 	// Set an interval to poll the Twitch API repeatedly
@@ -57,11 +46,11 @@ client.on('ready', async () => {
 
 // Dynamic command handler - Execute 'command module' if the command is part of the 'command Discord Collection'
 client.on('message', (message) => {
-	if (!message.content.startsWith(prefix) || message.author.bot) return;
+	if (!message.content.startsWith(config.commandPrefix) || message.author.bot) return;
 
 	if (message.channel.type !== 'text') return message.channel.send(`**Sorry**! Unfortunately, I can't help you with that in direct messages.`);
 
-	const args = message.content.slice(prefix.length).split(/ +/);
+	const args = message.content.slice(config.commandPrefix.length).split(/ +/);
 	const commandName = args.shift().toLowerCase();
 
 	// Looks up the command in the Discord Collection by either name directly or one of its aliases

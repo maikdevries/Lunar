@@ -1,9 +1,9 @@
 {
 	"token": "",
 
-	"username": "",
-	"activity": "",
-	"commandPrefix": "",
+	"username": "Lunar",
+	"activity": "with Admin perks",
+	"commandPrefix": "!",
 
 	"commands": {
 		"8ball": false,
