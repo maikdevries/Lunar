@@ -22,6 +22,14 @@
 		"DM-message": ""
 	},
 
+	"serverLock": {
+		"enabled": false,
+		"manual": false,
+		"role": "",
+		"message": {
+		}
+	},
+
 	"reactionRole": {
 		"enabled": false,
 		"messages": {

@@ -6,6 +6,7 @@ const fs = require('fs');
 const config = require('./config.json');
 
 const welcomeMessage = require('./features/welcomeMessage.js');
+const serverLock = require('./features/serverLock.js');
 const reactionRole = require('./features/reactionRole.js');
 const twitch = require('./features/twitch.js');
 const youtube = require('./features/youtube.js');
@@ -103,6 +104,7 @@ client.on('raw', (event) => {
 // Adds role to user based on reaction added to message
 client.on('messageReactionAdd', (reaction, user) => {
 	reactionRole.roleAdd(reaction, user);
+	serverLock.memberUnlock(reaction, user);
 });
 
 // Removes role from user based on reaction removed from message
@@ -115,6 +117,7 @@ client.on('messageReactionRemove', (reaction, user) => {
 client.on('guildMemberAdd', (member) => {
 	welcomeMessage.memberAdd(member);
 	welcomeMessage.memberAddDM(member);
+	serverLock.memberLock(member);
 });
 
 // Sends out a leave message when an user leaves the server
