@@ -15,11 +15,20 @@
 	},
 
 	"welcomeMessage": {
-		"enabled": false,
-		"channelID": "",
-
-		"DM-enabled": false,
-		"DM-message": ""
+		"welcome": {
+			"enabled": false,
+			"channelID": "",
+			"message": ""
+		},
+		"leave": {
+			"enabled": false,
+			"channelID": "",
+			"message": ""
+		},
+		"direct": {
+			"enabled": false,
+			"message": ""
+		}
 	},
 
 	"serverLock": {

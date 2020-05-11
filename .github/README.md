@@ -48,13 +48,32 @@ The bot can be shut down by terminating the command line or using the following 
 This bot offers a bunch of features that are all optional. These features can be enabled and disabled individually without affecting another feature. All of these features can be tweaked in the `config.json` file.
 
 ## Welcome Message - Leave Message
-This feature sends out a message to a Discord channel called `welcome` whenever a user joins/leaves the Discord server. It also allows for a direct message to be sent when a user joins the server.
+This feature sends out a message to a set channel whenever a user joins/leaves the Discord server and allows for a direct message to be sent when a user joins the server. It is fully customisable such that either welcome messages or leave messages are sent, or either one.
 
 The following configuration settings affect the behaviour of this feature:
-- `enabled` [Default is *false*] - This enables/disables sending out a message on a user joining/leaving the server.
-- `welcomeMessageChannelID` [Default is *empty*] - This overrides the default channel to send the message in. Set this setting to a specific channel ID.
-- `DM-enabled` [Default is *false*] - This enables/disables sending a direct message when a new member joins the server.
-- `DM-message` [Default is *empty*] - This overrides the direct message that will be sent to the new member. If empty, a default message will be sent instead.
+- `enabled` [Default is *false*] - This enables/disables sending out a (direct) message on a user joining/leaving the server.
+- `channelID` [Default is *empty*] - The channel to send the welcome/leave message in.
+- `message` [Default is *empty*] - The message that is appended to the default join/leave message: `[Member] has joined/left the Discord server! [message]` or the direct message sent to a new member.
+
+Example of the `welcomeMessage` configuration options object:
+```JSON
+"welcomeMessage": {
+		"welcome": {
+			"enabled": true,
+			"channelID": "618712023768891393",
+			"message": "Welcome to the Discord!"
+		},
+		"leave": {
+			"enabled": true,
+			"channelID": "706596433721163807",
+			"message": "Ah, another soldier has fallen..."
+		},
+		"direct" : {
+			"enabled": false,
+			"message": ""
+		}
+	}
+```
 
 ## Server Lock
 Allows for the server to lock out new members to certain channels by giving them a role when they join the server. This can be removed manually by members that can manage roles or automatically by making use of a reaction role system.

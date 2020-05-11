@@ -11,34 +11,28 @@ module.exports = {
 
 // Sends out a welcome message when a new user joins the server
 function memberAdd (member) {
-	if (!config.welcomeMessage.enabled) return;
+	if (!config.welcomeMessage.welcome.enabled) return;
 
-	let channel;
-	if (config.welcomeMessage.channelID) channel = member.guild.channels.cache.get(config.welcomeMessage.channelID);
-	else channel = member.guild.channels.cache.find((ch) => ch.name === 'welcome');
-
-	if (channel) return channel.send(`**${member.user.username}** has joined the Discord server! Give a warm welcome!`);
+	const channel = member.guild.channels.cache.get(config.welcomeMessage.welcome.channelID);
+	if (channel) return channel.send(`**${member.user.username}** has joined the Discord server! ${config.welcomeMessage.welcome.message}`);
 
 	console.error(`Cannot find welcome channel, couldn't send welcome message.`);
 }
 
 // Sends out a leave message when a user leaves the server
 function memberRemove (member) {
-	if (!config.welcomeMessage.enabled) return;
+	if (!config.welcomeMessage.leave.enabled) return;
 
-	let channel;
-	if (config.welcomeMessage.channelID) channel = member.guild.channels.cache.get(config.welcomeMessage.channelID);
-	else channel = member.guild.channels.cache.find((ch) => ch.name === 'welcome');
-
-	if (channel) return channel.send(`**${member.user.username}** has left the Discord server! What a shame!`);
+	const channel = member.guild.channels.cache.get(config.welcomeMessage.leave.channelID);
+	if (channel) return channel.send(`**${member.user.username}** has left the Discord server! ${config.welcomeMessage.leave.message}`);
 
 	console.error(`Cannot find welcome channel, couldn't send leave message.`);
 }
 
 // Sends direct message to newly joined member of the server
 function memberAddDM (member) {
-	if (!config.welcomeMessage['DM-enabled']) return;
+	if (!config.welcomeMessage.direct.enabled) return;
 
-	if (config.welcomeMessage['DM-message']) member.send(config.welcomeMessage['DM-message']);
+	if (config.welcomeMessage.direct.message) member.send(config.welcomeMessage.direct.message);
 	else member.send(`**Thanks for joining the Discord server**!\n*If you see this message, contact the server owner.*`);
 }
