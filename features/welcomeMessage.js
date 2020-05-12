@@ -13,8 +13,11 @@ module.exports = {
 function memberAdd (member) {
 	if (!config.welcomeMessage.welcome.enabled) return;
 
+	const messageArray = config.welcomeMessage.welcome.message;
+	const message = messageArray.length > 0 ? messageArray[Math.floor(Math.random() * messageArray.length)] : '[MEMBER] has joined the Discord server!';
+
 	const channel = member.guild.channels.cache.get(config.welcomeMessage.welcome.channelID);
-	if (channel) return channel.send(`**${member.user.username}** has joined the Discord server! ${config.welcomeMessage.welcome.message}`);
+	if (channel) return channel.send(message.replace(/\[MEMBER\]/, `${member}`));
 
 	console.error(`Cannot find welcome channel, couldn't send welcome message.`);
 }
@@ -23,8 +26,11 @@ function memberAdd (member) {
 function memberRemove (member) {
 	if (!config.welcomeMessage.leave.enabled) return;
 
+	const messageArray = config.welcomeMessage.leave.message;
+	const message = messageArray.length > 0 ? messageArray[Math.floor(Math.random() * messageArray.length)] : '[MEMBER] has left the Discord server!';
+
 	const channel = member.guild.channels.cache.get(config.welcomeMessage.leave.channelID);
-	if (channel) return channel.send(`**${member.user.username}** has left the Discord server! ${config.welcomeMessage.leave.message}`);
+	if (channel) return channel.send(message.replace(/\[MEMBER\]/, `${member}`));
 
 	console.error(`Cannot find welcome channel, couldn't send leave message.`);
 }

@@ -18,12 +18,16 @@
 		"welcome": {
 			"enabled": false,
 			"channelID": "",
-			"message": ""
+			"message": [
+
+			]
 		},
 		"leave": {
 			"enabled": false,
 			"channelID": "",
-			"message": ""
+			"message": [
+
+			]
 		},
 		"direct": {
 			"enabled": false,

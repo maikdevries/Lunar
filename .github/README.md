@@ -48,12 +48,12 @@ The bot can be shut down by terminating the command line or using the following 
 This bot offers a bunch of features that are all optional. These features can be enabled and disabled individually without affecting another feature. All of these features can be tweaked in the `config.json` file.
 
 ## Welcome Message - Leave Message
-This feature sends out a message to a set channel whenever a user joins/leaves the Discord server and allows for a direct message to be sent when a user joins the server. It is fully customisable such that either welcome messages or leave messages are sent, or either one.
+This feature sends out a message to a set channel whenever a user joins/leaves the Discord server and allows for a direct message to be sent when a user joins the server. It is fully customisable such that either welcome messages or leave messages are sent, or both.
 
 The following configuration settings affect the behaviour of this feature:
 - `enabled` [Default is *false*] - This enables/disables sending out a (direct) message on a user joining/leaving the server.
 - `channelID` [Default is *empty*] - The channel to send the welcome/leave message in.
-- `message` [Default is *empty*] - The message that is appended to the default join/leave message: `[Member] has joined/left the Discord server! [message]` or the direct message sent to a new member.
+- `message` [Default is *empty*] - An array of `Strings` that contain custom messages the bot will pick randomly from. If empty, the default message will be used: `[MEMBER] has joined/left the Discord server!`. The `[MEMBER]` flag has to be included in custom messages, or else it will not mention the newly joined user. For direct messages: the message sent to a new member - it cannot have the `[MEMBER]` flag.
 
 Example of the `welcomeMessage` configuration options object:
 ```JSON
@@ -61,16 +61,23 @@ Example of the `welcomeMessage` configuration options object:
 		"welcome": {
 			"enabled": true,
 			"channelID": "618712023768891393",
-			"message": "Welcome to the Discord!"
+			"message": [
+				"We've got a new member! Welcome [MEMBER]!",
+				"Hi [MEMBER]! **Welcome to the Discord**!",
+				"[MEMBER] is to be welcomed to the server!"
+			]
 		},
 		"leave": {
 			"enabled": true,
-			"channelID": "706596433721163807",
-			"message": "Ah, another soldier has fallen..."
+			"channelID": "548991203052486686",
+			"message": [
+				"[MEMBER] has fallen and will be remembered...",
+				"Rest in peace, [MEMBER]. You won't be forgotten."
+			]
 		},
 		"direct" : {
-			"enabled": false,
-			"message": ""
+			"enabled": true,
+			"message": "Hiya! Welcome to the Discord server, please read the rules and make sure to have a great time!"
 		}
 	}
 ```
