@@ -6,6 +6,7 @@
 	"commandPrefix": "!",
 
 	"commands": {
+		"channelID": "",
 		"8ball": false,
 		"about": false,
 		"ban": false,

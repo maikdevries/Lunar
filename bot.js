@@ -40,7 +40,6 @@ client.on('ready', async () => {
 	setInterval(() => youtube.fetchVideo(client), 600000);
 	setInterval(() => youtube.fetchStream(client), 1200000);
 
-
 	console.log(`${client.user.username} has loaded successfully and is now online!`);
 });
 
@@ -48,6 +47,8 @@ client.on('ready', async () => {
 // Dynamic command handler - Execute 'command module' if the command is part of the 'command Discord Collection'
 client.on('message', (message) => {
 	if (!message.content.startsWith(config.commandPrefix) || message.author.bot) return;
+
+	if (config.commands.channelID && config.commands.channelID !== message.channel.id) return message.channel.send(`**Oops**! Commands can only be used in <#${config.commands.channelID}>!`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	if (message.channel.type !== 'text') return message.channel.send(`**Sorry**! Unfortunately, I can't help you with that in direct messages.`);
 
@@ -61,13 +62,7 @@ client.on('message', (message) => {
 	if (!config.commands[command.name]) return message.channel.send(`**Err**... This command has been disabled by the server owner.`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	// If command arguments were expected but not given, return an error message to the user
-	if (command.args && !args.length) {
-		let reply = `**Oh no**! You didn't provide any arguments for this command to work properly!`;
-
-		if (command.usage) reply += ` The proper usage would be: \`${command.usage}\``;
-
-		return message.channel.send(reply).then((msg) => msg.delete({ timeout: 3500 }));
-	}
+	if (command.args && !args.length) return message.channel.send(`**Oh no**! You didn't provide any arguments for this command to work properly! The proper usage would be: ${command.usage}`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	try {
 		command.execute(client, message, args);
