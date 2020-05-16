@@ -115,6 +115,7 @@ The following command behaviour is currently natively supported:
 - `clear/purge/remove/delete @[user]` - This will delete all messages sent by `[user]` out of the last *99* messages sent in the current channel.
 - `invite` - This will generate an invite link for the current channel which can be used for 24 hours.
 - `kick @[user] ([reason])` - This will kick `[user]` from the current server with `([reason])` as reason.
+- `slowmode [number]` - This will enable slowmode and set it to allow messages to be sent every `number` of seconds - setting it to `0` will turn slowmode off.
 
 One could even add commands of their own if they possess the means to do so, please do keep in mind that this is not supported code, things could be wonky or not function the way initially envisioned.
 

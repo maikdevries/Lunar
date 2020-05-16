@@ -14,7 +14,7 @@ module.exports = {
 };
 
 function execute (client, message, ignore) {
-	client.generateInvite(469920839).then((inviteLink) => {
+	client.generateInvite(402811991).then((inviteLink) => {
 		const embed = new MessageEmbed()
 			.setAuthor(`The latest information on ${client.user.username}`, client.user.avatarURL())
 			.addField('Version', package.version, true)

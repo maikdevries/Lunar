@@ -12,7 +12,8 @@
 		"ban": false,
 		"clear": false,
 		"invite": false,
-		"kick": false
+		"kick": false,
+		"slowmode": false
 	},
 
 	"welcomeMessage": {
