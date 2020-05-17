@@ -7,7 +7,13 @@
 
 	"commands": {
 		"channelID": "",
-		"8ball": false,
+
+		"8ball": {
+			"enabled": false,
+			"responses": [
+
+			]
+		},
 		"about": false,
 		"ban": false,
 		"clear": false,

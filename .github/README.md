@@ -58,28 +58,28 @@ The following configuration settings affect the behaviour of this feature:
 Example of the `welcomeMessage` configuration options object:
 ```JSON
 "welcomeMessage": {
-		"welcome": {
-			"enabled": true,
-			"channelID": "618712023768891393",
-			"message": [
-				"We've got a new member! Welcome [MEMBER]!",
-				"Hi [MEMBER]! **Welcome to the Discord**!",
-				"[MEMBER] is to be welcomed to the server!"
-			]
-		},
-		"leave": {
-			"enabled": true,
-			"channelID": "548991203052486686",
-			"message": [
-				"[MEMBER] has fallen and will be remembered...",
-				"Rest in peace, [MEMBER]. You won't be forgotten."
-			]
-		},
-		"direct" : {
-			"enabled": true,
-			"message": "Hiya! Welcome to the Discord server, please read the rules and make sure to have a great time!"
-		}
+	"welcome": {
+		"enabled": true,
+		"channelID": "618712023768891393",
+		"message": [
+			"We've got a new member! Welcome [MEMBER]!",
+			"Hi [MEMBER]! **Welcome to the Discord**!",
+			"[MEMBER] is to be welcomed to the server!"
+		]
+	},
+	"leave": {
+		"enabled": true,
+		"channelID": "548991203052486686",
+		"message": [
+			"[MEMBER] has fallen and will be remembered...",
+			"Rest in peace, [MEMBER]. You won't be forgotten."
+		]
+	},
+	"direct" : {
+		"enabled": true,
+		"message": "Hiya! Welcome to the Discord server, please read the rules and make sure to have a great time!"
 	}
+}
 ```
 
 ## Server Lock
@@ -92,13 +92,13 @@ The following configuration settings affect the behaviour of this feature:
 - `message` - [Default is *empty*] - Object that contains the message ID and reaction emoji that removes the `role`. Example of a correct `message` object:
 ```JSON
 "serverLock": {
-		"enabled": true,
-		"manual": false,
-		"role": "709153445944229929",
-		"message": {
-			"643119241524019232": "👏"
-		}
+	"enabled": true,
+	"manual": false,
+	"role": "709153445944229929",
+	"message": {
+		"643119241524019232": "👏"
 	}
+}
 ```
 This will remove the role with ID `709153445944229929` from the member that reacts with '👏' to the message with ID `643119241524019232`.
 
@@ -116,6 +116,18 @@ The following command behaviour is currently natively supported:
 - `invite` - This will generate an invite link for the current channel which can be used for 24 hours.
 - `kick @[user] ([reason])` - This will kick `[user]` from the current server with `([reason])` as reason.
 - `slowmode [number]` - This will enable slowmode and set it to allow messages to be sent every `number` of seconds - setting it to `0` will turn slowmode off.
+
+The `8ball` command requires responses to be set that are randomly chosen from when someone asks a question. These should be added to the `responses` Array within the `8ball` Object, each separated by a comma. Example configuration Object:
+```JSON
+"8ball": {
+	"enabled": true,
+	"responses": [
+		"My answer is no.",
+		"The answer is yes.",
+		"Uhhhh..."
+	]
+},
+```
 
 One could even add commands of their own if they possess the means to do so, please do keep in mind that this is not supported code, things could be wonky or not function the way initially envisioned.
 
