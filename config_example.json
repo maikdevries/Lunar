@@ -19,6 +19,7 @@
 		"clear": false,
 		"invite": false,
 		"kick": false,
+		"nickname": false,
 		"slowmode": false
 	},
 

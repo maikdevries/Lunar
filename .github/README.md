@@ -115,6 +115,7 @@ The following command behaviour is currently natively supported:
 - `clear/purge/remove/delete @[user]` - This will delete all messages sent by `[user]` out of the last *99* messages sent in the current channel.
 - `invite` - This will generate an invite link for the current channel which can be used for 24 hours.
 - `kick @[user] ([reason])` - This will kick `[user]` from the current server with `([reason])` as reason.
+- `nickname @[user] [name]` - This will change the nickname of `[user]` to `[name]`.
 - `slowmode [number]` - This will enable slowmode and set it to allow messages to be sent every `number` of seconds - setting it to `0` will turn slowmode off.
 
 The `8ball` command requires responses to be set that are randomly chosen from when someone asks a question. These should be added to the `responses` Array within the `8ball` Object, each separated by a comma. Example configuration Object:
@@ -126,7 +127,7 @@ The `8ball` command requires responses to be set that are randomly chosen from w
 		"The answer is yes.",
 		"Uhhhh..."
 	]
-},
+}
 ```
 
 One could even add commands of their own if they possess the means to do so, please do keep in mind that this is not supported code, things could be wonky or not function the way initially envisioned.
