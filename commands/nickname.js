@@ -20,6 +20,7 @@ function execute (ignore, message, args) {
 
 	const nickname = args.slice(1, args.length + 1).join(' ');
 	if (nickname.length < 1) return message.channel.send(`**Ah**! You need to provide a new nickname!`).then((msg) => msg.delete({ timeout: 3500 }));
+	if (nickname.length > 32) return message.channel.send(`**Hmmm**... A nickname can't be longer than 32 characters due to a Discord limitation.`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	member.setNickname(nickname).then((changedMember) => {
 		message.delete();
