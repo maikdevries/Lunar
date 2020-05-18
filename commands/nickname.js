@@ -18,7 +18,10 @@ function execute (ignore, message, args) {
 
 	if (member.hasPermission('MANAGE_NICKNAMES')) return message.channel.send(`**Uhm**... You can't change the nickname of someone with the same privileges as yourself!`).then((msg) => msg.delete({ timeout: 3500 }));
 
-	member.setNickname(args[1]).then((changedMember) => {
+	const nickname = args.slice(1, args.length + 1).join(' ');
+	if (nickname.length < 1) return message.channel.send(`**Ah**! You need to provide a new nickname!`).then((msg) => msg.delete({ timeout: 3500 }));
+
+	member.setNickname(nickname).then((changedMember) => {
 		message.delete();
 		return message.channel.send(`**Great**! You've successfully changed their nickname to ${changedMember.displayName}!`).then((msg) => msg.delete({ timeout: 3500 }));
 	}).catch((error) => {
