@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const client = new Discord.Client();
+const client = new Discord.Client({ partials: ['MESSAGE', 'REACTION'] });
 
 const fs = require('fs');
 
@@ -45,12 +45,15 @@ client.on('ready', async () => {
 
 
 // Dynamic command handler - Execute 'command module' if the command is part of the 'command Discord Collection'
-client.on('message', (message) => {
-	if (!message.content.startsWith(config.commandPrefix) || message.author.bot) return;
+client.on('message', async (message) => {
+	if (message.partial) {
+		await message.fetch()
+			.catch((error) => console.error(`An error occurred fetching the partial reaction message, ${error}`));
+	}
+
+	if (!message.content.startsWith(config.commandPrefix) || message.author.bot || message.channel.type !== 'text') return;
 
 	if (config.commands.channelID && config.commands.channelID !== message.channel.id) return message.channel.send(`**Oops**! Commands can only be used in <#${config.commands.channelID}>!`).then((msg) => msg.delete({ timeout: 3500 }));
-
-	if (message.channel.type !== 'text') return message.channel.send(`**Sorry**! Unfortunately, I can't help you with that in direct messages.`);
 
 	const args = message.content.slice(config.commandPrefix.length).split(/ +/);
 	const commandName = args.shift().toLowerCase();
@@ -73,37 +76,24 @@ client.on('message', (message) => {
 });
 
 
-const events = {
-	MESSAGE_REACTION_ADD: 'messageReactionAdd',
-	MESSAGE_REACTION_REMOVE: 'messageReactionRemove',
-};
-
-// Emits 'messageReactionAdd' and 'messageReactionRemove' events on non-cached messages
-client.on('raw', (event) => {
-	if (!Object.prototype.hasOwnProperty.call(events, event.t)) return;
-
-	const { d: data } = event;
-	const user = client.users.cache.get(data.user_id);
-	const channel = client.channels.cache.get(data.channel_id);
-
-	if (channel.messages.cache.has(data.message_id)) return;
-
-	channel.messages.fetch(data.message_id).then((message) => {
-		const emojiKey = data.emoji.id || data.emoji.name;
-		const reaction = message.reactions.cache.get(emojiKey) || message.reactions.add(data);
-
-		client.emit(events[event.t], reaction, user);
-	});
-});
-
 // Adds role to user based on reaction added to message
-client.on('messageReactionAdd', (reaction, user) => {
+client.on('messageReactionAdd', async (reaction, user) => {
+	if (reaction.partial) {
+		await reaction.fetch()
+			.catch((error) => console.error(`An error occurred fetching the partial reaction message, ${error}`));
+	}
+
 	reactionRole.roleAdd(reaction, user);
 	serverLock.memberUnlock(reaction, user);
 });
 
 // Removes role from user based on reaction removed from message
-client.on('messageReactionRemove', (reaction, user) => {
+client.on('messageReactionRemove', async (reaction, user) => {
+	if (reaction.partial) {
+		await reaction.fetch()
+			.catch((error) => console.error(`An error occurred fetching the partial reaction message, ${error}`));
+	}
+
 	reactionRole.roleRemove(reaction, user);
 });
 
