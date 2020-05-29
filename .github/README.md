@@ -105,7 +105,7 @@ This will remove the role with ID `709153445944229929` from the member that reac
 ## Commands
 The default way to trigger a command is as follows: `![command] [argument]`, where the behaviour of `[argument]` could vary between the different commands. Arguments listed within parenthesis `([argument])` are optional and therefore not required. The command prefix can be changed in `config.json`, more information [here](#optional-configuration-settings).
 
-Each individual command can be enabled or disabled based on needs. All commands are disabled by default, which can be changed in `config.js` under `commands`. If a disabled command is triggered, the user will be notified. Commands can also be restricted to a specific channel, this is disabled by default. Change this behaviour by changing `channelID` to the channel the commands can be used in.
+Each individual command can be enabled or disabled based on needs. All commands are disabled by default, which can be changed in `config.js` under `commands`. If a disabled command is triggered, the user will be notified. Commands can also be restricted to a specific channel, this is disabled by default. Change this behaviour by changing `channelID` to the channel the commands can be used in and specifying whether the restriction applies to said command.
 
 The following command behaviour is currently natively supported:
 - `8ball [question]` - This will generate a random answer to the question being asked.
@@ -122,6 +122,7 @@ The `8ball` command requires responses to be set that are randomly chosen from w
 ```JSON
 "8ball": {
 	"enabled": true,
+	"restricted": true,
 	"responses": [
 		"My answer is no.",
 		"The answer is yes.",

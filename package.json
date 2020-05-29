@@ -1,6 +1,6 @@
 {
   "name": "lunar",
-  "version": "0.23.1",
+  "version": "0.23.2",
   "description": "A modular Discord bot written in NodeJS to be used in private servers.",
   "engines": {
     "node": ">=12.0.0"
@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/maikdevries/Lunar",
   "devDependencies": {
-    "eslint": "^7.0.0",
+    "eslint": "^7.1.0",
     "eslint-plugin-node": "^11.1.0"
   },
   "dependencies": {

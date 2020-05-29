@@ -6,9 +6,10 @@ const { commandPrefix } = require('./../config.json');
 
 module.exports = {
 	name: 'about',
-	description: 'A command to get the latest technical information on the bot',
-	usage: `${commandPrefix}about`,
 	aliases: ['version'],
+	description: 'A command to get the latest technical information on the bot',
+	args: false,
+	usage: `${commandPrefix}about`,
 
 	execute
 };

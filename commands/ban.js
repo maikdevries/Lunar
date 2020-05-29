@@ -2,10 +2,10 @@ const { commandPrefix } = require('./../config.json');
 
 module.exports = {
 	name: 'ban',
-	description: 'A command to ban a user from the server, with optional reason',
-	usage: `${commandPrefix}ban @[user] - ${commandPrefix}ban @[user] [reason]`,
-	args: true,
 	aliases: [],
+	description: 'A command to ban a user from the server, with optional reason',
+	args: true,
+	usage: `${commandPrefix}ban @[user] - ${commandPrefix}ban @[user] [reason]`,
 
 	execute
 };

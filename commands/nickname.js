@@ -2,10 +2,10 @@ const { commandPrefix } = require('./../config.json');
 
 module.exports = {
 	name: 'nickname',
+	aliases: ['nick', 'name'],
 	description: 'A command that turns on/off slowmode for the current channel',
-	usage: `${commandPrefix}nickname [member] [name]`,
 	args: true,
-	aliases: [],
+	usage: `${commandPrefix}nickname [member] [name]`,
 
 	execute
 };

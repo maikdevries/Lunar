@@ -10,17 +10,39 @@
 
 		"8ball": {
 			"enabled": false,
+			"restricted": true,
 			"responses": [
 
 			]
 		},
-		"about": false,
-		"ban": false,
-		"clear": false,
-		"invite": false,
-		"kick": false,
-		"nickname": false,
-		"slowmode": false
+		"about": {
+			"enabled": false,
+			"restricted": true
+		},
+		"ban": {
+			"enabled": false,
+			"restricted": false
+		},
+		"clear": {
+			"enabled": false,
+			"restricted": false
+		},
+		"invite": {
+			"enabled": false,
+			"restricted": true
+		},
+		"kick": {
+			"enabled": false,
+			"restricted": false
+		},
+		"nickname": {
+			"enabled": false,
+			"restricted": false
+		},
+		"slowmode": {
+			"enabled": false,
+			"restricted": false
+		}
 	},
 
 	"welcomeMessage": {

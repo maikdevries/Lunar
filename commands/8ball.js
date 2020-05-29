@@ -2,10 +2,10 @@ const config = require('./../config.json');
 
 module.exports = {
 	name: '8ball',
-	description: 'A command that randomly answers the question it is asked',
-	usage: `${config.commandPrefix}8ball [question]`,
-	args: true,
 	aliases: [],
+	description: 'A command that randomly answers the question it is asked',
+	args: true,
+	usage: `${config.commandPrefix}8ball [question]`,
 
 	execute
 };

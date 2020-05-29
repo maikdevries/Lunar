@@ -483,6 +483,7 @@
 		"sort-imports": "off",
 		"symbol-description": "error",
 		"template-curly-spacing": ["error", "never"],
-		"yield-star-spacing": ["error", "both"]
+		"yield-star-spacing": ["error", "both"],
+		"no-loss-of-precision": "error"
 	}
 }
