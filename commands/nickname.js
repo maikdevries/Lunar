@@ -5,7 +5,7 @@ module.exports = {
 	aliases: ['nick', 'name'],
 	description: 'A command that turns on/off slowmode for the current channel',
 	args: true,
-	usage: `${commandPrefix}nickname [member] [name]`,
+	usage: `${commandPrefix}nickname @[user] [name]`,
 
 	execute
 };
