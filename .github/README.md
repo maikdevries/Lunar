@@ -17,6 +17,7 @@ Check the **[GitHub wiki](https://github.com/maikdevries/Lunar/wiki)** for instr
 * **[Server Lock](https://github.com/maikdevries/Lunar/wiki/Server-Lock)**
 * **[Commands](https://github.com/maikdevries/Lunar/wiki/Commands)**
 * **[Reaction Role](https://github.com/maikdevries/Lunar/wiki/Reaction-Role)**
+* **[Currently Livestreaming](https://github.com/maikdevries/Lunar/wiki/Currently-Livestreaming)**
 * **[Twitch Announcements](https://github.com/maikdevries/Lunar/wiki/Twitch-Announcements)**
 * **[YouTube Announcements](https://github.com/maikdevries/Lunar/wiki/Youtube-Announcements)**
 

@@ -71,13 +71,21 @@
 		"manual": false,
 		"role": "",
 		"message": {
+
 		}
 	},
 
 	"reactionRole": {
 		"enabled": false,
 		"messages": {
+
 		}
+	},
+
+	"streamStatus": {
+		"enabled": false,
+		"streamerRole": "",
+		"streamStatusRole": ""
 	},
 
 	"twitch": {

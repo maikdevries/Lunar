@@ -10,6 +10,7 @@ const serverLock = require('./features/serverLock.js');
 const reactionRole = require('./features/reactionRole.js');
 const twitch = require('./features/twitch.js');
 const youtube = require('./features/youtube.js');
+const streamStatus = require('./features/streamStatus.js');
 
 
 // Create a Discord Collection from all the 'command modules' in the 'commands' folder
@@ -76,6 +77,12 @@ client.on('message', async (message) => {
 		console.error(`An error occurred executing one of the commands, ${error}`);
 		message.channel.send('**Oops**! Something went terribly wrong! Please try again later.').then((msg) => msg.delete({ timeout: 3500 }));
 	}
+});
+
+
+// Manages the 'Currently Livestreaming' role functionality
+client.on('presenceUpdate', (oldPresence, newPresence) => {
+	streamStatus.setStatus(client, oldPresence, newPresence);
 });
 
 
