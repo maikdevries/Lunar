@@ -10,8 +10,12 @@ module.exports = {
 	execute
 };
 
-function execute (ignore, message, args) {
+function execute (client, message, args) {
 	if (!message.member.hasPermission('MANAGE_CHANNELS')) return message.channel.send(`**Golly**! You don't have the right permissions to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
+
+	const botMember = message.guild.members.cache.get(client.user.id);
+	const channelPermissions = message.channel.permissionsFor(botMember);
+	if (!channelPermissions.any('MANAGE_CHANNELS')) return message.channel.send(`**Yikes**! It seems like I don't have the right permissions to do this.`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	const numberOfSeconds = parseInt(args[0]);
 	if (isNaN(numberOfSeconds)) return message.channel.send(`**Ah**, that doesn't seem to be a number. Please try again!`).then((msg) => msg.delete({ timeout: 3500 }));

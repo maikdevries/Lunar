@@ -10,8 +10,11 @@ module.exports = {
 	execute
 };
 
-function execute (ignore, message, args) {
+function execute (client, message, args) {
 	if (!message.member.hasPermission('BAN_MEMBERS')) return message.channel.send(`**Oh no**! You don't have the right perks to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
+
+	const botMember = message.guild.members.cache.get(client.user.id);
+	if (!botMember.hasPermission('BAN_MEMBERS')) return message.channel.send(`**Yikes**! It seems like I don't have the right permissions to do this.`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	const { users } = message.mentions;
 	if (!users) return message.channel.send(`**Oh snap**! You forgot to mention the person you would like to ban! Try again.`).then((msg) => msg.delete({ timeout: 3500 }));

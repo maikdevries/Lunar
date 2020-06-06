@@ -51,7 +51,11 @@ client.on('message', async (message) => {
 			.catch((error) => console.error(`An error occurred fetching the partial reaction message, ${error}`));
 	}
 
-	if (!message.content.startsWith(config.commandPrefix) || message.author.bot || message.channel.type !== 'text') return;
+	if (!message.content.startsWith(config.commandPrefix) || message.channel.type !== 'text') return;
+
+	const botMember = message.guild.members.cache.get(client.user.id);
+	const channelPermissions = message.channel.permissionsFor(botMember);
+	if (!channelPermissions.any('SEND_MESSAGES') || !channelPermissions.any('MANAGE_MESSAGES')) return console.error(`Missing permissions (SEND_MESSAGES or MANAGE_MESSAGES) to execute command in ${message.channel.name}!`);
 
 	const args = message.content.slice(config.commandPrefix.length).split(/ +/);
 	const commandName = args.shift().toLowerCase();
@@ -82,8 +86,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
 			.catch((error) => console.error(`An error occurred fetching the partial reaction message, ${error}`));
 	}
 
-	reactionRole.roleAdd(reaction, user);
-	serverLock.memberUnlock(reaction, user);
+	reactionRole.roleAdd(client, reaction, user);
+	serverLock.memberUnlock(client, reaction, user);
 });
 
 // Removes role from user based on reaction removed from message
@@ -93,20 +97,20 @@ client.on('messageReactionRemove', async (reaction, user) => {
 			.catch((error) => console.error(`An error occurred fetching the partial reaction message, ${error}`));
 	}
 
-	reactionRole.roleRemove(reaction, user);
+	reactionRole.roleRemove(client, reaction, user);
 });
 
 
 // Sends out a welcome message when a new user joins the server
 client.on('guildMemberAdd', (member) => {
-	welcomeMessage.memberAdd(member);
+	welcomeMessage.memberAdd(client, member);
 	welcomeMessage.memberAddDM(member);
-	serverLock.memberLock(member);
+	serverLock.memberLock(client, member);
 });
 
 // Sends out a leave message when an user leaves the server
 client.on('guildMemberRemove', (member) => {
-	welcomeMessage.memberRemove(member);
+	welcomeMessage.memberRemove(client, member);
 });
 
 

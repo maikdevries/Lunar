@@ -62,8 +62,11 @@ async function fetchData (streamInfo) {
 // Constructs a MessageEmbed and sends it to livestream announcements channel
 function sendAnnouncement (client, streamInfo, userInfo, gameInfo) {
 	const channel = client.channels.cache.get(config.twitch.announcementChannelID);
-
 	if (!channel) return console.error(`Couldn't send Twitch livestream announcement because the announcement channel couldn't be found.`);
+
+	const botMember = channel.guild.members.cache.get(client.user.id);
+	const channelPermissions = channel.permissionsFor(botMember);
+	if (!channelPermissions.any('VIEW_CHANNEL') || !channelPermissions.any('SEND_MESSAGES') || !channelPermissions.any('MENTION_EVERYONE')) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out Twitch announcement to ${channel.name}!`);
 
 	const embed = new MessageEmbed()
 		.setAuthor(`${streamInfo.data[0].user_name} is now LIVE on Twitch!`, userInfo.data[0].profile_image_url)
