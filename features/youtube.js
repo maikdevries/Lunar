@@ -18,6 +18,9 @@ module.exports = {
 // Polls API and checks if there is a new video release
 function fetchVideo (client) {
 	if (!config.youtube.video.enabled) return;
+
+	if (config.youtube.video.announcementChannelID.length < 1) return console.error(`Cannot send YouTube video announcement, no announcement channels were specified in the config!`);
+
 	if (!latestVideo) return setLatestVideo();
 
 	fetchData().then((videoInfo) => {
@@ -59,13 +62,6 @@ async function fetchData () {
 
 // Constructs a MessageEmbed and sends it to new video announcements channel
 function sendVideoAnnouncement (client, videoInfo, channelInfo) {
-	const channel = client.channels.cache.get(config.youtube.video.announcementChannelID);
-	if (!channel) return console.error(`Couldn't send YouTube new video announcement because the channel couldn't be found.`);
-
-	const botMember = channel.guild.members.cache.get(client.user.id);
-	const channelPermissions = channel.permissionsFor(botMember);
-	if (!channelPermissions.any('VIEW_CHANNEL') || !channelPermissions.any('SEND_MESSAGES') || !channelPermissions.any('MENTION_EVERYONE')) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out YouTube announcement to ${channel.name}!`);
-
 	// Regex to cut off the video description at the last whole word at 237 characters
 	const description = (videoInfo.items[0].snippet.description).replace(/^([\s\S]{237}[^\s]*)[\s\S]*/, '$1');
 
@@ -79,13 +75,24 @@ function sendVideoAnnouncement (client, videoInfo, channelInfo) {
 		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
 		.setTimestamp(new Date(videoInfo.items[0].snippet.publishedAt));
 
-	return channel.send(config.youtube.video.announcementMessage, { embed });
+	config.youtube.video.announcementChannelID.forEach((channelID) => {
+		const channel = client.channels.cache.get(channelID);
+		if (!channel) return console.error(`Couldn't send YouTube new video announcement to ${channelID} because the channel couldn't be found.`);
+
+		const botMember = channel.guild.members.cache.get(client.user.id);
+		const channelPermissions = channel.permissionsFor(botMember);
+		if (!channelPermissions.any('VIEW_CHANNEL') || !channelPermissions.any('SEND_MESSAGES') || !channelPermissions.any('MENTION_EVERYONE')) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out YouTube announcement to ${channel.name}!`);
+
+		return channel.send(config.youtube.video.announcementMessage, { embed });
+	});
 }
 
 
 // Polls API and checks whether channel is currently streaming
 function fetchStream (client) {
 	if (!config.youtube.stream.enabled) return;
+
+	if (config.youtube.stream.announcementChannelID.length < 1) return console.error(`Cannot send YouTube stream announcement, no announcement channels were specified in the config!`);
 
 	const path = `search?part=snippet&channelId=${config.youtube.channel}&maxResults=1&eventType=live&type=video&key=${config.youtube.APIkey}`;
 
@@ -100,10 +107,6 @@ function fetchStream (client) {
 
 // Constructs a MessageEmbed and sends it to livestream announcements channel
 function sendStreamAnnouncement (client, streamInfo) {
-	const channel = client.channels.cache.get(config.youtube.stream.announcementChannelID);
-
-	if (!channel) return console.error(`Couldn't send YouTube livestream announcement because the announcement channel couldn't be found.`);
-
 	// Regex to cut off the video description at the last whole word at 237 characters
 	const description = (streamInfo.items[0].snippet.description).replace(/^([\s\S]{237}[^\s]*)[\s\S]*/, '$1');
 
@@ -117,7 +120,16 @@ function sendStreamAnnouncement (client, streamInfo) {
 		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
 		.setTimestamp(new Date(streamInfo.items[0].snippet.publishedAt));
 
-	return channel.send(config.youtube.stream.announcementMessage, { embed });
+	config.youtube.stream.announcementChannelID.forEach((channelID) => {
+		const channel = client.channels.cache.get(channelID);
+		if (!channel) return console.error(`Couldn't send YouTube livestream announcement because the announcement channel couldn't be found.`);
+
+		const botMember = channel.guild.members.cache.get(client.user.id);
+		const channelPermissions = channel.permissionsFor(botMember);
+		if (!channelPermissions.any('VIEW_CHANNEL') || !channelPermissions.any('SEND_MESSAGES') || !channelPermissions.any('MENTION_EVERYONE')) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out YouTube announcement to ${channel.name}!`);
+
+		return channel.send(config.youtube.stream.announcementMessage, { embed });
+	});
 }
 
 

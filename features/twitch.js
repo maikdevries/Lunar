@@ -7,7 +7,7 @@ const config = require('./../config.json');
 let accessToken;
 let streamStatus = false;
 let updateInterval;
-let sentAnnouncementMessage;
+const sentAnnouncementMessage = [];
 
 
 module.exports = {
@@ -19,6 +19,8 @@ module.exports = {
 // Polls API and checks whether channel is currently streaming
 function fetchStream (client) {
 	if (!config.twitch.enabled) return;
+
+	if (config.twitch.announcementChannelID.length < 1) return console.error(`Cannot send Twitch announcement, no announcement channels were specified in the config!`);
 
 	if (!accessToken) return getAccessToken();
 
@@ -33,6 +35,7 @@ function fetchStream (client) {
 					streamStatus = false;
 					clearInterval(updateInterval);
 					streamOffline();
+					if (!streamStatus) sentAnnouncementMessage.length = 0;
 				}
 			} else {
 				if (streamStatus) return;
@@ -61,13 +64,6 @@ async function fetchData (streamInfo) {
 
 // Constructs a MessageEmbed and sends it to livestream announcements channel
 function sendAnnouncement (client, streamInfo, userInfo, gameInfo) {
-	const channel = client.channels.cache.get(config.twitch.announcementChannelID);
-	if (!channel) return console.error(`Couldn't send Twitch livestream announcement because the announcement channel couldn't be found.`);
-
-	const botMember = channel.guild.members.cache.get(client.user.id);
-	const channelPermissions = channel.permissionsFor(botMember);
-	if (!channelPermissions.any('VIEW_CHANNEL') || !channelPermissions.any('SEND_MESSAGES') || !channelPermissions.any('MENTION_EVERYONE')) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out Twitch announcement to ${channel.name}!`);
-
 	const embed = new MessageEmbed()
 		.setAuthor(`${streamInfo.data[0].user_name} is now LIVE on Twitch!`, userInfo.data[0].profile_image_url)
 		.setTitle(streamInfo.data[0].title)
@@ -79,7 +75,18 @@ function sendAnnouncement (client, streamInfo, userInfo, gameInfo) {
 		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
 		.setTimestamp(new Date(streamInfo.data[0].started_at));
 
-	return channel.send(config.twitch.announcementMessage, { embed }).then((msg) => { sentAnnouncementMessage = msg; update(); });
+	config.twitch.announcementChannelID.forEach((channelID) => {
+		const channel = client.channels.cache.get(channelID);
+		if (!channel) return console.error(`Couldn't send Twitch livestream announcement to ${channelID} because the announcement channel couldn't be found.`);
+
+		const botMember = channel.guild.members.cache.get(client.user.id);
+		const channelPermissions = channel.permissionsFor(botMember);
+		if (!channelPermissions.any('VIEW_CHANNEL') || !channelPermissions.any('SEND_MESSAGES') || !channelPermissions.any('MENTION_EVERYONE')) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out Twitch announcement to ${channel.name}!`);
+
+		return channel.send(config.twitch.announcementMessage, { embed }).then((msg) => sentAnnouncementMessage.push(msg));
+	});
+
+	if (sentAnnouncementMessage.length > 0) return update();
 }
 
 // Updates the livestream announcement every 3 minutes with current stream statistics
@@ -88,13 +95,15 @@ function update () {
 		fetchUpdatedData().then(([streamInfo, gameInfo]) => {
 			if (!streamInfo.data || !gameInfo.data) return;
 
-			const editedEmbed = new MessageEmbed(sentAnnouncementMessage.embeds[0])
-				.setTitle(streamInfo.data[0].title)
-				.setDescription(`**${streamInfo.data[0].user_name}** is playing **${gameInfo.data[0].name}** with **${streamInfo.data[0].viewer_count}** people watching!\n\n[**Come watch the stream!**](https://twitch.tv/${streamInfo.data[0].user_name})`)
-				.setThumbnail((gameInfo.data[0].box_art_url).replace('{width}', '300').replace('{height}', '400'))
-				.setImage(`${(streamInfo.data[0].thumbnail_url).replace('{width}', '1920').replace('{height}', '1080')}?date=${Date.now()}`);
+			sentAnnouncementMessage.forEach((message) => {
+				const editedEmbed = new MessageEmbed(message.embeds[0])
+					.setTitle(streamInfo.data[0].title)
+					.setDescription(`**${streamInfo.data[0].user_name}** is playing **${gameInfo.data[0].name}** with **${streamInfo.data[0].viewer_count}** people watching!\n\n[**Come watch the stream!**](https://twitch.tv/${streamInfo.data[0].user_name})`)
+					.setThumbnail((gameInfo.data[0].box_art_url).replace('{width}', '300').replace('{height}', '400'))
+					.setImage(`${(streamInfo.data[0].thumbnail_url).replace('{width}', '1920').replace('{height}', '1080')}?date=${Date.now()}`);
 
-			return sentAnnouncementMessage.edit(config.twitch.announcementMessage, editedEmbed);
+				return message.edit(config.twitch.announcementMessage, editedEmbed);
+			});
 		});
 	}, 180000);
 }
@@ -115,14 +124,16 @@ function streamOffline () {
 	fetchOfflineData().then(([userInfo, videoInfo]) => {
 		if (!userInfo.data || !videoInfo.data) streamStatus = true;
 		else {
-			const editedEmbed = new MessageEmbed(sentAnnouncementMessage.embeds[0])
-				.setAuthor(`${userInfo.data[0].display_name} was LIVE on Twitch!`, userInfo.data[0].profile_image_url)
-				.setTitle(videoInfo.data[0].title)
-				.setURL(videoInfo.data[0].url)
-				.setDescription(`Today's stream is **over** but you can watch the **VOD**!\n\n[**Watch the VOD!**](${videoInfo.data[0].url})`)
-				.setImage(`${(videoInfo.data[0].thumbnail_url).replace('%{width}', '1920').replace('%{height}', '1080')}?date=${Date.now()}`);
+			sentAnnouncementMessage.forEach((message) => {
+				const editedEmbed = new MessageEmbed(message.embeds[0])
+					.setAuthor(`${userInfo.data[0].display_name} was LIVE on Twitch!`, userInfo.data[0].profile_image_url)
+					.setTitle(videoInfo.data[0].title)
+					.setURL(videoInfo.data[0].url)
+					.setDescription(`Today's stream is **over** but you can watch the **VOD**!\n\n[**Watch the VOD!**](${videoInfo.data[0].url})`)
+					.setImage(`${(videoInfo.data[0].thumbnail_url).replace('%{width}', '1920').replace('%{height}', '1080')}?date=${Date.now()}`);
 
-			return sentAnnouncementMessage.edit(config.twitch.announcementMessage, editedEmbed);
+				return message.edit(config.twitch.announcementMessage, editedEmbed);
+			});
 		}
 	});
 }

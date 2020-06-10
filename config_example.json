@@ -6,7 +6,9 @@
 	"commandPrefix": "!",
 
 	"commands": {
-		"channelID": "",
+		"channelID": [
+
+		],
 
 		"8ball": {
 			"enabled": false,
@@ -48,14 +50,18 @@
 	"welcomeMessage": {
 		"welcome": {
 			"enabled": false,
-			"channelID": "",
+			"channelID": [
+
+			],
 			"message": [
 
 			]
 		},
 		"leave": {
 			"enabled": false,
-			"channelID": "",
+			"channelID": [
+
+			],
 			"message": [
 
 			]
@@ -94,7 +100,9 @@
 		"client-secret": "",
 		"username": "",
 
-		"announcementChannelID": "",
+		"announcementChannelID": [
+
+		],
 		"announcementMessage": ""
 	},
 
@@ -105,13 +113,17 @@
 		"video": {
 			"enabled": false,
 
-			"announcementChannelID": "",
+			"announcementChannelID": [
+
+			],
 			"announcementMessage": ""
 		},
 		"stream": {
 			"enabled": false,
 
-			"announcementChannelID": "",
+			"announcementChannelID": [
+				
+			],
 			"announcementMessage": ""
 		}
 	}
