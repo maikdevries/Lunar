@@ -11,9 +11,9 @@ function setStatus (client, ignore, newPresence) {
 	if (!config.streamStatus.enabled) return;
 
 	const { streamerRole, streamStatusRole } = config.streamStatus;
-	if (!streamStatusRole || !streamerRole) return console.error(`Stream status roles are not set in the configuration options!`);
+	if (!streamStatusRole) return console.error(`Stream status role is not set in the configuration options!`);
 
-	if (!newPresence.member.roles.cache.has(streamerRole)) return;
+	if (streamerRole && !newPresence.member.roles.cache.has(streamerRole)) return;
 
 	const botMember = newPresence.guild.members.cache.get(client.user.id);
 	if (!botMember.hasPermission('MANAGE_ROLES')) return console.error(`Missing permissions (MANAGE_ROLES) to change stream status role for ${newPresence.member.nickname}!`);
