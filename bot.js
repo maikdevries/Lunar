@@ -49,7 +49,7 @@ client.on('ready', async () => {
 client.on('message', async (message) => {
 	if (message.partial) {
 		await message.fetch()
-			.catch((error) => console.error(`An error occurred fetching the partial reaction message, ${error}`));
+			.catch((error) => console.error(`An error occurred fetching the partial message, ${error}`));
 	}
 
 	if (!message.content.startsWith(config.commandPrefix) || message.channel.type !== 'text') return;
@@ -69,7 +69,7 @@ client.on('message', async (message) => {
 
 	if (!config.commands.channelID.includes(message.channel.id) && config.commands[command.name].restricted) return message.channel.send(`**Oops**! This command cannot be used in this channel!`).then((msg) => msg.delete({ timeout: 3500 }));
 
-	if (command.args && !args.length) return message.channel.send(`**Oh no**! You didn't provide any arguments for this command to work properly! The proper usage would be: ${command.usage}`).then((msg) => msg.delete({ timeout: 3500 }));
+	if (command.args && !args.length) return message.channel.send(`**Oh no**! You didn't provide any arguments for this command to work properly! The proper usage would be: ${command.usage}. Edit your message to correctly use this command!`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	try {
 		command.execute(client, message, args);
@@ -77,6 +77,12 @@ client.on('message', async (message) => {
 		console.error(`An error occurred executing one of the commands, ${error}`);
 		message.channel.send('**Oops**! Something went terribly wrong! Please try again later.').then((msg) => msg.delete({ timeout: 3500 }));
 	}
+});
+
+client.on('messageUpdate', async (ignore, newMessage) => {
+	if (newMessage.partial) await newMessage.fetch().catch((error) => console.error(`An error occurred fetching the partial message, ${error}`));
+
+	client.emit('message', newMessage);
 });
 
 
