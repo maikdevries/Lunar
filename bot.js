@@ -67,7 +67,7 @@ client.on('message', async (message) => {
 
 	if (!config.commands[command.name].enabled) return message.channel.send(`**Err**... This command has been disabled by the server owner.`).then((msg) => msg.delete({ timeout: 3500 }));
 
-	if (!config.commands.channelID.includes(message.channel.id) && config.commands[command.name].restricted) return message.channel.send(`**Oops**! This command cannot be used in this channel!`).then((msg) => msg.delete({ timeout: 3500 }));
+	if (config.commands.channelID.length > 0 && !config.commands.channelID.includes(message.channel.id) && config.commands[command.name].restricted) return message.channel.send(`**Oops**! This command cannot be used in this channel!`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	if (command.args && !args.length) return message.channel.send(`**Oh no**! You didn't provide any arguments for this command to work properly! The proper usage would be: ${command.usage}. Edit your message to correctly use this command!`).then((msg) => msg.delete({ timeout: 3500 }));
 
