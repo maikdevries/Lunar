@@ -51,7 +51,7 @@
 		"array-callback-return": ["error", { "allowImplicit": true }],
 		"block-scoped-var": "error",
 		"class-methods-use-this": "error",
-		"complexity": ["error", 15],
+		"complexity": ["error", 18],
 		"consistent-return": "off",
 		"curly": ["error", "multi-line"],
 		"default-case": ["error", { "commentPattern": "^no\\sdefault" }],
