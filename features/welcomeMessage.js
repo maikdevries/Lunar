@@ -1,5 +1,7 @@
 const config = require('./../config.json');
 
+const { channelPermissionsCheck } = require('./../shared/permissionCheck.js');
+
 
 module.exports = {
 	description: `Handles both the 'guildMemberAdd' & 'guildMemberRemove' events`,
@@ -19,9 +21,7 @@ function memberAdd (client, member) {
 		const channel = member.guild.channels.cache.get(channelID);
 		if (!channel) return console.error(`Cannot find welcome channel, couldn't send welcome message to ${channelID}.`);
 
-		const botMember = channel.guild.members.cache.get(client.user.id);
-		const channelPermissions = channel.permissionsFor(botMember);
-		if (!channelPermissions.any('VIEW_CHANNEL') || !channelPermissions.any('SEND_MESSAGES')) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES) to send out welcome message to ${channel.name}!`);
+		if (!channelPermissionsCheck(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES'])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES) to send out welcome message to ${channel.name}!`);
 
 		const messageArray = config.welcomeMessage.welcome.message;
 		const message = messageArray.length > 0 ? messageArray[Math.floor(Math.random() * messageArray.length)] : '[MEMBER] has joined the Discord server!';
@@ -40,9 +40,7 @@ function memberRemove (client, member) {
 		const channel = member.guild.channels.cache.get(channelID);
 		if (!channel) return console.error(`Cannot find leave channel, couldn't send leave message to ${channelID}.`);
 
-		const botMember = channel.guild.members.cache.get(client.user.id);
-		const channelPermissions = channel.permissionsFor(botMember);
-		if (!channelPermissions.any('VIEW_CHANNEL') || !channelPermissions.any('SEND_MESSAGES')) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES) to send out welcome message to ${channel.name}!`);
+		if (!channelPermissionsCheck(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES'])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES) to send out welcome message to ${channel.name}!`);
 
 		const messageArray = config.welcomeMessage.leave.message;
 		const message = messageArray.length > 0 ? messageArray[Math.floor(Math.random() * messageArray.length)] : '[MEMBER] has joined the Discord server!';

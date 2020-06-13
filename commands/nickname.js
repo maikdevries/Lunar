@@ -1,5 +1,7 @@
 const { commandPrefix } = require('./../config.json');
 
+const { guildPermissionsCheck } = require('./../shared/permissionCheck.js');
+
 module.exports = {
 	name: 'nickname',
 	aliases: ['nick', 'name'],
@@ -13,8 +15,7 @@ module.exports = {
 function execute (client, message, args) {
 	if (!message.member.hasPermission('MANAGE_NICKNAMES')) return message.channel.send(`**Beans**! You don't have the right permissions to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
 
-	const botMember = message.guild.members.cache.get(client.user.id);
-	if (!botMember.hasPermission('MANAGE_NICKNAMES')) return message.channel.send(`**Yikes**! It seems like I don't have the right permissions to do this.`).then((msg) => msg.delete({ timeout: 3500 }));
+	if (!guildPermissionsCheck(client, message.guild, ['MANAGE_NICKNAMES'])) return message.channel.send(`**Yikes**! It seems like I don't have the right permissions to do this.`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	const member = message.mentions.members.first();
 	if (!member) return message.channel.send(`**Oh snap**! You forgot to mention the person you're trying to change the name of.`).then((msg) => msg.delete({ timeout: 3500 }));

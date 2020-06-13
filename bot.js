@@ -40,7 +40,7 @@ client.on('message', (message) => {
 	commandHandler.execute(client, message);
 });
 
-client.on('messageUpdate', async (ignore, newMessage) => {
+client.on('messageUpdate', (ignore, newMessage) => {
 	client.emit('message', newMessage);
 });
 
@@ -52,17 +52,13 @@ client.on('presenceUpdate', (oldPresence, newPresence) => {
 
 
 // Adds role to user based on reaction added to message
-client.on('messageReactionAdd', async (reaction, user) => {
-	if (reaction.partial) await reaction.fetch().catch((error) => console.error(`An error occurred fetching the partial reaction message, ${error}`));
-
+client.on('messageReactionAdd', (reaction, user) => {
 	reactionRole.roleAdd(client, reaction, user);
 	serverLock.memberUnlock(client, reaction, user);
 });
 
 // Removes role from user based on reaction removed from message
-client.on('messageReactionRemove', async (reaction, user) => {
-	if (reaction.partial) await reaction.fetch().catch((error) => console.error(`An error occurred fetching the partial reaction message, ${error}`));
-
+client.on('messageReactionRemove', (reaction, user) => {
 	reactionRole.roleRemove(client, reaction, user);
 });
 
@@ -82,6 +78,10 @@ client.on('guildMemberRemove', (member) => {
 
 client.on('error', (error) => {
 	console.error(`An error occurred with Discord, ${error}`);
+});
+
+client.on('warn', (warning) => {
+	console.warn(`A warning was thrown by Discord, ${warning}`);
 });
 
 client.login(config.token);

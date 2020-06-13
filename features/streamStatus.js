@@ -1,5 +1,7 @@
 const config = require('./../config.json');
 
+const { guildPermissionsCheck } = require('./../shared/permissionCheck.js');
+
 module.exports = {
 	description: `Manages the 'Currently Livestreaming' role functionality`,
 	setStatus
@@ -15,8 +17,7 @@ function setStatus (client, ignore, newPresence) {
 
 	if (streamerRole && !newPresence.member.roles.cache.has(streamerRole)) return;
 
-	const botMember = newPresence.guild.members.cache.get(client.user.id);
-	if (!botMember.hasPermission('MANAGE_ROLES')) return console.error(`Missing permissions (MANAGE_ROLES) to change stream status role for ${newPresence.member.nickname}!`);
+	if (!guildPermissionsCheck(client, newPresence.guild, ['MANAGE_ROLES'])) return console.error(`Missing permissions (MANAGE_ROLES) to change stream status role for ${newPresence.member.nickname}!`);
 
 	if (newPresence.activities.some((activity) => activity.type === 'STREAMING')) return newPresence.member.roles.add(streamStatusRole).catch((error) => console.error(`Cannot add streamer status role, ${error}`));
 

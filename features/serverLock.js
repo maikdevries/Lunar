@@ -1,5 +1,7 @@
 const config = require('./../config.json');
 
+const { guildPermissionsCheck } = require('./../shared/permissionCheck.js');
+
 
 module.exports = {
 	description: `Handles both the 'memberLock' and 'memberUnlock' of the serverLock feature`,
@@ -12,8 +14,7 @@ module.exports = {
 function memberLock (client, member) {
 	if (!config.serverLock.enabled) return;
 
-	const botMember = member.guild.members.cache.get(client.user.id);
-	if (!botMember.hasPermission('MANAGE_ROLES')) return console.error(`Missing permissions (MANAGE_ROLES) to add server lock to ${member.nickname}!`);
+	if (!guildPermissionsCheck(client, member.guild, ['MANAGE_ROLES'])) return console.error(`Missing permissions (MANAGE_ROLES) to add server lock to ${member.nickname}!`);
 
 	const { role } = config.serverLock;
 	if (role) member.roles.add(role).catch((error) => console.error(`Cannot add 'memberLock' role, ${error}`));
@@ -23,8 +24,7 @@ function memberLock (client, member) {
 function memberUnlock (client, reaction, user) {
 	if (!config.serverLock.enabled || config.serverLock.manual) return;
 
-	const botMember = reaction.message.guild.members.cache.get(client.user.id);
-	if (!botMember.hasPermission('MANAGE_ROLES')) return console.error(`Missing permissions (MANAGE_ROLES) to remove server lock from ${user.username}!`);
+	if (!guildPermissionsCheck(client, reaction.message.guild, ['MANAGE_ROLES'])) return console.error(`Missing permissions (MANAGE_ROLES) to remove server lock from ${user.username}!`);
 
 	const emojiKey = reaction.emoji.id || reaction.emoji.name;
 	if (config.serverLock.message[reaction.message.id] !== emojiKey) return;

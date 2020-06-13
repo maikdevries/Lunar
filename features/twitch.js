@@ -3,6 +3,8 @@ const { MessageEmbed } = require('discord.js');
 
 const config = require('./../config.json');
 
+const { channelPermissionsCheck } = require('./../shared/permissionCheck.js');
+
 
 let accessToken;
 let streamStatus = false;
@@ -79,9 +81,7 @@ function sendAnnouncement (client, streamInfo, userInfo, gameInfo) {
 		const channel = client.channels.cache.get(channelID);
 		if (!channel) return console.error(`Couldn't send Twitch livestream announcement to ${channelID} because the announcement channel couldn't be found.`);
 
-		const botMember = channel.guild.members.cache.get(client.user.id);
-		const channelPermissions = channel.permissionsFor(botMember);
-		if (!channelPermissions.any('VIEW_CHANNEL') || !channelPermissions.any('SEND_MESSAGES') || !channelPermissions.any('MENTION_EVERYONE')) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out Twitch announcement to ${channel.name}!`);
+		if (!channelPermissionsCheck(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MENTION_EVERYONE'])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out Twitch announcement to ${channel.name}!`);
 
 		return channel.send(config.twitch.announcementMessage, { embed }).then((msg) => sentAnnouncementMessage.push(msg));
 	});

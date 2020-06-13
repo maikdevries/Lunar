@@ -1,6 +1,8 @@
 const { Collection } = require('discord.js');
 const fs = require('fs').promises;
 
+const { channelPermissionsCheck } = require('./../shared/permissionCheck.js');
+
 const config = require('./../config.json');
 
 const commands = new Collection();
@@ -27,9 +29,7 @@ async function execute (client, message) {
 
 	if (!message.content.startsWith(config.commandPrefix) || message.channel.type !== 'text') return;
 
-	const botMember = message.guild.members.cache.get(client.user.id);
-	const channelPermissions = message.channel.permissionsFor(botMember);
-	if (!channelPermissions.any('SEND_MESSAGES') || !channelPermissions.any('MANAGE_MESSAGES')) return console.error(`Missing permissions (SEND_MESSAGES or MANAGE_MESSAGES) to execute command in ${message.channel.name}!`);
+	if (!channelPermissionsCheck(client, message.channel, ['SEND_MESSAGES', 'MANAGE_MESSAGES'])) return console.error(`Missing permissions (SEND_MESSAGES or MANAGE_MESSAGES) to execute command in ${message.channel.name}!`);
 
 	const args = message.content.slice(config.commandPrefix.length).split(/ +/);
 	const commandName = args.shift().toLowerCase();
