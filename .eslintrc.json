@@ -94,7 +94,7 @@
 		"no-param-reassign": [
 			"error",
 			{
-				"props": true,
+				"props": false,
 				"ignorePropertyModificationsFor": ["req", "request", "res", "response"]
 			}
 		],

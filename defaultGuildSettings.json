@@ -1,0 +1,139 @@
+{
+	"commands": {
+		"prefix": "!",
+		"channelID": [
+
+		],
+
+		"8ball": {
+			"enabled": true,
+			"restricted": true,
+			"responses": [
+				"My answer is no.",
+				"The answer is yes.",
+				"Yep, that's true.",
+				"Nah, that's where you're wrong.",
+				"You can be certain.",
+				"Without a doubt.",
+				"Most certainly not.",
+				"Definitely not.",
+				"Don't think so.",
+				"You're not wrong.",
+				"Sure thing.",
+				"I wouldn't follow through.",
+				"Brainfart.",
+				"Uhhhh...",
+				"The question being?"
+			]
+		},
+		"about": {
+			"enabled": true,
+			"restricted": true
+		},
+		"ban": {
+			"enabled": true,
+			"restricted": false
+		},
+		"clear": {
+			"enabled": true,
+			"restricted": false
+		},
+		"invite": {
+			"enabled": true,
+			"restricted": true
+		},
+		"kick": {
+			"enabled": true,
+			"restricted": false
+		},
+		"nickname": {
+			"enabled": true,
+			"restricted": false
+		},
+		"slowmode": {
+			"enabled": true,
+			"restricted": false
+		}
+	},
+
+	"welcomeMessage": {
+		"welcome": {
+			"enabled": false,
+			"channelID": [
+
+			],
+			"message": [
+				"We've got a new member! Welcome [MEMBER]!",
+				"Hi [MEMBER]! **Welcome to the Discord**!",
+				"[MEMBER] is to be welcomed to the server!"
+			]
+		},
+		"leave": {
+			"enabled": false,
+			"channelID": [
+
+			],
+			"message": [
+				"[MEMBER] has fallen and will be remembered...",
+				"Rest in peace, [MEMBER]. You won't be forgotten."
+			]
+		},
+		"direct": {
+			"enabled": false,
+			"message": ""
+		}
+	},
+
+	"serverLock": {
+		"enabled": false,
+		"manual": false,
+		"role": "",
+		"message": {
+
+		}
+	},
+
+	"reactionRole": {
+		"enabled": false,
+		"messages": {
+
+		}
+	},
+
+	"streamStatus": {
+		"enabled": false,
+		"streamerRole": "",
+		"streamStatusRole": ""
+	},
+
+	"twitch": {
+		"enabled": false,
+		"username": "",
+
+		"announcementChannelID": [
+
+		],
+		"announcementMessage": ""
+	},
+
+	"youtube": {
+		"channel": "",
+
+		"video": {
+			"enabled": false,
+
+			"announcementChannelID": [
+
+			],
+			"announcementMessage": ""
+		},
+		"stream": {
+			"enabled": false,
+
+			"announcementChannelID": [
+
+			],
+			"announcementMessage": ""
+		}
+	}
+}

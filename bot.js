@@ -1,7 +1,10 @@
 const Discord = require('discord.js');
 const client = new Discord.Client({ partials: ['MESSAGE', 'REACTION'] });
 
+const Enmap = require('enmap');
+
 const config = require('./config.json');
+const defaultGuildSettings = require('./defaultGuildSettings.json');
 
 const welcomeMessage = require('./features/welcomeMessage.js');
 const serverLock = require('./features/serverLock.js');
@@ -22,6 +25,14 @@ client.on('ready', async () => {
 	await client.user.setActivity(config.activity, { type: 'PLAYING' })
 		.catch((error) => console.error(`An error occurred when setting the default activity, ${error}`));
 
+	client.settings = new Enmap({
+		name: 'settings',
+		fetchAll: false,
+		autoFetch: true,
+		cloneLevel: 'deep',
+		ensureProps: true
+	});
+
 	await commandHandler.setup();
 
 	// Set an interval to poll the Twitch API repeatedly
@@ -32,6 +43,18 @@ client.on('ready', async () => {
 	setInterval(() => youtube.fetchStream(client), 1200000);
 
 	console.log(`${client.user.username} has loaded successfully and is now online!`);
+});
+
+
+// TODO Server feature setup through Discord DMs
+// Creates a record with the default guild settings for the Discord server the bot joined
+client.on('guildCreate', (guild) => {
+	client.settings.set(guild.id, defaultGuildSettings);
+});
+
+// Deletes the server specific settings from the database when the bot leaves the Discord server
+client.on('guildDelete', (guild) => {
+	client.settings.delete(guild.id);
 });
 
 
