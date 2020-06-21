@@ -484,6 +484,8 @@
 		"symbol-description": "error",
 		"template-curly-spacing": ["error", "never"],
 		"yield-star-spacing": ["error", "both"],
-		"no-loss-of-precision": "error"
+		"no-loss-of-precision": "error",
+		"no-promise-executor-return": "error",
+		"no-unreachable-loop": "error"
 	}
 }
