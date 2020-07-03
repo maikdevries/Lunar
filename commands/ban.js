@@ -27,10 +27,7 @@ function execute (client, message, args) {
 		if (userToBan.hasPermission('BAN_MEMBERS')) return message.channel.send(`**Uhm**... You can't ban someone with the same privileges as yourself!`).then((msg) => msg.delete({ timeout: 3500 }));
 
 		userToBan.ban({ days: 7, reason: args[1] })
-			.then((member) => {
-				message.delete();
-				return message.channel.send(`**Nice**! You've successfully banned ${member.displayName} from this server.`).then((msg) => msg.delete({ timeout: 3500 }));
-			})
+			.then((member) => message.channel.send(`**Nice**! You've successfully banned ${member.displayName} from this server.`).then((msg) => msg.delete({ timeout: 3500 })))
 			.catch((error) => {
 				console.error(`An error occurred when trying to ban a member, ${error}`);
 				message.channel.send('**Oh no**! Something went terribly wrong! Please try again later.').then((msg) => msg.delete({ timeout: 3500 }));

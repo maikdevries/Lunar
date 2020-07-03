@@ -26,7 +26,6 @@ function execute (client, message, ignore) {
 			.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
 			.setTimestamp(Date.now());
 
-		message.delete();
 		return message.channel.send({ embed });
 	});
 }

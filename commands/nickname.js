@@ -26,11 +26,10 @@ function execute (client, message, args) {
 	if (nickname.length < 1) return message.channel.send(`**Ah**! You need to provide a new nickname!`).then((msg) => msg.delete({ timeout: 3500 }));
 	if (nickname.length > 32) return message.channel.send(`**Hmmm**... A nickname can't be longer than 32 characters due to a Discord limitation.`).then((msg) => msg.delete({ timeout: 3500 }));
 
-	member.setNickname(nickname).then((changedMember) => {
-		message.delete();
-		return message.channel.send(`**Great**! You've successfully changed their nickname to ${changedMember.displayName}!`).then((msg) => msg.delete({ timeout: 3500 }));
-	}).catch((error) => {
-		console.error(`An error occurred when trying to change a nickname, ${error}`);
-		return message.channel.send(`**Oops**! A thing or two went wrong... Try again later!`).then((msg) => msg.delete({ timeout: 3500 }));
-	});
+	member.setNickname(nickname)
+		.then((changedMember) => message.channel.send(`**Great**! You've successfully changed their nickname to ${changedMember.displayName}!`).then((msg) => msg.delete({ timeout: 3500 })))
+		.catch((error) => {
+			console.error(`An error occurred when trying to change a nickname, ${error}`);
+			return message.channel.send(`**Oops**! A thing or two went wrong... Try again later!`).then((msg) => msg.delete({ timeout: 3500 }));
+		});
 }

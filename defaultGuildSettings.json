@@ -50,6 +50,10 @@
 			"enabled": true,
 			"restricted": false
 		},
+		"settings": {
+			"enabled": true,
+			"restricted": false
+		},
 		"slowmode": {
 			"enabled": true,
 			"restricted": false

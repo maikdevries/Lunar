@@ -27,10 +27,7 @@ function execute (client, message, args) {
 		if (userToKick.hasPermission('KICK_MEMBERS') || userToKick.hasPermission('BAN_MEMBERS')) return message.channel.send(`**Uhm**... You can't kick someone with the same privileges as yourself!`).then((msg) => msg.delete({ timeout: 3500 }));
 
 		userToKick.kick(args[1])
-			.then((member) => {
-				message.delete();
-				return message.channel.send(`**Nice**! You've successfully kicked ${member.displayName} from this server.`).then((msg) => msg.delete({ timeout: 3500 }));
-			})
+			.then((member) => message.channel.send(`**Nice**! You've successfully kicked ${member.displayName} from this server.`).then((msg) => msg.delete({ timeout: 3500 })))
 			.catch((error) => {
 				console.error(`An error occurred when trying to kick a member, ${error}`);
 				message.channel.send('**Oh no**! Something went terribly wrong! Please try again later.').then((msg) => msg.delete({ timeout: 3500 }));

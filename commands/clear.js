@@ -19,17 +19,12 @@ function execute (ignore, message, args) {
 	if (isNaN(numberOfMessages)) return message.channel.send(`**Oops**! That doesn't seem to be a number! Please try again later.`).then((msg) => msg.delete({ timeout: 3500 }));
 	if (numberOfMessages < 1 || numberOfMessages > 99) return message.channel.send(`**Oops**! That doesn't seem to work! Please try again with a number between 1 and 99!`).then((msg) => msg.delete({ timeout: 3500 }));
 
-	// Fetches the messages if not in cache and attempts to delete them in bulk
 	message.channel.messages.fetch({ limit: numberOfMessages + 1 })
 		.then((messages) => {
 			let filteredMessages;
 			if (userToPurge) {
 				filteredMessages = messages.filter((msg) => msg.author.id === userToPurge.id);
 
-				// Delete the message that invoked the command to keep the channel nice and clean
-				message.delete();
-
-				// Sets variable to the actual number of messages deleted instead of the default 100 when clearing a specific user
 				numberOfMessages = filteredMessages.length;
 			}
 

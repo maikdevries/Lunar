@@ -21,8 +21,6 @@ function execute (client, message, args) {
 	if (isNaN(numberOfSeconds)) return message.channel.send(`**Ah**, that doesn't seem to be a number. Please try again!`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	message.channel.setRateLimitPerUser(numberOfSeconds).then(() => {
-		message.delete();
-
 		if (numberOfSeconds > 0) return message.channel.send(`**Done**! I turned on slowmode for this channel and set it to ${numberOfSeconds} seconds.`).then((msg) => msg.delete({ timeout: 3500 }));
 		return message.channel.send(`**Done**! I turned off slowmode for this channel.`).then((msg) => msg.delete({ timeout: 3500 }));
 	}).catch((error) => {

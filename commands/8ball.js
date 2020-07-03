@@ -13,8 +13,6 @@ module.exports = {
 function execute (ignore, message, args) {
 	if (!args[args.length - 1].endsWith('?')) return message.channel.send(`**Hmmm**, you forgot to ask a question!`).then((msg) => msg.delete({ timeout: 3500 }));
 
-	message.delete();
-
 	const { responses } = config.commands['8ball'];
 	return message.channel.send(`> ${args.join(' ')}\n${responses[Math.floor(Math.random() * responses.length)]}`);
 }
