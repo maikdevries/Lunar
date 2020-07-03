@@ -1,5 +1,3 @@
-const { commandPrefix } = require('./../config.json');
-
 const { guildPermissionsCheck } = require('./../shared/permissionCheck.js');
 
 module.exports = {
@@ -7,7 +5,7 @@ module.exports = {
 	aliases: ['nick', 'name'],
 	description: 'A command that turns on/off slowmode for the current channel',
 	args: true,
-	usage: `${commandPrefix}nickname @[user] [name]`,
+	usage: `[PREFIX]nickname @[user] [name]`,
 
 	execute
 };

@@ -1,11 +1,9 @@
-const { commandPrefix } = require('./../config.json');
-
 module.exports = {
 	name: 'clear',
 	aliases: ['purge', 'remove', 'delete'],
 	description: 'A command used to clear a given number of messages in the current channel',
 	args: true,
-	usage: `${commandPrefix}clear [number] - ${commandPrefix}clear @[user]`,
+	usage: `[PREFIX]clear [number] - [PREFIX]clear @[user]`,
 
 	execute
 };

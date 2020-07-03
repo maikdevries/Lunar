@@ -1,5 +1,3 @@
-const { commandPrefix } = require('./../config.json');
-
 const { channelPermissionsCheck } = require('./../shared/permissionCheck.js');
 
 module.exports = {
@@ -7,7 +5,7 @@ module.exports = {
 	aliases: ['link'],
 	description: 'A command to generate an invite link to the current channel',
 	args: false,
-	usage: `${commandPrefix}invite`,
+	usage: `[PREFIX]invite`,
 
 	execute
 };

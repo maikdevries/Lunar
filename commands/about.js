@@ -2,14 +2,13 @@ const { execSync } = require('child_process');
 const { MessageEmbed } = require('discord.js');
 
 const package = require('./../package.json');
-const { commandPrefix } = require('./../config.json');
 
 module.exports = {
 	name: 'about',
 	aliases: ['version'],
 	description: 'A command to get the latest technical information on the bot',
 	args: false,
-	usage: `${commandPrefix}about`,
+	usage: `[PREFIX]about`,
 
 	execute
 };

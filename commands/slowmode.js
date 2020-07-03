@@ -1,5 +1,3 @@
-const { commandPrefix } = require('./../config.json');
-
 const { channelPermissionsCheck } = require('./../shared/permissionCheck.js');
 
 module.exports = {
@@ -7,7 +5,7 @@ module.exports = {
 	aliases: ['slow'],
 	description: 'A command that turns on/off slowmode for the current channel',
 	args: true,
-	usage: `${commandPrefix}slowmode [number]`,
+	usage: `[PREFIX]slowmode [number]`,
 
 	execute
 };

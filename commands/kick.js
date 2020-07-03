@@ -1,5 +1,3 @@
-const { commandPrefix } = require('./../config.json');
-
 const { guildPermissionsCheck } = require('./../shared/permissionCheck.js');
 
 module.exports = {
@@ -7,7 +5,7 @@ module.exports = {
 	aliases: [],
 	description: 'A command to kick a user from the server, with optional reason',
 	args: true,
-	usage: `${commandPrefix}kick @[user(s)] - ${commandPrefix}kick @[user(s)] [reason]`,
+	usage: `[PREFIX]kick @[user(s)] - [PREFIX]kick @[user(s)] [reason]`,
 
 	execute
 };
