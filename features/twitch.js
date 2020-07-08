@@ -22,7 +22,7 @@ module.exports = {
 function fetchStream (client) {
 	if (!config.twitch.enabled) return;
 
-	if (config.twitch.announcementChannelID.length < 1) return console.error(`Cannot send Twitch announcement, no announcement channels were specified in the config!`);
+	if (config.twitch.channels.length) return console.error(`Cannot send Twitch announcement, no announcement channels were specified in the config!`);
 
 	if (!accessToken) return getAccessToken();
 
@@ -77,16 +77,16 @@ function sendAnnouncement (client, streamInfo, userInfo, gameInfo) {
 		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
 		.setTimestamp(new Date(streamInfo.data[0].started_at));
 
-	config.twitch.announcementChannelID.forEach((channelID) => {
+	config.twitch.channels.forEach((channelID) => {
 		const channel = client.channels.cache.get(channelID);
 		if (!channel) return console.error(`Couldn't send Twitch livestream announcement to ${channelID} because the announcement channel couldn't be found.`);
 
 		if (!channelPermissionsCheck(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MENTION_EVERYONE'])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out Twitch announcement to ${channel.name}!`);
 
-		return channel.send(config.twitch.announcementMessage, { embed }).then((msg) => sentAnnouncementMessage.push(msg));
+		return channel.send(config.twitch.message, { embed }).then((msg) => sentAnnouncementMessage.push(msg));
 	});
 
-	if (sentAnnouncementMessage.length > 0) return update();
+	if (sentAnnouncementMessage.length) return update();
 }
 
 // Updates the livestream announcement every 3 minutes with current stream statistics
@@ -102,7 +102,7 @@ function update () {
 					.setThumbnail((gameInfo.data[0].box_art_url).replace('{width}', '300').replace('{height}', '400'))
 					.setImage(`${(streamInfo.data[0].thumbnail_url).replace('{width}', '1920').replace('{height}', '1080')}?date=${Date.now()}`);
 
-				return message.edit(config.twitch.announcementMessage, editedEmbed);
+				return message.edit(config.twitch.message, editedEmbed);
 			});
 		});
 	}, 180000);
@@ -132,7 +132,7 @@ function streamOffline () {
 					.setDescription(`Today's stream is **over** but you can watch the **VOD**!\n\n[**Watch the VOD!**](${videoInfo.data[0].url})`)
 					.setImage(`${(videoInfo.data[0].thumbnail_url).replace('%{width}', '1920').replace('%{height}', '1080')}?date=${Date.now()}`);
 
-				return message.edit(config.twitch.announcementMessage, editedEmbed);
+				return message.edit(config.twitch.message, editedEmbed);
 			});
 		}
 	});

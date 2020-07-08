@@ -27,7 +27,7 @@ function memberUnlock (client, reaction, user) {
 	if (!guildPermissionsCheck(client, reaction.message.guild, ['MANAGE_ROLES'])) return console.error(`Missing permissions (MANAGE_ROLES) to remove server lock from ${user.username}!`);
 
 	const emojiKey = reaction.emoji.id || reaction.emoji.name;
-	if (config.serverLock.message[reaction.message.id] !== emojiKey) return;
+	if (config.serverLock.messages[reaction.message.id] !== emojiKey) return;
 
 	const { role } = config.serverLock;
 	const member = reaction.message.guild.members.cache.get(user.id);

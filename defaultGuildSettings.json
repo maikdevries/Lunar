@@ -1,14 +1,14 @@
 {
 	"commands": {
 		"prefix": "!",
-		"channelID": [
+		"channels": [
 
 		],
 
 		"8ball": {
 			"enabled": true,
 			"restricted": true,
-			"responses": [
+			"messages": [
 				"My answer is no.",
 				"The answer is yes.",
 				"Yep, that's true.",
@@ -63,10 +63,10 @@
 	"welcomeMessage": {
 		"welcome": {
 			"enabled": false,
-			"channelID": [
+			"channels": [
 
 			],
-			"message": [
+			"messages": [
 				"We've got a new member! Welcome [MEMBER]!",
 				"Hi [MEMBER]! **Welcome to the Discord**!",
 				"[MEMBER] is to be welcomed to the server!"
@@ -74,17 +74,13 @@
 		},
 		"leave": {
 			"enabled": false,
-			"channelID": [
+			"channels": [
 
 			],
-			"message": [
+			"messages": [
 				"[MEMBER] has fallen and will be remembered...",
 				"Rest in peace, [MEMBER]. You won't be forgotten."
 			]
-		},
-		"direct": {
-			"enabled": false,
-			"message": ""
 		}
 	},
 
@@ -92,7 +88,7 @@
 		"enabled": false,
 		"manual": false,
 		"role": "",
-		"message": {
+		"messages": {
 
 		}
 	},
@@ -113,11 +109,10 @@
 	"twitch": {
 		"enabled": false,
 		"username": "",
-
-		"announcementChannelID": [
+		"channels": [
 
 		],
-		"announcementMessage": ""
+		"message": ""
 	},
 
 	"youtube": {
@@ -125,19 +120,17 @@
 
 		"video": {
 			"enabled": false,
-
-			"announcementChannelID": [
+			"channels": [
 
 			],
-			"announcementMessage": ""
+			"message": ""
 		},
 		"stream": {
 			"enabled": false,
-
-			"announcementChannelID": [
+			"channels": [
 
 			],
-			"announcementMessage": ""
+			"message": ""
 		}
 	}
 }

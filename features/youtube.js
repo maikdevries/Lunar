@@ -21,7 +21,7 @@ module.exports = {
 function fetchVideo (client) {
 	if (!config.youtube.video.enabled) return;
 
-	if (config.youtube.video.announcementChannelID.length < 1) return console.error(`Cannot send YouTube video announcement, no announcement channels were specified in the config!`);
+	if (config.youtube.video.channels.length) return console.error(`Cannot send YouTube video announcement, no announcement channels were specified in the config!`);
 
 	if (!latestVideo) return setLatestVideo();
 
@@ -77,13 +77,13 @@ function sendVideoAnnouncement (client, videoInfo, channelInfo) {
 		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
 		.setTimestamp(new Date(videoInfo.items[0].snippet.publishedAt));
 
-	config.youtube.video.announcementChannelID.forEach((channelID) => {
+	config.youtube.video.channels.forEach((channelID) => {
 		const channel = client.channels.cache.get(channelID);
 		if (!channel) return console.error(`Couldn't send YouTube new video announcement to ${channelID} because the channel couldn't be found.`);
 
 		if (!channelPermissionsCheck(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MENTION_EVERYONE'])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out YouTube announcement to ${channel.name}!`);
 
-		return channel.send(config.youtube.video.announcementMessage, { embed });
+		return channel.send(config.youtube.video.message, { embed });
 	});
 }
 
@@ -92,7 +92,7 @@ function sendVideoAnnouncement (client, videoInfo, channelInfo) {
 function fetchStream (client) {
 	if (!config.youtube.stream.enabled) return;
 
-	if (config.youtube.stream.announcementChannelID.length < 1) return console.error(`Cannot send YouTube stream announcement, no announcement channels were specified in the config!`);
+	if (config.youtube.stream.channels.length) return console.error(`Cannot send YouTube stream announcement, no announcement channels were specified in the config!`);
 
 	const path = `search?part=snippet&channelId=${config.youtube.channel}&maxResults=1&eventType=live&type=video&key=${config.youtube.APIkey}`;
 
@@ -120,13 +120,13 @@ function sendStreamAnnouncement (client, streamInfo) {
 		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
 		.setTimestamp(new Date(streamInfo.items[0].snippet.publishedAt));
 
-	config.youtube.stream.announcementChannelID.forEach((channelID) => {
+	config.youtube.stream.channels.forEach((channelID) => {
 		const channel = client.channels.cache.get(channelID);
 		if (!channel) return console.error(`Couldn't send YouTube livestream announcement because the announcement channel couldn't be found.`);
 
 		if (!channelPermissionsCheck(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MENTION_EVERYONE'])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out YouTube announcement to ${channel.name}!`);
 
-		return channel.send(config.youtube.stream.announcementMessage, { embed });
+		return channel.send(config.youtube.stream.message, { embed });
 	});
 }
 

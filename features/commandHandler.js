@@ -42,7 +42,7 @@ async function execute (client, message) {
 
 	if (!guildCommandSettings[command.name].enabled) return message.channel.send(`**Err**... This command has been disabled by the server owner.`).then((msg) => msg.delete({ timeout: 3500 }));
 
-	if (guildCommandSettings[command.name].restricted && guildCommandSettings.channelID.length && !guildCommandSettings.channelID.includes(message.channel.id)) return message.channel.send(`**Oops**! This command cannot be used in this channel!`).then((msg) => msg.delete({ timeout: 3500 }));
+	if (guildCommandSettings[command.name].restricted && guildCommandSettings.channels.length && !guildCommandSettings.channels.includes(message.channel.id)) return message.channel.send(`**Oops**! This command cannot be used in this channel!`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	if (message.edits.length > 3) return message.channel.send(`**Excuse me**, third time wasn't the charm for you. Please send a new message instead of editing the original.`).then((msg) => msg.delete({ timeout: 3500 }));
 

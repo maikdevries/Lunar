@@ -89,7 +89,6 @@ client.on('messageReactionRemove', (reaction, user) => {
 // Sends out a welcome message when a new user joins the server
 client.on('guildMemberAdd', (member) => {
 	welcomeMessage.memberAdd(client, member);
-	welcomeMessage.memberAddDM(member);
 	serverLock.memberLock(client, member);
 });
 
