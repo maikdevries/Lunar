@@ -22,7 +22,7 @@ module.exports = {
 function fetchStream (client) {
 	if (!config.twitch.enabled) return;
 
-	if (config.twitch.channels.length) return console.error(`Cannot send Twitch announcement, no announcement channels were specified in the config!`);
+	if (!config.twitch.channels.length) return console.error(`Cannot send Twitch announcement, no announcement channels were specified in the config!`);
 
 	if (!accessToken) return getAccessToken();
 

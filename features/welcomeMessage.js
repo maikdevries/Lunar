@@ -23,7 +23,7 @@ function memberAdd (client, member) {
 		if (!channelPermissionsCheck(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES'])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES) to send out welcome message to ${channel.name}!`);
 
 		const messageArray = guildSettings.messages;
-		const message = messageArray.length > 0 ? messageArray[Math.floor(Math.random() * messageArray.length)] : '[MEMBER] has joined the Discord server!';
+		const message = messageArray.length ? messageArray[Math.floor(Math.random() * messageArray.length)] : '[MEMBER] has joined the Discord server!';
 
 		return channel.send(message.replace(/\[MEMBER\]/, `${member}`));
 	});
@@ -35,7 +35,7 @@ function memberRemove (client, member) {
 
 	if (!guildSettings.enabled) return;
 
-	if (guildSettings.channels.length) return console.error(`Cannot send leave message, no leave channels were specified in the config!`);
+	if (!guildSettings.channels.length) return console.error(`Cannot send leave message, no leave channels were specified in the config!`);
 
 	guildSettings.channels.forEach((channelID) => {
 		const channel = member.guild.channels.cache.get(channelID);
@@ -44,7 +44,7 @@ function memberRemove (client, member) {
 		if (!channelPermissionsCheck(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES'])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES) to send out welcome message to ${channel.name}!`);
 
 		const messageArray = guildSettings.messages;
-		const message = messageArray.length > 0 ? messageArray[Math.floor(Math.random() * messageArray.length)] : '[MEMBER] has joined the Discord server!';
+		const message = messageArray.length ? messageArray[Math.floor(Math.random() * messageArray.length)] : '[MEMBER] has joined the Discord server!';
 
 		return channel.send(message.replace(/\[MEMBER\]/, `${member}`));
 	});

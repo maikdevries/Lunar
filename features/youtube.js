@@ -21,7 +21,7 @@ module.exports = {
 function fetchVideo (client) {
 	if (!config.youtube.video.enabled) return;
 
-	if (config.youtube.video.channels.length) return console.error(`Cannot send YouTube video announcement, no announcement channels were specified in the config!`);
+	if (!config.youtube.video.channels.length) return console.error(`Cannot send YouTube video announcement, no announcement channels were specified in the config!`);
 
 	if (!latestVideo) return setLatestVideo();
 
@@ -92,7 +92,7 @@ function sendVideoAnnouncement (client, videoInfo, channelInfo) {
 function fetchStream (client) {
 	if (!config.youtube.stream.enabled) return;
 
-	if (config.youtube.stream.channels.length) return console.error(`Cannot send YouTube stream announcement, no announcement channels were specified in the config!`);
+	if (!config.youtube.stream.channels.length) return console.error(`Cannot send YouTube stream announcement, no announcement channels were specified in the config!`);
 
 	const path = `search?part=snippet&channelId=${config.youtube.channel}&maxResults=1&eventType=live&type=video&key=${config.youtube.APIkey}`;
 

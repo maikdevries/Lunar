@@ -1,5 +1,3 @@
-const config = require('./../config.json');
-
 const { guildPermissionsCheck } = require('./../shared/permissionCheck.js');
 
 module.exports = {
@@ -13,11 +11,13 @@ module.exports = {
 async function roleAdd (client, reaction, user) {
 	if (reaction.partial) await reaction.fetch().catch((error) => console.error(`An error occurred fetching the partial reaction message, ${error}`));
 
-	if (!config.reactionRole.enabled || typeof config.reactionRole.messages[reaction.message.id] === 'undefined' || config.reactionRole.messages[reaction.message.id] === null) return;
+	const guildSettings = client.settings.get(reaction.message.guild.id, 'reactionRole');
+
+	if (!guildSettings.enabled || typeof guildSettings.messages[reaction.message.id] === 'undefined' || guildSettings.messages[reaction.message.id] === null) return;
 
 	if (!guildPermissionsCheck(client, reaction.message.guild, ['MANAGE_ROLES'])) return console.error(`Missing permissions (MANAGE_ROLES) to add reaction role in ${reaction.message.channel.name}!`);
 
-	const roles = config.reactionRole.messages[reaction.message.id][reaction.emoji.id || reaction.emoji.name];
+	const roles = guildSettings.messages[reaction.message.id][reaction.emoji.id || reaction.emoji.name];
 	const member = reaction.message.guild.members.cache.get(user.id);
 
 	if (roles) member.roles.add(roles).catch((error) => console.error(`Cannot add roles, ${error}`));
@@ -27,11 +27,13 @@ async function roleAdd (client, reaction, user) {
 async function roleRemove (client, reaction, user) {
 	if (reaction.partial) await reaction.fetch().catch((error) => console.error(`An error occurred fetching the partial reaction message, ${error}`));
 
-	if (!config.reactionRole.enabled || typeof config.reactionRole.messages[reaction.message.id] === 'undefined' || config.reactionRole.messages[reaction.message.id] === null) return;
+	const guildSettings = client.settings.get(reaction.message.guild.id, 'reactionRole');
+
+	if (!guildSettings.enabled || typeof guildSettings.messages[reaction.message.id] === 'undefined' || guildSettings.messages[reaction.message.id] === null) return;
 
 	if (!guildPermissionsCheck(client, reaction.message.guild, ['MANAGE_ROLES'])) return console.error(`Missing permissions (MANAGE_ROLES) to add reaction role in ${reaction.message.channel.name}!`);
 
-	const roles = config.reactionRole.messages[reaction.message.id][reaction.emoji.id || reaction.emoji.name];
+	const roles = guildSettings.messages[reaction.message.id][reaction.emoji.id || reaction.emoji.name];
 	const member = reaction.message.guild.members.cache.get(user.id);
 
 	if (roles) member.roles.remove(roles).catch((error) => console.error(`Cannot remove roles, ${error}`));
