@@ -102,7 +102,7 @@
 	"streamStatus": {
 		"enabled": false,
 		"streamerRole": "",
-		"streamStatusRole": ""
+		"statusRole": ""
 	},
 
 	"twitch": {

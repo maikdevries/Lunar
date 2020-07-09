@@ -46,6 +46,9 @@ const REACTION_ADD = { name: 'add', description: 'Add message/reaction/role to r
 const REACTION_REMOVE = { name: 'remove', description: 'Remove message/reaction/role from reaction role' };
 const REACTION_CLEAR = { name: 'clear', description: 'Clear messages/reactions/roles from reaction role' };
 
+const STATUS_STREAMER = { name: 'streamerRole', description: 'Set a required role to be eligible to get the currently livestreaming role' };
+const STATUS_ROLE = { name: 'statusRole', description: 'Set the currently livestreaming role' };
+
 const COMMAND_RESTRICT = { name: 'restricted', description: 'Enable or disable command restriction to specified channel(s)' };
 
 const COMMANDS_PREFIX = { name: 'prefix', description: 'Set the command prefix for this Discord server' };
@@ -135,7 +138,7 @@ function serverLockSettings (client, message, args) {
 	switch (args[1]) {
 		case 'enabled': return handleEnabledSettings(client, message, args[2], 'serverLock');
 
-		case 'role': return serverLockRoleSettings(client, message, args[2]);
+		case 'role': return addRoleSettings(client, message, args[2], `serverLock.role`);
 
 		case 'message': return serverLockMessageSettings(client, message, args[2], args[3], args[4]);
 
@@ -145,7 +148,15 @@ function serverLockSettings (client, message, args) {
 
 
 function streamStatusSettings (client, message, args) {
+	switch (args[1]) {
+		case 'enabled': return handleEnabledSettings(client, message, args[2], 'streamStatus');
 
+		case 'streamerRole': return addRoleSettings(client, message, args[2], `streamStatus.streamerRole`);
+
+		case 'statusRole': return addRoleSettings(client, message, args[2], `streamStatus.statusRole`);
+
+		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, STATUS_STREAMER, STATUS_ROLE]));
+	}
 }
 
 
@@ -210,14 +221,6 @@ function commandChangeRestrictionSettings (client, message, command, boolean) {
 	return message.channel.send(`**Nice**! Successfully changed the \`restricted\` property of **${command}** to **${boolean}**!`).then((msg) => msg.delete({ timeout: 3500 }));
 }
 
-
-async function serverLockRoleSettings (client, message, roleMention) {
-	const role = await parseRole(message, roleMention);
-	if (!role) return;
-
-	client.settings.set(message.guild.id, role.id, 'serverLock.role');
-	return message.channel.send(`**Nice**! Successfully changed the server lock role to **${role.name}**`).then((msg) => msg.delete({ timeout: 3500 }));
-}
 
 async function serverLockMessageSettings (client, message, channelMention, messageMention, emojiMention) {
 	const newChannel = await parseChannel(client, message, channelMention);
@@ -389,6 +392,16 @@ async function resetMessageSettings (client, message, path) {
 }
 
 
+async function addRoleSettings (client, message, roleMention, path) {
+	const role = await parseRole(message, roleMention);
+	if (!role) return;
+
+	client.settings.set(message.guild.id, role.id, path);
+	console.log(client.settings.export());
+	return message.channel.send(`**Nice**! Successfully changed the role!`).then((msg) => msg.delete({ timeout: 3500 }));
+}
+
+
 async function addReactionRoleMessageSettings (client, message, messageMention) {
 	if (!await parseMessage(message, null, messageMention)) return;
 
@@ -493,7 +506,6 @@ function addReactionRoleSettings (client, message, newMessage, newReaction, newR
 	client.settings.ensure(message.guild.id, [], `reactionRole.messages.${newMessage}.${newReaction}`);
 
 	client.settings.push(message.guild.id, newRole.id, `reactionRole.messages.${newMessage}.${newReaction}`);
-	console.log(client.settings.export());
 	return message.channel.send(`**Nice**! Successfully created a new reaction role!`).then((msg) => msg.delete({ timeout: 3500 }));
 }
 
