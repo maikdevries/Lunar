@@ -86,9 +86,8 @@
 
 	"serverLock": {
 		"enabled": false,
-		"manual": false,
 		"role": "",
-		"messages": {
+		"message": {
 
 		}
 	},
