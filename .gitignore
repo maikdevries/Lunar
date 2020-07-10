@@ -9,3 +9,6 @@
 
 # Ignore database files
 **/data/
+
+# Ignore environment variables
+*.env

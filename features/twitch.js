@@ -83,7 +83,8 @@ function sendAnnouncement (client, streamInfo, userInfo, gameInfo) {
 
 		if (!channelPermissionsCheck(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MENTION_EVERYONE'])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out Twitch announcement to ${channel.name}!`);
 
-		return channel.send(config.twitch.message, { embed }).then((msg) => sentAnnouncementMessage.push(msg));
+		const { messages } = config.twitch;
+		return channel.send(messages[Math.floor(Math.random() * messages.length)], { embed }).then((msg) => sentAnnouncementMessage.push(msg));
 	});
 
 	if (sentAnnouncementMessage.length) return update();
@@ -102,7 +103,7 @@ function update () {
 					.setThumbnail((gameInfo.data[0].box_art_url).replace('{width}', '300').replace('{height}', '400'))
 					.setImage(`${(streamInfo.data[0].thumbnail_url).replace('{width}', '1920').replace('{height}', '1080')}?date=${Date.now()}`);
 
-				return message.edit(config.twitch.message, editedEmbed);
+				return message.edit(message.content, editedEmbed);
 			});
 		});
 	}, 180000);
@@ -132,7 +133,7 @@ function streamOffline () {
 					.setDescription(`Today's stream is **over** but you can watch the **VOD**!\n\n[**Watch the VOD!**](${videoInfo.data[0].url})`)
 					.setImage(`${(videoInfo.data[0].thumbnail_url).replace('%{width}', '1920').replace('%{height}', '1080')}?date=${Date.now()}`);
 
-				return message.edit(config.twitch.message, editedEmbed);
+				return message.edit(message.content, editedEmbed);
 			});
 		}
 	});
@@ -153,7 +154,7 @@ async function fetchOfflineData () {
 function getAccessToken () {
 	const options = {
 		host: 'id.twitch.tv',
-		path: `/oauth2/token?client_id=${config.twitch['client-ID']}&client_secret=${config.twitch['client-secret']}&grant_type=client_credentials`,
+		path: `/oauth2/token?client_id=${process.env.TWITCH_ID}&client_secret=${process.env.TWITCH_SECRET}&grant_type=client_credentials`,
 		method: 'POST'
 	};
 
@@ -186,7 +187,7 @@ function callAPI (path) {
 			path: `/helix/${path}`,
 			method: 'GET',
 			headers: {
-				'Client-ID': config.twitch['client-ID'],
+				'Client-ID': process.env.TWITCH_ID,
 				Authorization: `Bearer ${accessToken}`
 			}
 		};

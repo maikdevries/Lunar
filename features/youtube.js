@@ -32,7 +32,7 @@ function fetchVideo (client) {
 		// Return if the video hasn't been uploaded in the last 12 hours
 		if (Math.abs(Date.parse(videoInfo.items[0].snippet.publishedAt) - Date.now()) >= 43200000) return;
 
-		const path = `channels?part=snippet&id=${config.youtube.channel}&key=${config.youtube.APIkey}`;
+		const path = `channels?part=snippet&id=${config.youtube.channel}&key=${process.env.YOUTUBE_VIDEO_KEY}`;
 		callAPI(path).then((channelInfo) => {
 			if (channelInfo.error) return;
 
@@ -53,10 +53,10 @@ function setLatestVideo () {
 
 // Fetches data required to check if there is a new video release
 async function fetchData () {
-	let path = `channels?part=contentDetails&id=${config.youtube.channel}&key=${config.youtube.APIkey}`;
+	let path = `channels?part=contentDetails&id=${config.youtube.channel}&key=${process.env.YOUTUBE_VIDEO_KEY}`;
 	const channelContent = await callAPI(path);
 
-	path = `playlistItems?part=snippet&maxResults=1&playlistId=${channelContent.items[0].contentDetails.relatedPlaylists.uploads}&key=${config.youtube.APIkey}`;
+	path = `playlistItems?part=snippet&maxResults=1&playlistId=${channelContent.items[0].contentDetails.relatedPlaylists.uploads}&key=${process.env.YOUTUBE_VIDEO_KEY}`;
 	const videoInfo = await callAPI(path);
 
 	return videoInfo;
@@ -83,7 +83,8 @@ function sendVideoAnnouncement (client, videoInfo, channelInfo) {
 
 		if (!channelPermissionsCheck(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MENTION_EVERYONE'])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out YouTube announcement to ${channel.name}!`);
 
-		return channel.send(config.youtube.video.message, { embed });
+		const { messages } = config.youtube.video;
+		return channel.send(messages[Math.floor(Math.random() * messages.length)], { embed });
 	});
 }
 
@@ -94,7 +95,7 @@ function fetchStream (client) {
 
 	if (!config.youtube.stream.channels.length) return console.error(`Cannot send YouTube stream announcement, no announcement channels were specified in the config!`);
 
-	const path = `search?part=snippet&channelId=${config.youtube.channel}&maxResults=1&eventType=live&type=video&key=${config.youtube.APIkey}`;
+	const path = `search?part=snippet&channelId=${config.youtube.channel}&maxResults=1&eventType=live&type=video&key=${process.env.YOUTUBE_STREAM_KEY}`;
 
 	callAPI(path).then((streamInfo) => {
 		if (streamInfo.error || !streamInfo.items[0]) return;
@@ -126,7 +127,8 @@ function sendStreamAnnouncement (client, streamInfo) {
 
 		if (!channelPermissionsCheck(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MENTION_EVERYONE'])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out YouTube announcement to ${channel.name}!`);
 
-		return channel.send(config.youtube.stream.message, { embed });
+		const { messages } = config.youtube.stream;
+		return channel.send(messages[Math.floor(Math.random() * messages.length)], { embed });
 	});
 }
 

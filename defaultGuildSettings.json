@@ -111,7 +111,9 @@
 		"channels": [
 
 		],
-		"message": ""
+		"messages": [
+
+		]
 	},
 
 	"youtube": {
@@ -122,14 +124,18 @@
 			"channels": [
 
 			],
-			"message": ""
+			"messages": [
+
+			]
 		},
 		"stream": {
 			"enabled": false,
 			"channels": [
 
 			],
-			"message": ""
+			"messages": [
+
+			]
 		}
 	}
 }

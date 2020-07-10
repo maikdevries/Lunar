@@ -3,7 +3,6 @@ const client = new Discord.Client({ partials: ['MESSAGE', 'REACTION'] });
 
 const Enmap = require('enmap');
 
-const config = require('./config.json');
 const defaultGuildSettings = require('./defaultGuildSettings.json');
 
 const welcomeMessage = require('./features/welcomeMessage.js');
@@ -15,23 +14,24 @@ const streamStatus = require('./features/streamStatus.js');
 const commandHandler = require('./features/commandHandler.js');
 
 
+client.settings = new Enmap({
+	name: 'settings',
+	fetchAll: false,
+	autoFetch: true,
+	cloneLevel: 'deep',
+	ensureProps: true
+});
+
+
 client.on('ready', async () => {
-	await client.user.setUsername(config.username)
+	await client.user.setUsername(process.env.DISCORD_USERNAME)
 		.catch((error) => console.error(`An error occurred when setting the username, ${error}`));
 
 	await client.user.setAvatar('./avatar.png')
 		.catch((error) => console.error(`An error occurred when setting the avatar, ${error}`));
 
-	await client.user.setActivity(config.activity, { type: 'PLAYING' })
+	await client.user.setActivity(process.env.DISCORD_ACTIVITY, { type: 'PLAYING' })
 		.catch((error) => console.error(`An error occurred when setting the default activity, ${error}`));
-
-	client.settings = new Enmap({
-		name: 'settings',
-		fetchAll: false,
-		autoFetch: true,
-		cloneLevel: 'deep',
-		ensureProps: true
-	});
 
 	await commandHandler.setup();
 
@@ -106,7 +106,7 @@ client.on('warn', (warning) => {
 	console.warn(`A warning was thrown by Discord, ${warning}`);
 });
 
-client.login(config.token);
+client.login(process.env.DISCORD_TOKEN);
 
 
 process.on('unhandledRejection', (error) => {
