@@ -2,7 +2,6 @@ const Discord = require('discord.js');
 const client = new Discord.Client({ partials: ['MESSAGE', 'REACTION'] });
 
 const Enmap = require('enmap');
-
 const defaultGuildSettings = require('./defaultGuildSettings.json');
 
 const welcomeMessage = require('./features/welcomeMessage.js');
@@ -12,15 +11,6 @@ const twitch = require('./features/twitch.js');
 const youtube = require('./features/youtube.js');
 const streamStatus = require('./features/streamStatus.js');
 const commandHandler = require('./features/commandHandler.js');
-
-
-client.settings = new Enmap({
-	name: 'settings',
-	fetchAll: false,
-	autoFetch: true,
-	cloneLevel: 'deep',
-	ensureProps: true
-});
 
 
 client.on('ready', async () => {
@@ -33,14 +23,31 @@ client.on('ready', async () => {
 	await client.user.setActivity(process.env.DISCORD_ACTIVITY, { type: 'PLAYING' })
 		.catch((error) => console.error(`An error occurred when setting the default activity, ${error}`));
 
+
+	client.settings = new Enmap({
+		name: 'settings',
+		fetchAll: false,
+		autoFetch: true,
+		cloneLevel: 'deep',
+		ensureProps: true
+	});
+
+	client.twitch = new Enmap({
+		name: 'twitch',
+		fetchAll: false,
+		autoFetch: true,
+		cloneLevel: 'deep',
+		ensureProps: true
+	});
+
 	await commandHandler.setup();
 
-	// Set an interval to poll the Twitch API repeatedly
-	setInterval(() => twitch.fetchStream(client), 60000);
+	await twitch.setup(client);
 
 	// Set intervals to poll the YouTube API repeatedly
 	setInterval(() => youtube.fetchVideo(client), 600000);
 	setInterval(() => youtube.fetchStream(client), 1200000);
+
 
 	console.log(`${client.user.username} has loaded successfully and is now online!`);
 });

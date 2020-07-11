@@ -1,6 +1,7 @@
 const { MessageEmbed } = require('discord.js');
 
 const { channelPermissionsCheck } = require('./../shared/permissionCheck.js');
+const { validateChannel } = require('./../features/twitch.js');
 
 const defaultGuildSettings = require('./../defaultGuildSettings.json');
 
@@ -48,6 +49,8 @@ const REACTION_CLEAR = { name: 'clear', description: 'Clear messages/reactions/r
 
 const STATUS_STREAMER = { name: 'streamerRole', description: 'Set a required role to be eligible to get the currently livestreaming role' };
 const STATUS_ROLE = { name: 'statusRole', description: 'Set the currently livestreaming role' };
+
+const TWITCH_USERNAME = { name: 'username', description: 'Set the Twitch channel name to send out livestream announcements for' };
 
 const COMMAND_RESTRICT = { name: 'restricted', description: 'Enable or disable command restriction to specified channel(s)' };
 
@@ -161,7 +164,17 @@ function streamStatusSettings (client, message, args) {
 
 
 function twitchSettings (client, message, args) {
+	switch (args[1]) {
+		case 'enabled': return handleEnabledSettings(client, message, args[2], 'twitch');
 
+		case 'username': return handleUsernameSettings(client, message, args[2], 'twitch');
+
+		case 'channels': return handleChannelSettings(client, message, args[2], args[3], 'twitch');
+
+		case 'messages': return handleMessageSettings(client, message, args[2], args[3], 'twitch');
+
+		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, TWITCH_USERNAME, LIST_CHANNELS, LIST_MESSAGES]));
+	}
 }
 
 
@@ -328,6 +341,14 @@ function handleReactionRoleSettings (client, message, action, object, messageMen
 	}
 }
 
+async function handleUsernameSettings (client, message, username, path) {
+	switch (path) {
+		case 'twitch': return changeUsernameSettings(client, message, await validateChannel(message, username), 'twitch');
+
+		case 'youtube': return;
+	}
+}
+
 
 function changeEnabledSettings (client, message, boolean, path) {
 	client.settings.set(message.guild.id, boolean, `${path}.enabled`);
@@ -397,7 +418,6 @@ async function addRoleSettings (client, message, roleMention, path) {
 	if (!role) return;
 
 	client.settings.set(message.guild.id, role.id, path);
-	console.log(client.settings.export());
 	return message.channel.send(`**Nice**! Successfully changed the role!`).then((msg) => msg.delete({ timeout: 3500 }));
 }
 
@@ -510,6 +530,14 @@ function addReactionRoleSettings (client, message, newMessage, newReaction, newR
 }
 
 
+function changeUsernameSettings (client, message, newUsername, path) {
+	if (!newUsername) return;
+
+	client.settings.set(message.guild.id, newUsername, `${path}.username`);
+	return message.channel.send(`**Nice**! Successfully changed the username!`).then((msg) => msg.delete({ timeout: 3500 }));
+}
+
+
 async function requestChannel (client, message) {
 	const pollMessage = await message.channel.send(`Please respond with a **mention** of the preferred channel.`);
 	const responseChannel = await collectResponse(message);
@@ -560,11 +588,11 @@ function collectResponse (message) {
 		const filter = (msg) => msg.author.id === message.author.id;
 		message.channel.awaitMessages(filter, { max: 1, time: 60000, errors: ['time'] })
 			.then((collected) => {
-				resolve(collected.first());
+				return resolve(collected.first());
 			})
 			.catch(() => {
 				message.channel.send(`**Oh oh**... You weren't able to respond in time, please try again!`);
-				resolve(false);
+				return resolve(false);
 			});
 	});
 }
@@ -581,11 +609,11 @@ async function confirmChange (message) {
 				if (!confirmation) message.channel.send(`**Alrighty**! If you change your mind, please use the command again.`).then((msg) => msg.delete({ timeout: 3500 }));
 
 				confirmationMessage.delete();
-				resolve(confirmation);
+				return resolve(confirmation);
 			}).catch(() => {
 				confirmationMessage.delete();
 				message.channel.send(`**Oh oh**... You weren't able to confirm in time, please try again!`);
-				resolve(false);
+				return resolve(false);
 			});
 		});
 	});

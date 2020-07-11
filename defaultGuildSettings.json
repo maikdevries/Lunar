@@ -117,7 +117,7 @@
 	},
 
 	"youtube": {
-		"channel": "",
+		"username": "",
 
 		"video": {
 			"enabled": false,
