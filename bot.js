@@ -40,13 +40,19 @@ client.on('ready', async () => {
 		ensureProps: true
 	});
 
+	client.youtube = new Enmap({
+		name: 'youtube',
+		fetchAll: false,
+		autoFetch: true,
+		cloneLevel: 'deep',
+		ensureProps: true
+	})
+
 	await commandHandler.setup();
 
 	await twitch.setup(client);
 
-	// Set intervals to poll the YouTube API repeatedly
-	setInterval(() => youtube.fetchVideo(client), 600000);
-	setInterval(() => youtube.fetchStream(client), 1200000);
+	await youtube.setup(client);
 
 
 	console.log(`${client.user.username} has loaded successfully and is now online!`);

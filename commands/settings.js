@@ -1,7 +1,8 @@
 const { MessageEmbed } = require('discord.js');
 
 const { channelPermissionsCheck } = require('./../shared/permissionCheck.js');
-const { validateChannel } = require('./../features/twitch.js');
+const validateTwitchChannel = require('./../features/twitch.js').validateChannel;
+const validateYouTubeChannel = require('./../features/youtube.js').validateChannel;
 
 const defaultGuildSettings = require('./../defaultGuildSettings.json');
 
@@ -35,6 +36,7 @@ const MESSAGE_CLEAR = { name: 'clear', description: 'Clear the list of responses
 const MESSAGE_RESET = { name: 'reset', description: 'Reset the list of responses' };
 
 const FEATURE_ENABLE = { name: 'enabled', description: 'Enable or disable this feature' };
+const FEATURE_USERNAME = { name: 'username', description: 'Set the channel username to send out announcements for' };
 
 const LOCK_ROLE = { name: 'role', description: 'Set the role to lock new members with' };
 const LOCK_MESSAGE = { name: 'message', description: 'Set the message for new members to unlock themselves' };
@@ -49,8 +51,6 @@ const REACTION_CLEAR = { name: 'clear', description: 'Clear messages/reactions/r
 
 const STATUS_STREAMER = { name: 'streamerRole', description: 'Set a required role to be eligible to get the currently livestreaming role' };
 const STATUS_ROLE = { name: 'statusRole', description: 'Set the currently livestreaming role' };
-
-const TWITCH_USERNAME = { name: 'username', description: 'Set the Twitch channel name to send out livestream announcements for' };
 
 const COMMAND_RESTRICT = { name: 'restricted', description: 'Enable or disable command restriction to specified channel(s)' };
 
@@ -190,7 +190,17 @@ function welcomeMessageSettings (client, message, args) {
 
 
 function youtubeSettings (client, message, args) {
+	switch (args[1]) {
+		case 'enabled': return handleEnabledSettings(client, message, args[2], 'youtube');
 
+		case 'username': return handleUsernameSettings(client, message, args[2], 'youtube');
+
+		case 'channels': return handleChannelSettings(client, message, args[2], args[3], 'youtube');
+
+		case 'messages': return handleMessageSettings(client, message, args[2], args[3], 'youtube');
+
+		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, FEATURE_USERNAME, LIST_CHANNELS, LIST_MESSAGES]));
+	}
 }
 
 
@@ -343,9 +353,9 @@ function handleReactionRoleSettings (client, message, action, object, messageMen
 
 async function handleUsernameSettings (client, message, username, path) {
 	switch (path) {
-		case 'twitch': return changeUsernameSettings(client, message, await validateChannel(message, username), 'twitch');
+		case 'twitch': return changeUsernameSettings(client, message, await validateTwitchChannel(message, username), 'twitch');
 
-		case 'youtube': return;
+		case 'youtube': return changeUsernameSettings(client, message, await validateYouTubeChannel(client, message, username), 'youtube');
 	}
 }
 

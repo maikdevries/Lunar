@@ -1,158 +1,129 @@
-const https = require('https');
 const { MessageEmbed } = require('discord.js');
 
-const config = require('./../config.json');
-
 const { channelPermissionsCheck } = require('./../shared/permissionCheck.js');
+const request = require('./../shared/httpsRequest.js');
 
 
-let latestVideo;
-let streamID;
+const MINUTES_A_GUILD = (1440 / (10000 / 9)) * 1.05;
+
+const defaultYouTubeSettings = {
+	"guild": "",
+	"lastVideo": "",
+	"settings": {}
+}
 
 
 module.exports = {
 	description: 'Interacts with the YouTube API to do various tasks, such as video release announcements',
-	fetchVideo,
-	fetchStream
+	setup,
+	validateChannel
 };
 
 
-// Polls API and checks if there is a new video release
-function fetchVideo (client) {
-	if (!config.youtube.video.enabled) return;
-
-	if (!config.youtube.video.channels.length) return console.error(`Cannot send YouTube video announcement, no announcement channels were specified in the config!`);
-
-	if (!latestVideo) return setLatestVideo();
-
-	fetchData().then((videoInfo) => {
-		if (videoInfo.error) return;
-		if (videoInfo.items[0].snippet.resourceId.videoId === latestVideo) return;
-
-		// Return if the video hasn't been uploaded in the last 12 hours
-		if (Math.abs(Date.parse(videoInfo.items[0].snippet.publishedAt) - Date.now()) >= 43200000) return;
-
-		const path = `channels?part=snippet&id=${config.youtube.channel}&key=${process.env.YOUTUBE_VIDEO_KEY}`;
-		callAPI(path).then((channelInfo) => {
-			if (channelInfo.error) return;
-
-			sendVideoAnnouncement(client, videoInfo, channelInfo);
-			latestVideo = videoInfo.items[0].snippet.resourceId.videoId;
-		});
-	});
+async function setup (client) {
+	const guilds = Array.from((client.settings.filter((guild) => guild.youtube.enabled)).keys());
+	return execute(client, guilds);
 }
 
-// At start of the bot, fetches the latest video which is compared to if an announcement needs to be sent
-function setLatestVideo () {
-	fetchData().then((videoInfo) => {
-		if (videoInfo.error) return;
-
-		latestVideo = videoInfo.items[0].snippet.resourceId.videoId;
-	});
+async function execute (client, guilds) {
+	await guilds.forEach((guildID) => getVideo(client, guildID));
+	return setTimeout(() => setup(client), ((MINUTES_A_GUILD * guilds.length < 60000) ? MINUTES_A_GUILD * 60000 : MINUTES_A_GUILD * guilds.length * 60000));
 }
 
-// Fetches data required to check if there is a new video release
-async function fetchData () {
-	let path = `channels?part=contentDetails&id=${config.youtube.channel}&key=${process.env.YOUTUBE_VIDEO_KEY}`;
-	const channelContent = await callAPI(path);
 
-	path = `playlistItems?part=snippet&maxResults=1&playlistId=${channelContent.items[0].contentDetails.relatedPlaylists.uploads}&key=${process.env.YOUTUBE_VIDEO_KEY}`;
-	const videoInfo = await callAPI(path);
+async function getVideo (client, guildID) {
+	const videoSettings = await getGuildSettings(client, guildID);
 
-	return videoInfo;
+	if (!videoSettings.settings.enabled) return client.youtube.delete(videoSettings.guild);
+	if (!videoSettings.settings.username || !videoSettings.settings.channels.length) {
+		client.youtube.delete(videoSettings.guild);
+		return console.error(`Cannot send YouTube announcement, setup not complete for guild: ${videoSettings.guild}`);
+	}
+
+	const [channelSnippet, channelContent, videoSnippet] = await getData(videoSettings.settings.username, videoSettings.settings.username, true);
+	if (channelSnippet.error || channelContent.error || videoSnippet.error || !channelSnippet?.items?.[0] || !channelContent?.items?.[0] || !videoSnippet?.items?.[0]) return;
+
+	if (videoSnippet.items[0].snippet.resourceId.videoId === videoSettings.lastVideo) return;
+	await sendVideoAnnouncement(client, videoSettings, channelSnippet, videoSnippet);
+	return client.youtube.set(videoSettings.guild, videoSnippet.items[0].snippet.resourceId.videoId, 'lastVideo');
 }
 
-// Constructs a MessageEmbed and sends it to new video announcements channel
-function sendVideoAnnouncement (client, videoInfo, channelInfo) {
-	// Regex to cut off the video description at the last whole word at 237 characters
-	const description = (videoInfo.items[0].snippet.description).replace(/^([\s\S]{237}[^\s]*)[\s\S]*/, '$1');
-
+async function sendVideoAnnouncement (client, videoSettings, channelInfo, videoInfo) {
+	const shortVideoDescription = (videoInfo.items[0].snippet.description).replace(/^([\s\S]{237}[^\s]*)[\s\S]*/, '$1');
 	const embed = new MessageEmbed()
 		.setAuthor(`${channelInfo.items[0].snippet.title} has uploaded a new YouTube video!`, channelInfo.items[0].snippet.thumbnails.high.url)
 		.setTitle(videoInfo.items[0].snippet.title)
 		.setURL(`https://www.youtube.com/watch?v=${videoInfo.items[0].snippet.resourceId.videoId}`)
-		.setDescription(`${description}...\n\n[**Watch the video here!**](https://www.youtube.com/watch?v=${videoInfo.items[0].snippet.resourceId.videoId})`)
+		.setDescription(`${shortVideoDescription}...\n\n[**Watch the video here!**](https://www.youtube.com/watch?v=${videoInfo.items[0].snippet.resourceId.videoId})`)
 		.setColor('#FF0000')
 		.setImage(videoInfo.items[0].snippet.thumbnails.maxres.url)
 		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
 		.setTimestamp(new Date(videoInfo.items[0].snippet.publishedAt));
 
-	config.youtube.video.channels.forEach((channelID) => {
+	videoSettings.settings.channels.forEach((channelID) => {
 		const channel = client.channels.cache.get(channelID);
-		if (!channel) return console.error(`Couldn't send YouTube new video announcement to ${channelID} because the channel couldn't be found.`);
 
-		if (!channelPermissionsCheck(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MENTION_EVERYONE'])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out YouTube announcement to ${channel.name}!`);
+		if (!channel) return console.error(`Cannot send YouTube video announcement for channel: ${channelID}, it no longer exists!`);
+		if (!channelPermissionsCheck(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MENTION_EVERYONE'])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) for channel: ${channel.id}!`);
 
-		const { messages } = config.youtube.video;
-		return channel.send(messages[Math.floor(Math.random() * messages.length)], { embed });
+		const message = videoSettings.settings.messages[Math.floor(Math.random() * videoSettings.settings.messages.length)];
+		return channel.send(message, { embed });
 	});
 }
 
 
-// Polls API and checks whether channel is currently streaming
-function fetchStream (client) {
-	if (!config.youtube.stream.enabled) return;
+async function getGuildSettings (client, guildID) {
+	const guildSettings = client.settings.get(guildID, 'youtube');
+	client.youtube.ensure(guildID, defaultYouTubeSettings);
 
-	if (!config.youtube.stream.channels.length) return console.error(`Cannot send YouTube stream announcement, no announcement channels were specified in the config!`);
+	client.youtube.set(guildID, guildID, 'guild');
+	client.youtube.set(guildID, guildSettings, 'settings');
 
-	const path = `search?part=snippet&channelId=${config.youtube.channel}&maxResults=1&eventType=live&type=video&key=${process.env.YOUTUBE_STREAM_KEY}`;
-
-	callAPI(path).then((streamInfo) => {
-		if (streamInfo.error || !streamInfo.items[0]) return;
-		if (streamID === streamInfo.items[0].id.videoId) return;
-
-		streamID = streamInfo.items[0].id.videoId;
-		sendStreamAnnouncement(client, streamInfo);
-	});
+	return client.youtube.get(guildID);
 }
 
-// Constructs a MessageEmbed and sends it to livestream announcements channel
-function sendStreamAnnouncement (client, streamInfo) {
-	// Regex to cut off the video description at the last whole word at 237 characters
-	const description = (streamInfo.items[0].snippet.description).replace(/^([\s\S]{237}[^\s]*)[\s\S]*/, '$1');
+async function getData (snippetChannel, contentChannel, snippetVideo) {
+	let [channelSnippet, channelContent, videoSnippet] = [null, null, null];
 
-	const embed = new MessageEmbed()
-		.setAuthor(`${streamInfo.items[0].snippet.channelTitle} is now LIVE on YouTube!`)
-		.setTitle(streamInfo.items[0].snippet.title)
-		.setURL(`https://www.youtube.com/watch?v=${streamInfo.items[0].id.videoId}`)
-		.setDescription(`${description}...\n\n[**Watch the stream here!**](https://www.youtube.com/watch?v=${streamInfo.items[0].id.videoId})`)
-		.setColor('#FF0000')
-		.setImage(streamInfo.items[0].snippet.thumbnails.high.url)
-		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
-		.setTimestamp(new Date(streamInfo.items[0].snippet.publishedAt));
+	if (snippetChannel) channelSnippet = await request.getYouTube(`channels?part=snippet&id=${snippetChannel}&key=${process.env.YOUTUBE_VIDEO_KEY}`);
+	if (contentChannel) channelContent = await request.getYouTube(`channels?part=contentDetails&id=${contentChannel}&key=${process.env.YOUTUBE_VIDEO_KEY}`);
+	if (snippetVideo && channelContent?.items?.[0]) videoSnippet = await request.getYouTube(`playlistItems?part=snippet&maxResults=1&playlistId=${channelContent.items[0].contentDetails.relatedPlaylists.uploads}&key=${process.env.YOUTUBE_VIDEO_KEY}`);
 
-	config.youtube.stream.channels.forEach((channelID) => {
-		const channel = client.channels.cache.get(channelID);
-		if (!channel) return console.error(`Couldn't send YouTube livestream announcement because the announcement channel couldn't be found.`);
-
-		if (!channelPermissionsCheck(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MENTION_EVERYONE'])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out YouTube announcement to ${channel.name}!`);
-
-		const { messages } = config.youtube.stream;
-		return channel.send(messages[Math.floor(Math.random() * messages.length)], { embed });
-	});
+	return [channelSnippet, channelContent, videoSnippet];
 }
 
 
-// Template HTTPS get function that interacts with the YouTube API, wrapped in a Promise
-function callAPI (path) {
-	return new Promise((resolve) => {
+async function validateChannel (client, message, channelName) {
+	if (!channelName) {
+		message.channel.send(`**Ouch**... You forgot to name a YouTube channel. Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
+		return false;
+	}
 
-		const options = {
-			host: 'www.googleapis.com',
-			path: `/youtube/v3/${path}`
-		};
+	const path = `search?part=snippet&maxResults=1&q=${channelName}&type=channel&key=${process.env.YOUTUBE_VALIDATE_KEY}`;
+	const channelInfo = await request.getYouTube(path);
 
-		https.get(options, (res) => {
-			if (res.statusCode !== 200) return;
+	if (channelInfo.error) {
+		message.channel.send(`**Oh no**... Something went wrong! Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
+		return false;
+	}
 
-			const rawData = [];
-			res.on('data', (chunk) => rawData.push(chunk));
-			res.on('end', () => {
-				try {
-					return resolve(JSON.parse(Buffer.concat(rawData)));
-				} catch (error) { console.error(`An error occurred parsing the YouTube API response to JSON, ${error}`); }
-			});
+	if (!channelInfo?.items?.[0] || channelInfo.items[0].snippet.title.toLowerCase() !== channelName.toLowerCase()) {
+		message.channel.send(`**Ehh**... This doesn't seem to be a valid YouTube channel. Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
+		return false;
+	}
 
-		}).on('error', (error) => console.error(`Error occurred while polling YouTube API, ${error}`));
-	});
+	if (!await setLatestVideo(client, message, channelInfo.items[0].id.channelId)) return false;
+	return channelInfo.items[0].id.channelId;
+}
+
+async function setLatestVideo (client, message, channelID) {
+	const videoSettings = await getGuildSettings(client, message.guild.id);
+
+	const [channelSnippet, channelContent, videoSnippet] = await getData(null, channelID, true);
+	if (channelContent.error || videoSnippet.error || !channelContent?.items?.[0] || !videoSnippet?.items?.[0]) {
+		message.channel.send(`**Oh no**... Something went wrong! Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
+		return false;
+	}
+
+	return client.youtube.set(videoSettings.guild, videoSnippet.items[0].snippet.resourceId.videoId, 'lastVideo');
 }

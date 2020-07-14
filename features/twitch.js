@@ -2,10 +2,9 @@ const { MessageEmbed } = require('discord.js');
 
 const { channelPermissionsCheck } = require('./../shared/permissionCheck.js');
 const request = require('./../shared/httpsRequest.js');
-const { getTwitch } = require('./../shared/httpsRequest.js');
 
 
-const GUILDS_A_MINUTE = (800 / 10) * .95;
+const GUILDS_A_MINUTE = (800 / 5) * .95;
 
 const defaultTwitchSettings = {
 	"guild": "",
@@ -20,15 +19,14 @@ let accessToken;
 module.exports = {
 	description: 'Interacts with the Twitch API to do various tasks, such as livestream announcements',
 	setup,
-	execute,
 	validateChannel
 }
 
 
 async function setup (client) {
 	if (!accessToken) accessToken = (await request.getTwitchToken()).access_token;
-	const guilds = Array.from((client.settings.filter((guild) => guild.twitch.enabled)).keys());
 
+	const guilds = Array.from((client.settings.filter((guild) => guild.twitch.enabled)).keys());
 	return loopGuilds(client, guilds);
 }
 
@@ -36,15 +34,15 @@ async function loopGuilds (client, guilds) {
 	const timer = new Promise((ignore) => setTimeout((ignore), 60000));
 
 	for (let i = 0; i < guilds.length; i += GUILDS_A_MINUTE) {
-		execute(client, guilds.slice(i, i + GUILDS_A_MINUTE));
+		await execute(client, guilds.slice(i, i + GUILDS_A_MINUTE));
 		await timer;
 	}
 
 	return setTimeout(() => setup(client), 60000);
 }
 
-function execute (client, guilds) {
-	guilds.forEach((guildID) => getStream(client, guildID));
+async function execute (client, guilds) {
+	await guilds.forEach((guildID) => getStream(client, guildID));
 }
 
 
@@ -54,7 +52,7 @@ async function getStream (client, guildID) {
 	if (!streamSettings.settings.enabled) return client.twitch.delete(streamSettings.guild);
 	if (!streamSettings.settings.username || !streamSettings.settings.channels.length) {
 		client.twitch.delete(streamSettings.guild);
-		return console.error(`Cannot send Twitch announcement, setup not complete for guild: ${guildID}!`);
+		return console.error(`Cannot send Twitch announcement, setup not complete for guild: ${streamSettings.guild}!`);
 	}
 
 	try { await request.validateTwitchToken(accessToken) }
@@ -193,7 +191,7 @@ async function validateChannel (message, channelName) {
 	catch { accessToken = (await request.getTwitchToken()).access_token }
 
 	const path = `users?login=${channelName}`;
-	const channelInfo = await getTwitch(accessToken, path);
+	const channelInfo = await request.getTwitch(accessToken, path);
 
 	if (!channelInfo?.data) {
 		message.channel.send(`**Oh no**... Something went wrong! Try again!`).then((msg) => msg.delete({ timeout: 3500 }));

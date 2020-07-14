@@ -117,25 +117,13 @@
 	},
 
 	"youtube": {
+		"enabled": false,
 		"username": "",
+		"channels": [
 
-		"video": {
-			"enabled": false,
-			"channels": [
+		],
+		"messages": [
 
-			],
-			"messages": [
-
-			]
-		},
-		"stream": {
-			"enabled": false,
-			"channels": [
-
-			],
-			"messages": [
-
-			]
-		}
+		]
 	}
 }
