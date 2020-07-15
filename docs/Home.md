@@ -1,0 +1,2 @@
+## Documentation
+You'll find the documentation on [Lunar](https://github.com/maikdevries/Lunar) on this GitHub wiki. Every feature and its configuration settings in addition to other miscellaneous settings will be explained in detail and provided with an example where necessary.
