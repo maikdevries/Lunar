@@ -19,13 +19,13 @@ Check out the <b>docs</b> folder for instructions on how to install, configure a
 Check the **[GitHub wiki](https://github.com/maikdevries/Lunar/wiki)** for instructions on how to **[install](https://github.com/maikdevries/Lunar/wiki/Installation)**, **[configure](https://github.com/maikdevries/Lunar/wiki/Configuring-the-bot)** and **[run the bot](https://github.com/maikdevries/Lunar/wiki/Running-the-bot)** in addition to documentation on all of its features.
 
 ### Features
-* **[Welcome and Leave Message](https://github.com/maikdevries/Lunar/wiki/Welcome-and-Leave-Message)**
-* **[Server Lock](https://github.com/maikdevries/Lunar/wiki/Server-Lock)**
-* **[Commands](https://github.com/maikdevries/Lunar/wiki/Commands)**
-* **[Reaction Role](https://github.com/maikdevries/Lunar/wiki/Reaction-Role)**
-* **[Currently Livestreaming](https://github.com/maikdevries/Lunar/wiki/Currently-Livestreaming)**
-* **[Twitch Announcements](https://github.com/maikdevries/Lunar/wiki/Twitch-Announcements)**
-* **[YouTube Announcements](https://github.com/maikdevries/Lunar/wiki/Youtube-Announcements)**
+* **[Welcome and Leave Message](https://github.com/maikdevries/Lunar/blob/local/docs/Welcome-and-Leave-Message.md)**
+* **[Server Lock](https://github.com/maikdevries/Lunar/blob/local/docs/Server-Lock.md)**
+* **[Commands](https://github.com/maikdevries/Lunar/blob/local/docs/Commands.md)**
+* **[Reaction Role](https://github.com/maikdevries/Lunar/blob/local/docs/Reaction-Role.md)**
+* **[Currently Livestreaming](https://github.com/maikdevries/Lunar/blob/local/docs/Currently-Livestreaming.md)**
+* **[Twitch Announcements](https://github.com/maikdevries/Lunar/blob/local/docs/Twitch-Announcements.md)**
+* **[YouTube Announcements](https://github.com/maikdevries/Lunar/blob/local/docs/YouTube-Announcements.md)**
 
 ### Contributing
 People are free to contribute to the project by opening issues and pull requests in accordance with the **[Contribution Guidelines](https://github.com/maikdevries/Lunar/blob/master/.github/CONTRIBUTING.md)**.
