@@ -1,0 +1,150 @@
+{
+	"commands": {
+		"prefix": "!",
+		"channels": [
+
+		],
+
+		"ask": {
+			"enabled": true,
+			"restricted": true,
+			"messages": [
+				"The answer is yes.",
+				"Yep, that's true.",
+				"You can be certain.",
+				"Without a doubt.",
+				"Yes.",
+				"You're not wrong.",
+				"Sure thing.",
+				"I wouldn't advise against it.",
+				"There's a chance.",
+				"Uhh, I guess?",
+				"The stars are aligned.",
+				"No.",
+				"My answer is no.",
+				"Nah, that's where you're wrong.",
+				"Most certainly not.",
+				"Definitely not.",
+				"Don't think so.",
+				"I wouldn't follow through.",
+				"This will result in failure.",
+				"Regrets are awaiting you.",
+				"The outlook isn't good.",
+				"I don't have an answer for you.",
+				"*Starts sweating...*",
+				"I have forgotten the answer.",
+				"That's a difficult question to answer.",
+				"I'm don't possess the knowledge to answer this.",
+				"Brainfart.",
+				"Uhh..."
+			]
+		},
+		"about": {
+			"enabled": true,
+			"restricted": true
+		},
+		"ban": {
+			"enabled": true,
+			"restricted": false
+		},
+		"clear": {
+			"enabled": true,
+			"restricted": false
+		},
+		"help": {
+			"enabled": true,
+			"restricted": false
+		},
+		"invite": {
+			"enabled": false,
+			"restricted": true
+		},
+		"kick": {
+			"enabled": false,
+			"restricted": false
+		},
+		"nickname": {
+			"enabled": false,
+			"restricted": false
+		},
+		"settings": {
+			"enabled": true,
+			"restricted": false
+		},
+		"setup": {
+			"enabled": true,
+			"restricted": false
+		},
+		"slowmode": {
+			"enabled": true,
+			"restricted": false
+		}
+	},
+
+	"welcomeMessage": {
+		"welcome": {
+			"enabled": false,
+			"channels": [
+
+			],
+			"messages": [
+				"We've got a new member! Welcome [MEMBER]!",
+				"Hi [MEMBER]! **Welcome to the Discord**!",
+				"[MEMBER] is to be welcomed to the server!"
+			]
+		},
+		"leave": {
+			"enabled": false,
+			"channels": [
+
+			],
+			"messages": [
+				"[MEMBER] has fallen and will be remembered...",
+				"Rest in peace, [MEMBER]. You won't be forgotten."
+			]
+		}
+	},
+
+	"serverLock": {
+		"enabled": false,
+		"role": "",
+		"message": {
+
+		}
+	},
+
+	"reactionRole": {
+		"enabled": false,
+		"messages": {
+
+		}
+	},
+
+	"streamStatus": {
+		"enabled": false,
+		"streamerRole": "",
+		"statusRole": ""
+	},
+
+	"twitch": {
+		"enabled": false,
+		"username": "",
+		"channels": [
+
+		],
+		"messages": [
+
+		]
+	},
+
+	"youtube": {
+		"enabled": false,
+		"username": "",
+		"channels": [
+
+		],
+		"messages": [
+
+		]
+	}
+}

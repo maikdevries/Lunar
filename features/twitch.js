@@ -1,215 +1,195 @@
-const https = require('https');
-const { MessageEmbed } = require('discord.js');
+const { MessageEmbed } = require(`discord.js`);
 
-const config = require('./../config.json');
+const { channelPermissionsCheck } = require(`./../shared/permissionCheck.js`);
+const request = require(`./../shared/httpsRequest.js`);
 
-const { channelPermissionsCheck } = require('./../shared/permissionCheck.js');
+const GUILDS_A_MINUTE = (800 / 5) * .95;
 
-
-let accessToken;
-let streamStatus = false;
-let updateInterval;
-const sentAnnouncementMessage = [];
-
+const defaultTwitchSettings = {
+	"guild": "",
+	"streaming": false,
+	"sentMessages": [],
+	"settings": {}
+}
 
 module.exports = {
-	description: 'Interacts with the Twitch API to do various tasks, such as livestream announcements',
-	fetchStream
-};
-
-
-// Polls API and checks whether channel is currently streaming
-function fetchStream (client) {
-	if (!config.twitch.enabled) return;
-
-	if (config.twitch.announcementChannelID.length < 1) return console.error(`Cannot send Twitch announcement, no announcement channels were specified in the config!`);
-
-	if (!accessToken) return getAccessToken();
-
-	validateAccessToken().then(() => {
-		const path = `streams?user_login=${config.twitch.username}`;
-
-		callAPI(path).then((streamInfo) => {
-			if (!streamInfo.data) return;
-
-			if (!streamInfo.data[0]) {
-				if (streamStatus) {
-					streamStatus = false;
-					clearInterval(updateInterval);
-					streamOffline();
-					if (!streamStatus) sentAnnouncementMessage.length = 0;
-				}
-			} else {
-				if (streamStatus) return;
-
-				streamStatus = true;
-
-				fetchData(streamInfo).then(([userInfo, gameInfo]) => {
-					if (!userInfo.data || !gameInfo.data) streamStatus = false;
-					else sendAnnouncement(client, streamInfo, userInfo, gameInfo);
-				});
-			}
-		});
-	});
+	description: `Interacts with the Twitch API to do various tasks, such as livestream announcements`,
+	setup,
+	validateChannel
 }
 
-// Fetches additional data required to construct embed
-async function fetchData (streamInfo) {
-	let path = `users?login=${config.twitch.username}`;
-	const userInfo = await callAPI(path);
 
-	path = `games?id=${streamInfo.data[0].game_id}`;
-	const gameInfo = await callAPI(path);
+async function setup (client) {
+	if (!await request.hasTwitchToken()) await request.getTwitchToken();
 
-	return [userInfo, gameInfo];
+	const guilds = Array.from((client.settings.filter((guild) => guild.twitch.enabled)).keys());
+	return loopGuilds(client, guilds);
 }
 
-// Constructs a MessageEmbed and sends it to livestream announcements channel
-function sendAnnouncement (client, streamInfo, userInfo, gameInfo) {
+async function loopGuilds (client, guilds) {
+	const timer = new Promise((ignore) => setTimeout((ignore), 60000));
+
+	for (let i = 0; i < guilds.length; i += GUILDS_A_MINUTE) {
+		await execute(client, guilds.slice(i, i + GUILDS_A_MINUTE));
+		await timer;
+	}
+
+	return setTimeout(() => setup(client), 60000);
+}
+
+async function execute (client, guilds) {
+	await guilds.forEach((guildID) => getStream(client, guildID));
+}
+
+async function getStream (client, guildID) {
+	const streamSettings = await getGuildSettings(client, guildID);
+
+	if (!streamSettings.settings.enabled) return client.twitch.delete(streamSettings.guild);
+	if (!streamSettings.settings.username || !streamSettings.settings.channels.length) {
+		client.twitch.delete(streamSettings.guild);
+		return console.error(`Cannot send Twitch announcement, setup not complete for guild: ${streamSettings.guild}!`);
+	}
+
+	try { await request.validateTwitchToken() }
+	catch { await request.getTwitchToken() }
+
+	const path = `streams?user_login=${streamSettings.settings.username}`;
+	const streamInfo = await request.getTwitch(path);
+	if (!streamInfo?.data) return;
+
+	if (!streamInfo?.data?.[0] && streamSettings.streaming) {
+		client.twitch.set(streamSettings.guild, false, `streaming`);
+		await setStreamAnnouncementOffline(client, streamSettings);
+		if (!client.twitch.get(streamSettings.guild, `streaming`)) return client.twitch.delete(streamSettings.guild);
+	} else {
+		if (streamSettings.streaming) return await updateStreamAnnouncement(client, streamSettings);
+		client.twitch.set(streamSettings.guild, true, `streaming`);
+
+		const [newUserInfo, newStreamInfo, newGameInfo, newVideoInfo] = await getData(streamSettings.settings.username, streamSettings.settings.username, true, null);
+		if (!newUserInfo?.data?.[0] || !newStreamInfo?.data?.[0] || !newGameInfo?.data?.[0]) return client.twitch.set(streamSettings.guild, false, `streaming`);
+		else return sendStreamAnnouncement(client, streamSettings, newStreamInfo, newUserInfo, newGameInfo);
+	}
+}
+
+function sendStreamAnnouncement (client, streamSettings, streamInfo, userInfo, gameInfo) {
 	const embed = new MessageEmbed()
 		.setAuthor(`${streamInfo.data[0].user_name} is now LIVE on Twitch!`, userInfo.data[0].profile_image_url)
 		.setTitle(streamInfo.data[0].title)
 		.setURL(`https://twitch.tv/${streamInfo.data[0].user_name}`)
 		.setDescription(`**${streamInfo.data[0].user_name}** is playing **${gameInfo.data[0].name}** with **${streamInfo.data[0].viewer_count}** people watching!\n\n[**Come watch the stream!**](https://twitch.tv/${streamInfo.data[0].user_name})`)
-		.setColor('#6441A5')
-		.setThumbnail((gameInfo.data[0].box_art_url).replace('{width}', '300').replace('{height}', '400'))
-		.setImage(`${(streamInfo.data[0].thumbnail_url).replace('{width}', '1920').replace('{height}', '1080')}?date=${Date.now()}`)
+		.setColor(`#6441A5`)
+		.setThumbnail((gameInfo.data[0].box_art_url).replace(`{width}`, `300`).replace(`{height}`, `400`))
+		.setImage(`${(streamInfo.data[0].thumbnail_url).replace(`{width}`, `1920`).replace(`{height}`, `1080`)}?date=${Date.now()}`)
 		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
 		.setTimestamp(new Date(streamInfo.data[0].started_at));
 
-	config.twitch.announcementChannelID.forEach((channelID) => {
+	streamSettings.settings.channels.forEach((channelID) => {
 		const channel = client.channels.cache.get(channelID);
-		if (!channel) return console.error(`Couldn't send Twitch livestream announcement to ${channelID} because the announcement channel couldn't be found.`);
 
-		if (!channelPermissionsCheck(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MENTION_EVERYONE'])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out Twitch announcement to ${channel.name}!`);
+		if (!channel) return console.error(`Cannot send Twitch announcement for channel: ${channelID}, it no longer exists!`);
+		if (!channelPermissionsCheck(client, channel, [`VIEW_CHANNEL`, `SEND_MESSAGES`, `MENTION_EVERYONE`])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out Twitch announcement for channel: ${channel.id}!`);
 
-		return channel.send(config.twitch.announcementMessage, { embed }).then((msg) => sentAnnouncementMessage.push(msg));
-	});
-
-	if (sentAnnouncementMessage.length > 0) return update();
-}
-
-// Updates the livestream announcement every 3 minutes with current stream statistics
-function update () {
-	updateInterval = setInterval(() => {
-		fetchUpdatedData().then(([streamInfo, gameInfo]) => {
-			if (!streamInfo.data || !gameInfo.data) return;
-
-			sentAnnouncementMessage.forEach((message) => {
-				const editedEmbed = new MessageEmbed(message.embeds[0])
-					.setTitle(streamInfo.data[0].title)
-					.setDescription(`**${streamInfo.data[0].user_name}** is playing **${gameInfo.data[0].name}** with **${streamInfo.data[0].viewer_count}** people watching!\n\n[**Come watch the stream!**](https://twitch.tv/${streamInfo.data[0].user_name})`)
-					.setThumbnail((gameInfo.data[0].box_art_url).replace('{width}', '300').replace('{height}', '400'))
-					.setImage(`${(streamInfo.data[0].thumbnail_url).replace('{width}', '1920').replace('{height}', '1080')}?date=${Date.now()}`);
-
-				return message.edit(config.twitch.announcementMessage, editedEmbed);
-			});
-		});
-	}, 180000);
-}
-
-// Fetches required data needed to update the livestream announcement with current stream statistics
-async function fetchUpdatedData () {
-	let path = `streams?user_login=${config.twitch.username}`;
-	const streamInfo = await callAPI(path);
-
-	path = `games?id=${streamInfo.data[0].game_id}`;
-	const gameInfo = await callAPI(path);
-
-	return [streamInfo, gameInfo];
-}
-
-// Updates the livestream announcement to reflect that the stream went offline
-function streamOffline () {
-	fetchOfflineData().then(([userInfo, videoInfo]) => {
-		if (!userInfo.data || !videoInfo.data) streamStatus = true;
-		else {
-			sentAnnouncementMessage.forEach((message) => {
-				const editedEmbed = new MessageEmbed(message.embeds[0])
-					.setAuthor(`${userInfo.data[0].display_name} was LIVE on Twitch!`, userInfo.data[0].profile_image_url)
-					.setTitle(videoInfo.data[0].title)
-					.setURL(videoInfo.data[0].url)
-					.setDescription(`Today's stream is **over** but you can watch the **VOD**!\n\n[**Watch the VOD!**](${videoInfo.data[0].url})`)
-					.setImage(`${(videoInfo.data[0].thumbnail_url).replace('%{width}', '1920').replace('%{height}', '1080')}?date=${Date.now()}`);
-
-				return message.edit(config.twitch.announcementMessage, editedEmbed);
-			});
-		}
+		const message = streamSettings.settings.messages[Math.floor(Math.random() * streamSettings.settings.messages.length)];
+		return channel.send(message, { embed }).then((msg) => client.twitch.push(streamSettings.guild, { 'channelID': msg.channel.id, 'messageID': msg.id }, `sentMessages`));
 	});
 }
 
-// Fetches required data needed to update livestream announcement with link to VOD
-async function fetchOfflineData () {
-	let path = `users?login=${config.twitch.username}`;
-	const userInfo = await callAPI(path);
+async function updateStreamAnnouncement (client, streamSettings) {
+	const [newUserInfo, newStreamInfo, newGameInfo, newVideoInfo] = await getData(streamSettings.settings.username, streamSettings.settings.username, true, null);
+	if (!newUserInfo?.data?.[0] || !newStreamInfo?.data?.[0] || !newGameInfo?.data?.[0]) return;
 
-	path = `videos?user_id=${userInfo.data[0].id}&first=1&type=archive`;
-	const videoInfo = await callAPI(path);
+	streamSettings.sentMessages.forEach(async (savedMessage) => {
+		const channel = client.channels.cache.get(savedMessage.channelID);
+		if (!channel) return console.error(`Cannot update Twitch announcement for channel: ${savedMessage.channelID}, it no longer exists!`);
 
-	return [userInfo, videoInfo];
-}
+		const message = await channel.messages.fetch(savedMessage.messageID).catch((error) => console.error(`Something went wrong when fetching a twitch announcement message: ${error}`));
+		if (!message?.embeds?.[0]) return console.error(`Cannot update Twitch announcement for message: ${savedMessage.messageID}, it no longer exists!`);
 
-// Handler function that requests a new OAuth access token
-function getAccessToken () {
-	const options = {
-		host: 'id.twitch.tv',
-		path: `/oauth2/token?client_id=${config.twitch['client-ID']}&client_secret=${config.twitch['client-secret']}&grant_type=client_credentials`,
-		method: 'POST'
-	};
+		const editedEmbed = new MessageEmbed(message.embeds[0])
+			.setAuthor(`${newStreamInfo.data[0].user_name} is now LIVE on Twitch!`, newUserInfo.data[0].profile_image_url)
+			.setTitle(newStreamInfo.data[0].title)
+			.setDescription(`**${newStreamInfo.data[0].user_name}** is playing **${newGameInfo.data[0].name}** with **${newStreamInfo.data[0].viewer_count}** people watching!\n\n[**Come watch the stream!**](https://twitch.tv/${newStreamInfo.data[0].user_name})`)
+			.setThumbnail((newGameInfo.data[0].box_art_url).replace(`{width}`, `300`).replace(`{height}`, `400`))
+			.setImage(`${(newStreamInfo.data[0].thumbnail_url).replace(`{width}`, `1920`).replace(`{height}`, `1080`)}?date=${Date.now()}`)
+			.setTimestamp(new Date(newStreamInfo.data[0].started_at));
 
-	API(options).then((res) => {
-		accessToken = res.access_token;
+		return message.edit(message.content, editedEmbed);
 	});
 }
 
-// Handler function that validates OAuth access token
-function validateAccessToken () {
-	return new Promise((resolve) => {
-		const options = {
-			host: 'id.twitch.tv',
-			path: '/oauth2/validate',
-			method: 'GET',
-			headers: {
-				Authorization: `OAuth ${accessToken}`
-			}
-		};
+async function setStreamAnnouncementOffline (client, streamSettings) {
+	const [newUserInfo, newStreamInfo, newGameInfo, newVideoInfo] = await getData(streamSettings.settings.username, null, null, true);
+	if (!newUserInfo?.data?.[0] || !newVideoInfo?.data?.[0]) return client.twitch.set(streamSettings.guild, true, `streaming`);
 
-		API(options).then(() => resolve());
+	streamSettings.sentMessages.forEach(async (savedMessage) => {
+		const channel = client.channels.cache.get(savedMessage.channelID);
+		if (!channel) return console.error(`Cannot take Twitch announcement offline for channel: ${savedMessage.channelID}, it no longer exists!`);
+
+		const message = await channel.messages.fetch(savedMessage.messageID).catch((error) => console.error(`Something went wrong when fetching a twitch announcement: ${error}`));
+		if (!message?.embeds?.[0]) return console.error(`Cannot take Twitch announcement offline for message: ${savedMessage.messageID}, it no longer exists!`);
+
+		const editedEmbed = new MessageEmbed(message.embeds[0])
+			.setAuthor(`${newUserInfo.data[0].display_name} was LIVE on Twitch!`, newUserInfo.data[0].profile_image_url)
+			.setTitle(newVideoInfo.data[0].title)
+			.setURL(newVideoInfo.data[0].url)
+			.setDescription(`Today's stream is **over** but you can watch the **VOD**!\n\n[**Watch the VOD!**](${newVideoInfo.data[0].url})`)
+			.setThumbnail()
+			.setImage(`${(newVideoInfo.data[0].thumbnail_url).replace(`%{width}`, `1920`).replace(`%{height}`, `1080`)}?date=${Date.now()}`)
+			.setTimestamp(new Date(newVideoInfo.data[0].created_at));;
+
+		return message.edit(message.content, editedEmbed);
 	});
 }
 
-// Handler function for all Twitch API interactions
-function callAPI (path) {
-	return new Promise((resolve) => {
-		const options = {
-			host: 'api.twitch.tv',
-			path: `/helix/${path}`,
-			method: 'GET',
-			headers: {
-				'Client-ID': config.twitch['client-ID'],
-				Authorization: `Bearer ${accessToken}`
-			}
-		};
+async function validateChannel (message, channelName) {
+	if (!channelName) {
+		message.channel.send(`**Ouch**... You forgot to name a Twitch channel. Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
+		return false;
+	}
 
-		API(options).then((res) => resolve(res));
-	});
+	if (!request.hasTwitchToken()) await request.getTwitchToken();
+
+	try { await request.validateTwitchToken() }
+	catch { await request.getTwitchToken() }
+
+	const path = `users?login=${encodeURI(channelName)}`;
+	const channelInfo = await request.getTwitch(path);
+
+	if (!channelInfo?.data) {
+		message.channel.send(`**Oh no**... Something went wrong! Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
+		return false;
+	}
+
+	if (!channelInfo?.data?.[0]) {
+		message.channel.send(`**Ehh**... This doesn't seem to be a valid Twitch channel. Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
+		return false;
+	}
+
+	return channelInfo.data[0].login;
 }
 
-// Template HTTPS request function, wrapped in a Promise
-function API (options) {
-	return new Promise((resolve) => {
-		https.request(options, (res) => {
-			if (res.statusCode === 401) return getAccessToken();
-			if (res.statusCode !== 200) return;
 
-			const rawData = [];
-			res.on('data', (chunk) => rawData.push(chunk));
-			res.on('end', () => {
-				try {
-					resolve(JSON.parse(Buffer.concat(rawData)));
-				} catch (error) { console.error(`An error occurred parsing the Twitch API response to JSON, ${error}`); }
-			});
-		}).end()
-			.on('error', (error) => console.error(`Error occurred while polling Twitch API, ${error}`));
-	});
+async function getGuildSettings (client, guildID) {
+	const guildSettings = client.settings.get(guildID, `twitch`);
+	client.twitch.ensure(guildID, defaultTwitchSettings);
+
+	client.twitch.set(guildID, guildID, `guild`);
+	client.twitch.set(guildID, guildSettings, `settings`);
+
+	return client.twitch.get(guildID);
+}
+
+async function getData (userUsername, streamUsername, gameID, videoUsername) {
+	let [userInfo, streamInfo, gameInfo, videoInfo] = [null, null, null, null];
+
+	if (userUsername) userInfo = await request.getTwitch(`users?login=${userUsername}`);
+	if (streamUsername) streamInfo = await request.getTwitch(`streams?user_login=${streamUsername}`);
+
+	if (gameID && streamInfo) gameInfo = await request.getTwitch(`games?id=${streamInfo?.data?.[0]?.game_id}`);
+	else if (gameID) gameInfo = await request.getTwitch(`games?id=${gameID}`);
+
+	if (videoUsername && userInfo) videoInfo = await request.getTwitch(`videos?user_id=${userInfo?.data?.[0]?.id}&first=1&type=archive`);
+	else if (videoUsername) videoInfo = await request.getTwitch(`videos?user_id=${videoUsername}&first=1&type=archive`);
+
+	return [userInfo, streamInfo, gameInfo, videoInfo];
 }

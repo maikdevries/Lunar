@@ -1,11 +1,14 @@
 {
   "name": "lunar",
-  "version": "0.27.0",
-  "description": "A modular Discord bot written in NodeJS to be used in private servers.",
+  "version": "1.0.0",
+  "description": "A public Discord bot written in NodeJS that allows for easy customisation.",
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=14.0.0"
   },
   "main": "bot.js",
+  "scripts": {
+	"start": "node -r dotenv/config bot.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/maikdevries/Lunar.git"
@@ -17,10 +20,13 @@
   },
   "homepage": "https://github.com/maikdevries/Lunar",
   "devDependencies": {
-    "eslint": "^7.2.0",
+    "eslint": "^7.4.0",
     "eslint-plugin-node": "^11.1.0"
   },
   "dependencies": {
-    "discord.js": "^12.2.0"
+    "better-sqlite3": "^7.1.0",
+    "discord.js": "^12.2.0",
+    "dotenv": "^8.2.0",
+    "enmap": "^5.3.2"
   }
 }
