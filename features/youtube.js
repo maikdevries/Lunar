@@ -1,8 +1,7 @@
-const { MessageEmbed } = require('discord.js');
+const { MessageEmbed } = require(`discord.js`);
 
-const { channelPermissionsCheck } = require('./../shared/permissionCheck.js');
-const request = require('./../shared/httpsRequest.js');
-
+const { channelPermissionsCheck } = require(`./../shared/permissionCheck.js`);
+const request = require(`./../shared/httpsRequest.js`);
 
 const MINUTES_A_GUILD = (1440 / (10000 / 9)) * 1.05;
 
@@ -12,9 +11,8 @@ const defaultYouTubeSettings = {
 	"settings": {}
 }
 
-
 module.exports = {
-	description: 'Interacts with the YouTube API to do various tasks, such as video release announcements',
+	description: `Interacts with the YouTube API to do various tasks, such as video release announcements`,
 	setup,
 	validateChannel
 };
@@ -27,7 +25,8 @@ async function setup (client) {
 
 async function execute (client, guilds) {
 	await guilds.forEach((guildID) => getVideo(client, guildID));
-	return setTimeout(() => setup(client), ((MINUTES_A_GUILD * guilds.length < 60000) ? MINUTES_A_GUILD * 60000 : MINUTES_A_GUILD * guilds.length * 60000));
+
+	return setTimeout(() => setup(client), ((MINUTES_A_GUILD * guilds.length < 60000) ? (MINUTES_A_GUILD * 60000) : (MINUTES_A_GUILD * guilds.length * 60000)));
 }
 
 
@@ -41,21 +40,22 @@ async function getVideo (client, guildID) {
 	}
 
 	const [channelSnippet, channelContent, videoSnippet] = await getData(videoSettings.settings.username, videoSettings.settings.username, true);
-	if (channelSnippet.error || channelContent.error || videoSnippet.error || !channelSnippet?.items?.[0] || !channelContent?.items?.[0] || !videoSnippet?.items?.[0]) return;
+	if (!channelSnippet?.items?.[0] || !channelContent?.items?.[0] || !videoSnippet?.items?.[0]) return;
 
 	if (videoSnippet.items[0].snippet.resourceId.videoId === videoSettings.lastVideo) return;
 	await sendVideoAnnouncement(client, videoSettings, channelSnippet, videoSnippet);
-	return client.youtube.set(videoSettings.guild, videoSnippet.items[0].snippet.resourceId.videoId, 'lastVideo');
+
+	return client.youtube.set(videoSettings.guild, videoSnippet.items[0].snippet.resourceId.videoId, `lastVideo`);
 }
 
 async function sendVideoAnnouncement (client, videoSettings, channelInfo, videoInfo) {
-	const shortVideoDescription = (videoInfo.items[0].snippet.description).replace(/^([\s\S]{237}[^\s]*)[\s\S]*/, '$1');
+	const shortVideoDescription = (videoInfo.items[0].snippet.description).replace(/^([\s\S]{237}[^\s]*)[\s\S]*/, `$1`);
 	const embed = new MessageEmbed()
 		.setAuthor(`${channelInfo.items[0].snippet.title} has uploaded a new YouTube video!`, channelInfo.items[0].snippet.thumbnails.high.url)
 		.setTitle(videoInfo.items[0].snippet.title)
 		.setURL(`https://www.youtube.com/watch?v=${videoInfo.items[0].snippet.resourceId.videoId}`)
 		.setDescription(`${shortVideoDescription}...\n\n[**Watch the video here!**](https://www.youtube.com/watch?v=${videoInfo.items[0].snippet.resourceId.videoId})`)
-		.setColor('#FF0000')
+		.setColor(`#FF0000`)
 		.setImage(videoInfo.items[0].snippet.thumbnails.maxres.url)
 		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
 		.setTimestamp(new Date(videoInfo.items[0].snippet.publishedAt));
@@ -64,34 +64,12 @@ async function sendVideoAnnouncement (client, videoSettings, channelInfo, videoI
 		const channel = client.channels.cache.get(channelID);
 
 		if (!channel) return console.error(`Cannot send YouTube video announcement for channel: ${channelID}, it no longer exists!`);
-		if (!channelPermissionsCheck(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MENTION_EVERYONE'])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) for channel: ${channel.id}!`);
+		if (!channelPermissionsCheck(client, channel, [`VIEW_CHANNEL`, `SEND_MESSAGES`, `MENTION_EVERYONE`])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send YouTube video announcement for channel: ${channel.id}!`);
 
 		const message = videoSettings.settings.messages[Math.floor(Math.random() * videoSettings.settings.messages.length)];
 		return channel.send(message, { embed });
 	});
 }
-
-
-async function getGuildSettings (client, guildID) {
-	const guildSettings = client.settings.get(guildID, 'youtube');
-	client.youtube.ensure(guildID, defaultYouTubeSettings);
-
-	client.youtube.set(guildID, guildID, 'guild');
-	client.youtube.set(guildID, guildSettings, 'settings');
-
-	return client.youtube.get(guildID);
-}
-
-async function getData (snippetChannel, contentChannel, snippetVideo) {
-	let [channelSnippet, channelContent, videoSnippet] = [null, null, null];
-
-	if (snippetChannel) channelSnippet = await request.getYouTube(`channels?part=snippet&id=${snippetChannel}&key=${process.env.YOUTUBE_VIDEO_KEY}`);
-	if (contentChannel) channelContent = await request.getYouTube(`channels?part=contentDetails&id=${contentChannel}&key=${process.env.YOUTUBE_VIDEO_KEY}`);
-	if (snippetVideo && channelContent?.items?.[0]) videoSnippet = await request.getYouTube(`playlistItems?part=snippet&maxResults=1&playlistId=${channelContent.items[0].contentDetails.relatedPlaylists.uploads}&key=${process.env.YOUTUBE_VIDEO_KEY}`);
-
-	return [channelSnippet, channelContent, videoSnippet];
-}
-
 
 async function validateChannel (client, message, channelName) {
 	if (!channelName) {
@@ -99,7 +77,7 @@ async function validateChannel (client, message, channelName) {
 		return false;
 	}
 
-	const path = `search?part=snippet&maxResults=1&q=${channelName}&type=channel&key=${process.env.YOUTUBE_VALIDATE_KEY}`;
+	const path = `search?part=snippet&maxResults=1&q=${encodeURI(channelName)}&type=channel&key=${process.env.YOUTUBE_VALIDATE_KEY}`;
 	const channelInfo = await request.getYouTube(path);
 
 	if (channelInfo.error) {
@@ -125,5 +103,26 @@ async function setLatestVideo (client, message, channelID) {
 		return false;
 	}
 
-	return client.youtube.set(videoSettings.guild, videoSnippet.items[0].snippet.resourceId.videoId, 'lastVideo');
+	return client.youtube.set(videoSettings.guild, videoSnippet.items[0].snippet.resourceId.videoId, `lastVideo`);
+}
+
+
+async function getGuildSettings (client, guildID) {
+	const guildSettings = client.settings.get(guildID, `youtube`);
+	client.youtube.ensure(guildID, defaultYouTubeSettings);
+
+	client.youtube.set(guildID, guildID, `guild`);
+	client.youtube.set(guildID, guildSettings, `settings`);
+
+	return client.youtube.get(guildID);
+}
+
+async function getData (snippetChannel, contentChannel, snippetVideo) {
+	let [channelSnippet, channelContent, videoSnippet] = [null, null, null];
+
+	if (snippetChannel) channelSnippet = await request.getYouTube(`channels?part=snippet&id=${snippetChannel}&key=${process.env.YOUTUBE_VIDEO_KEY}`);
+	if (contentChannel) channelContent = await request.getYouTube(`channels?part=contentDetails&id=${contentChannel}&key=${process.env.YOUTUBE_VIDEO_KEY}`);
+	if (snippetVideo && channelContent?.items?.[0]) videoSnippet = await request.getYouTube(`playlistItems?part=snippet&maxResults=1&playlistId=${channelContent.items[0].contentDetails.relatedPlaylists.uploads}&key=${process.env.YOUTUBE_VIDEO_KEY}`);
+
+	return [channelSnippet, channelContent, videoSnippet];
 }

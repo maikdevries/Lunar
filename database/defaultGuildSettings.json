@@ -5,25 +5,38 @@
 
 		],
 
-		"8ball": {
+		"ask": {
 			"enabled": true,
 			"restricted": true,
 			"messages": [
-				"My answer is no.",
 				"The answer is yes.",
 				"Yep, that's true.",
-				"Nah, that's where you're wrong.",
 				"You can be certain.",
 				"Without a doubt.",
+				"Yes.",
+				"You're not wrong.",
+				"Sure thing.",
+				"I wouldn't advise against it.",
+				"There's a chance.",
+				"Uhh, I guess?",
+				"The stars are aligned.",
+				"No.",
+				"My answer is no.",
+				"Nah, that's where you're wrong.",
 				"Most certainly not.",
 				"Definitely not.",
 				"Don't think so.",
-				"You're not wrong.",
-				"Sure thing.",
 				"I wouldn't follow through.",
+				"This will result in failure.",
+				"Regrets are awaiting you.",
+				"The outlook isn't good.",
+				"I don't have an answer for you.",
+				"*Starts sweating...*",
+				"I have forgotten the answer.",
+				"That's a difficult question to answer.",
+				"I'm don't possess the knowledge to answer this.",
 				"Brainfart.",
-				"Uhhhh...",
-				"The question being?"
+				"Uhh..."
 			]
 		},
 		"about": {
@@ -38,19 +51,27 @@
 			"enabled": true,
 			"restricted": false
 		},
-		"invite": {
+		"help": {
 			"enabled": true,
+			"restricted": false
+		},
+		"invite": {
+			"enabled": false,
 			"restricted": true
 		},
 		"kick": {
-			"enabled": true,
+			"enabled": false,
 			"restricted": false
 		},
 		"nickname": {
-			"enabled": true,
+			"enabled": false,
 			"restricted": false
 		},
 		"settings": {
+			"enabled": true,
+			"restricted": false
+		},
+		"setup": {
 			"enabled": true,
 			"restricted": false
 		},

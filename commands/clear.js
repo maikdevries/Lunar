@@ -1,15 +1,15 @@
 module.exports = {
-	name: 'clear',
-	aliases: ['purge', 'remove', 'delete'],
-	description: 'A command used to clear a given number of messages in the current channel',
+	name: `clear`,
+	aliases: [`purge`, `remove`, `delete`],
+	description: `A command to clear a given number of messages in a channel`,
 	args: true,
-	usage: `[PREFIX]clear [number] - [PREFIX]clear @[user]`,
-
+	usage: `[PREFIX]clear [number]/@[user]`,
 	execute
-};
+}
+
 
 function execute (ignore, message, args) {
-	if (!message.member.hasPermission('MANAGE_MESSAGES')) return message.channel.send(`**Oh no**! You don't have the right perks to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
+	if (!message.member.hasPermission(`MANAGE_MESSAGES`)) return message.channel.send(`**Oh no**! You don't have the right perks to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	const userToPurge = parseInt(args[0]) ? false : message.mentions.users.first();
 	let numberOfMessages = userToPurge ? 99 : parseInt(args[0]);
@@ -22,14 +22,13 @@ function execute (ignore, message, args) {
 			let filteredMessages;
 			if (userToPurge) {
 				filteredMessages = messages.filter((msg) => msg.author.id === userToPurge.id);
-
 				numberOfMessages = filteredMessages.length;
 			}
 
 			message.channel.bulkDelete(filteredMessages || messages, true)
 				.catch((error) => {
-					console.error(`An error occurred when deleting messages in bulk, ${error}`);
-					message.channel.send('**Oh no**! Something went terribly wrong! Please try again later.').then((msg) => msg.delete({ timeout: 3500 }));
+					console.error(`Something went wrong when deleting messages: ${error}`);
+					return message.channel.send(`**Oh no**! Something went terribly wrong! Please try again later.`).then((msg) => msg.delete({ timeout: 3500 }));
 				});
 
 			return message.channel.send(`**Yay**! I successfully cleared ${numberOfMessages} message(s) for you!`).then((msg) => msg.delete({ timeout: 3500 }));

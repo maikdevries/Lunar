@@ -1,12 +1,6 @@
 # Ignore node modules
 **/node_modules/
 
-# Ignore configuration files
-**/config.json
-
-# Ignore package-lock.json
-**/package-lock.json
-
 # Ignore database files
 **/data/
 

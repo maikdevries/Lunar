@@ -1,25 +1,20 @@
-const { guildPermissionsCheck } = require('./../shared/permissionCheck.js');
+const { guildPermissionsCheck } = require(`./../shared/permissionCheck.js`);
 
 module.exports = {
-	description: `Manages the 'Currently Livestreaming' role functionality`,
+	description: `Adds a shoutout Discord role to currently streaming members`,
 	setStatus
 };
 
 
-// Adds 'Currently Livestreaming' role to streamers that are streaming and removes it when they stop streaming
 function setStatus (client, ignore, newPresence) {
-	const guildSettings = client.settings.get(newPresence.guild.id, 'streamStatus');
+	const guildSettings = client.settings.get(newPresence.guild.id, `streamStatus`);
 
 	if (!guildSettings.enabled) return;
+	if (!guildSettings.statusRole) return console.error(`Cannot manage shoutout role for livestreaming members, setup not complete for guild: ${newPresence.guild.id}!`);
 
-	const { streamerRole, statusRole } = guildSettings;
-	if (!statusRole) return console.error(`Stream status role is not set in the configuration options!`);
+	if (guildSettings.streamerRole && !newPresence.member.roles.cache.has(guildSettings.streamerRole)) return newPresence.member.roles.remove(guildSettings.statusRole).catch((error) => console.error(`Something went wrong, cannot remove shoutout livestreaming role for guild: ${newPresence.guild.id}, ${error}`));;
+	if (!guildPermissionsCheck(client, newPresence.guild, [`MANAGE_ROLES`])) return console.error(`Missing permissions (MANAGE_ROLES) to add shoutout livestreaming role for guild: ${newPresence.guild.id}!`);
 
-	if (streamerRole && !newPresence.member.roles.cache.has(streamerRole)) return;
-
-	if (!guildPermissionsCheck(client, newPresence.guild, ['MANAGE_ROLES'])) return console.error(`Missing permissions (MANAGE_ROLES) to change stream status role for ${newPresence.member.nickname}!`);
-
-	if (newPresence.activities.some((activity) => activity.type === 'STREAMING')) return newPresence.member.roles.add(statusRole).catch((error) => console.error(`Cannot add streamer status role, ${error}`));
-
-	if (newPresence.member.roles.cache.has(statusRole)) return newPresence.member.roles.remove(statusRole).catch((error) => console.error(`Cannot remove streamer status role, ${error}`));
+	if (newPresence.activities.some((activity) => activity.type === `STREAMING`)) return newPresence.member.roles.add(guildSettings.statusRole).catch((error) => console.error(`Something went wrong, cannot add shoutout livestreaming role for guild: ${newPresence.guild.id}, ${error}`));
+	if (newPresence.member.roles.cache.has(guildSettings.statusRole)) return newPresence.member.roles.remove(guildSettings.statusRole).catch((error) => console.error(`Something went wrong, cannot remove shoutout livestreaming role for guild: ${newPresence.guild.id}, ${error}`));
 }
