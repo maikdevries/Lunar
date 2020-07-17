@@ -37,7 +37,7 @@ async function setup (client) {
 	await client.twitch.defer;
 	await client.youtube.defer;
 
-	return await ensureGuilds();
+	return await ensureGuilds(client);
 }
 
 async function ensureGuilds (client) {

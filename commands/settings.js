@@ -174,7 +174,7 @@ function twitchSettings (client, message, args) {
 
 		case `channels`: return handleChannelSettings(client, message, args[2], args[3], `twitch`);
 
-		case `messages`: return handleMessageSettings(client, message, args[2], args[3], `twitch`);
+		case `messages`: return handleMessageSettings(client, message, args[2], args.slice(3).join(` `), `twitch`);
 
 		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, FEATURE_USERNAME, LIST_CHANNELS, LIST_MESSAGES]));
 	}
@@ -198,7 +198,7 @@ function youtubeSettings (client, message, args) {
 
 		case `channels`: return handleChannelSettings(client, message, args[2], args[3], `youtube`);
 
-		case `messages`: return handleMessageSettings(client, message, args[2], args[3], `youtube`);
+		case `messages`: return handleMessageSettings(client, message, args[2], args.slice(3).join(` `), `youtube`);
 
 		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, FEATURE_USERNAME, LIST_CHANNELS, LIST_MESSAGES]));
 	}
