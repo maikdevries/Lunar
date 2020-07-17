@@ -71,35 +71,34 @@ async function sendVideoAnnouncement (client, videoSettings, channelInfo, videoI
 	});
 }
 
-async function validateChannel (client, message, channelName) {
-	if (!channelName) {
-		message.channel.send(`**Ouch**... You forgot to name a YouTube channel. Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
+async function validateChannel (client, message, channelURL) {
+	if (!channelURL) {
+		message.channel.send(`**Ouch**... You forgot to link to a YouTube channel. Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
 		return false;
 	}
 
-	const path = `search?part=snippet&maxResults=1&q=${encodeURI(channelName)}&type=channel&key=${process.env.YOUTUBE_VALIDATE_KEY}`;
-	const channelInfo = await request.getYouTube(path);
-
-	if (!channelInfo || channelInfo.error) {
-		message.channel.send(`**Oh no**... Something went wrong! Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
+	const matches = channelURL.match(/youtube.com\/channel\/([a-zA-Z0-9_\-]{3,24}).*/);
+	if (!matches) {
+		message.channel.send(`**Ehh**... This doesn't seem to be a valid YouTube URL. Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
 		return false;
 	}
 
-	if (!channelInfo.items?.[0] || channelInfo.items?.[0]?.snippet.title.toLowerCase() !== channelName.toLowerCase()) {
-		message.channel.send(`**Ehh**... This doesn't seem to be a valid YouTube channel. Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
-		return false;
-	}
-
-	if (!await setLatestVideo(client, message, channelInfo.items[0].id.channelId)) return false;
-	return channelInfo.items[0].id.channelId;
+	if (!await setLatestVideo(client, message, matches[1])) return false;
+	return matches[1];
 }
 
 async function setLatestVideo (client, message, channelID) {
 	const videoSettings = await getGuildSettings(client, message.guild.id);
 
 	const [channelSnippet, channelContent, videoSnippet] = await getData(null, channelID, true);
-	if (!channelContent?.items?.[0] || !videoSnippet?.items?.[0] || channelContent.error || videoSnippet.error) {
+
+	if (!videoSnippet?.items?.[0] || channelContent.error || videoSnippet.error) {
 		message.channel.send(`**Oh no**... Something went wrong! Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
+		return false;
+	}
+
+	if (!channelContent?.items?.[0]) {
+		message.channel.send(`**Ehh**... This doesn't seem to be a valid YouTube channel. Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
 		return false;
 	}
 

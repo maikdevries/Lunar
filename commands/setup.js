@@ -233,7 +233,7 @@ async function welcomeMessageSetup (client, message) {
 }
 
 async function youtubeSetup (client, message) {
-	const pollUsername = await message.channel.send(`You'll now be asked questions related to the **YouTube** feature to get it all ready for use. What YouTube channel do you want announcements for?`);
+	const pollUsername = await message.channel.send(`Let's get you some YouTube subs! First up, what is the **URL** to the YouTube channel? Formatting example: \`https://www.youtube.com/channel/UCBn5UlccfcRilV53F3auwUA\``);
 	const usernameMessage = await settings.collectResponse(message);
 
 	if (!usernameMessage) return pollUsername.delete();

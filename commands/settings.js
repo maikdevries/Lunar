@@ -194,7 +194,7 @@ function youtubeSettings (client, message, args) {
 	switch (args[1]) {
 		case `enabled`: return handleEnabledSettings(client, message, args[2], `youtube`);
 
-		case `username`: return handleUsernameSettings(client, message, args.slice(2).join(` `), `youtube`);
+		case `username`: return handleUsernameSettings(client, message, args[2], `youtube`);
 
 		case `channels`: return handleChannelSettings(client, message, args[2], args[3], `youtube`);
 
