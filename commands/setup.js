@@ -16,7 +16,7 @@ module.exports = {
 
 function execute (client, message, args) {
 	if (!message.member.hasPermission(`MANAGE_GUILD`)) return message.channel.send(`**Oh no**! You don't have the right perks to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
-	if (!channelPermissionsCheck(client, message.channel, [`ADD_REACTIONS`])) return console.error(`Missing permissions (ADD_REACTIONS) to change settings for guild: ${message.guild.id}!`);
+	if (!channelPermissionsCheck(client, message.channel, [`ADD_REACTIONS`])) return message.channel.send(`**Oh no**! You don't have the right perks to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	switch (args[0]) {
 		case `commands`: return commandsSetup(client, message);

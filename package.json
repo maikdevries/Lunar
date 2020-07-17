@@ -1,6 +1,6 @@
 {
   "name": "lunar",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A public Discord bot written in NodeJS that allows for easy customisation.",
   "engines": {
     "node": ">=14.0.0"
