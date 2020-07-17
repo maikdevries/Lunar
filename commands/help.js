@@ -11,7 +11,7 @@ module.exports = {
 }
 
 
-function execute (client, message, ignored) {
+async function execute (client, message, ignored) {
 	const guildSettings = client.settings.get(message.guild.id, `commands`);
 
 	const embed = new MessageEmbed()
@@ -20,6 +20,6 @@ function execute (client, message, ignored) {
 		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
 		.setTimestamp(new Date());
 
-	commandHandler.commands.filter((command) => guildSettings[command.name].enabled === true).forEach((command) => embed.addField(command.usage.replace(/\[PREFIX\]/, guildSettings.prefix), command.description));
+	commandHandler.commands.filter((command) => guildSettings[command.name]?.enabled === true).forEach((command) => embed.addField(command.usage.replace(/\[PREFIX\]/, guildSettings.prefix), command.description));
 	return message.channel.send(embed);
 }

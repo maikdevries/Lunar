@@ -44,8 +44,8 @@ async function execute (client, guilds) {
 async function getStream (client, guildID) {
 	const streamSettings = await getGuildSettings(client, guildID);
 
-	if (!streamSettings.settings.enabled) return client.twitch.delete(streamSettings.guild);
-	if (!streamSettings.settings.username || !streamSettings.settings.channels.length) {
+	if (!streamSettings?.settings?.enabled) return client.twitch.delete(streamSettings.guild);
+	if (!streamSettings.settings.username || !streamSettings.settings.channels?.length) {
 		client.twitch.delete(streamSettings.guild);
 		return console.error(`Cannot send Twitch announcement, setup not complete for guild: ${streamSettings.guild}!`);
 	}
@@ -57,7 +57,7 @@ async function getStream (client, guildID) {
 	const streamInfo = await request.getTwitch(path);
 	if (!streamInfo?.data) return;
 
-	if (!streamInfo?.data?.[0] && streamSettings.streaming) {
+	if (!streamInfo.data[0] && streamSettings.streaming) {
 		client.twitch.set(streamSettings.guild, false, `streaming`);
 		await setStreamAnnouncementOffline(client, streamSettings);
 		if (!client.twitch.get(streamSettings.guild, `streaming`)) return client.twitch.delete(streamSettings.guild);
@@ -102,7 +102,9 @@ async function updateStreamAnnouncement (client, streamSettings) {
 		const channel = client.channels.cache.get(savedMessage.channelID);
 		if (!channel) return console.error(`Cannot update Twitch announcement for channel: ${savedMessage.channelID}, it no longer exists!`);
 
-		const message = await channel.messages.fetch(savedMessage.messageID).catch((error) => console.error(`Something went wrong when fetching a twitch announcement message: ${error}`));
+		try { var message = await channel.messages.fetch(savedMessage.messageID) }
+		catch (error) { return console.error(`Something went wrong when fetching a twitch announcement: ${error}`) }
+
 		if (!message?.embeds?.[0]) return console.error(`Cannot update Twitch announcement for message: ${savedMessage.messageID}, it no longer exists!`);
 
 		const editedEmbed = new MessageEmbed(message.embeds[0])
@@ -125,7 +127,9 @@ async function setStreamAnnouncementOffline (client, streamSettings) {
 		const channel = client.channels.cache.get(savedMessage.channelID);
 		if (!channel) return console.error(`Cannot take Twitch announcement offline for channel: ${savedMessage.channelID}, it no longer exists!`);
 
-		const message = await channel.messages.fetch(savedMessage.messageID).catch((error) => console.error(`Something went wrong when fetching a twitch announcement: ${error}`));
+		try { var message = await channel.messages.fetch(savedMessage.messageID) }
+		catch (error) { return console.error(`Something went wrong when fetching a twitch announcement: ${error}`) }
+
 		if (!message?.embeds?.[0]) return console.error(`Cannot take Twitch announcement offline for message: ${savedMessage.messageID}, it no longer exists!`);
 
 		const editedEmbed = new MessageEmbed(message.embeds[0])
@@ -160,7 +164,7 @@ async function validateChannel (message, channelName) {
 		return false;
 	}
 
-	if (!channelInfo?.data?.[0]) {
+	if (!channelInfo.data[0]) {
 		message.channel.send(`**Ehh**... This doesn't seem to be a valid Twitch channel. Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
 		return false;
 	}
@@ -185,10 +189,10 @@ async function getData (userUsername, streamUsername, gameID, videoUsername) {
 	if (userUsername) userInfo = await request.getTwitch(`users?login=${userUsername}`);
 	if (streamUsername) streamInfo = await request.getTwitch(`streams?user_login=${streamUsername}`);
 
-	if (gameID && streamInfo) gameInfo = await request.getTwitch(`games?id=${streamInfo?.data?.[0]?.game_id}`);
+	if (gameID && streamInfo) gameInfo = await request.getTwitch(`games?id=${streamInfo.data?.[0]?.game_id}`);
 	else if (gameID) gameInfo = await request.getTwitch(`games?id=${gameID}`);
 
-	if (videoUsername && userInfo) videoInfo = await request.getTwitch(`videos?user_id=${userInfo?.data?.[0]?.id}&first=1&type=archive`);
+	if (videoUsername && userInfo) videoInfo = await request.getTwitch(`videos?user_id=${userInfo.data?.[0]?.id}&first=1&type=archive`);
 	else if (videoUsername) videoInfo = await request.getTwitch(`videos?user_id=${videoUsername}&first=1&type=archive`);
 
 	return [userInfo, streamInfo, gameInfo, videoInfo];

@@ -8,7 +8,7 @@ module.exports = {
 	name: `setup`,
 	aliases: [],
 	description: `A command used to easily configure the bot one feature at a time`,
-	args: true,
+	args: false,
 	usage: `[PREFIX]setup [feature]`,
 	execute
 }
@@ -42,11 +42,12 @@ async function commandsSetup (client, message) {
 	const pollPrefix = await message.channel.send(`Just a quick setup for the **Commands** feature. What prefix do you want to use?`);
 	const newPrefix = await settings.collectResponse(message);
 
+	if (!newPrefix) return pollPrefix.delete();
 	message.channel.bulkDelete([pollPrefix, newPrefix], true);
-	if (!newPrefix) return;
 
 	let pollChannel = await message.channel.send(`Almost done, what channel do you want to restrict commands to? Say '**NO**' if not applicable.`);
 	const response = await settings.collectResponse(message);
+	if (!response) return pollChannel.delete();
 
 	let newChannel;
 	if (response.content === `NO`) newChannel = `NO`;
@@ -122,6 +123,7 @@ async function serverLockSetup (client, message) {
 async function streamStatusSetup (client, message) {
 	let pollRole = await message.channel.send(`Let's go through the setup for **Stream Status**. First on the list, is there a required role to receive the shoutout? If not, respond with '**NO**'.`);
 	const response = await settings.collectResponse(message);
+	if (!response) return pollRole.delete();
 
 	let requiredRole;
 	if (response.content === `NO`) requiredRole = `NO`;
@@ -146,6 +148,8 @@ async function streamStatusSetup (client, message) {
 async function twitchSetup (client, message) {
 	const pollUsername = await message.channel.send(`Time to set up the next feature: **Twitch**! What Twitch channel do you want to receive announcements for?`);
 	const usernameMessage = await settings.collectResponse(message);
+
+	if (!usernameMessage) return pollUsername.delete();
 	const newUsername = await validateTwitchChannel(message, usernameMessage.content);
 
 	message.channel.bulkDelete([pollUsername, usernameMessage], true);
@@ -160,8 +164,8 @@ async function twitchSetup (client, message) {
 	const pollMessage = await message.channel.send(`Lastly, what's the message that you want to include with the announcement? Respond with '**NO**' if not.`);
 	const newMessage = await settings.collectResponse(message);
 
+	if (!newMessage) return pollMessage.delete();
 	message.channel.bulkDelete([pollMessage, newMessage], true);
-	if (!newMessage) return;
 
 	client.settings.set(message.guild.id, newUsername, `twitch.username`);
 	client.settings.set(message.guild.id, [newChannel.id], `twitch.channels`);
@@ -178,8 +182,8 @@ async function welcomeMessageSetup (client, message) {
 	const pollWelcome = await message.channel.send(`As part of the **Welcome Message** feature, would you like to send out a message when someone **joins** the Discord? Respond with '**Yes**' or '**No**'.`);
 	const welcomeMessage = await settings.collectResponse(message);
 
+	if (!welcomeMessage) return pollWelcome.delete();
 	message.channel.bulkDelete([pollWelcome, welcomeMessage], true);
-	if (!welcomeMessage) return;
 
 	switch (welcomeMessage.content) {
 		case `Yes`: {
@@ -203,8 +207,8 @@ async function welcomeMessageSetup (client, message) {
 	const pollLeave = await message.channel.send(`In addition, would you like to send out a message when someone **leaves** the Discord? Respond with '**Yes**' or '**No**'.`);
 	const leaveMessage = await settings.collectResponse(message);
 
+	if (!leaveMessage) return pollLeave.delete();
 	message.channel.bulkDelete([pollLeave, leaveMessage], true);
-	if (!leaveMessage) return;
 
 	switch (leaveMessage.content) {
 		case `Yes`: {
@@ -231,6 +235,8 @@ async function welcomeMessageSetup (client, message) {
 async function youtubeSetup (client, message) {
 	const pollUsername = await message.channel.send(`You'll now be asked questions related to the **YouTube** feature to get it all ready for use. What YouTube channel do you want announcements for?`);
 	const usernameMessage = await settings.collectResponse(message);
+
+	if (!usernameMessage) return pollUsername.delete();
 	const newUsername = await validateYouTubeChannel(client, message, usernameMessage.content);
 
 	message.channel.bulkDelete([pollUsername, usernameMessage], true);
@@ -245,8 +251,8 @@ async function youtubeSetup (client, message) {
 	const pollMessage = await message.channel.send(`At last, what message do you want to attach to the announcement? Reply '**NO**' if not.`);
 	const newMessage = await settings.collectResponse(message);
 
+	if (!newMessage) return pollMessage.delete();
 	message.channel.bulkDelete([pollMessage, newMessage], true);
-	if (!newMessage) return;
 
 	client.settings.set(message.guild.id, newUsername, `youtube.username`);
 	client.settings.set(message.guild.id, [newChannel.id], `youtube.channels`);

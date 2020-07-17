@@ -73,7 +73,7 @@ module.exports = {
 	name: `settings`,
 	aliases: [`options`],
 	description: `A command used to change guild settings for the current Discord guild`,
-	args: true,
+	args: false,
 	usage: `[PREFIX]settings [feature] [property] (sub-properties) (operation) (value)`,
 	execute,
 	requestChannel,
@@ -89,7 +89,7 @@ module.exports = {
 }
 
 
-function execute (client, message, args) {
+async function execute (client, message, args) {
 	if (!message.member.hasPermission(`MANAGE_GUILD`)) return message.channel.send(`**Oh no**! You don't have the right perks to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
 	if (!channelPermissionsCheck(client, message.channel, [`ADD_REACTIONS`])) return console.error(`Missing permissions (ADD_REACTIONS) to change settings for guild: ${message.guild.id}!`);
 
@@ -176,7 +176,7 @@ function twitchSettings (client, message, args) {
 
 		case `messages`: return handleMessageSettings(client, message, args[2], args[3], `twitch`);
 
-		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, TWITCH_USERNAME, LIST_CHANNELS, LIST_MESSAGES]));
+		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, FEATURE_USERNAME, LIST_CHANNELS, LIST_MESSAGES]));
 	}
 }
 
@@ -543,36 +543,40 @@ function changeUsernameSettings (client, message, newUsername, path) {
 
 
 function collectResponse (message) {
-	return new Promise((resolve) => {
+	return new Promise(async (resolve) => {
 		const filter = (msg) => msg.author.id === message.author.id;
-		message.channel.awaitMessages(filter, { max: 1, time: 60000, errors: [`time`] })
-			.then((collected) => resolve(collected.first()))
-			.catch(() => {
-				message.channel.send(`**Oh oh**... You weren't able to respond in time, please try again!`);
-				return resolve(false);
-			});
+
+		try {
+			const collected = await message.channel.awaitMessages(filter, { max: 1, time: 60000, errors: [`time`] });
+			return resolve(collected.first());
+		} catch {
+			message.channel.send(`**Oh oh**... You weren't able to respond in time, please try again!`);
+			return resolve(false);
+		}
 	});
 }
 
-async function confirmChange (message) {
+function confirmChange (message) {
 	return new Promise(async (resolve) => {
-		message.channel.send(`**WARNING**! This action is irreversible! Do you want to continue?`).then(async (confirmationMessage) => {
-			await confirmationMessage.react(CONFIRM_REACTION);
-			await confirmationMessage.react(DENY_REACTION);
+		const confirmationMessage = await message.channel.send(`**WARNING**! This action is irreversible! Do you want to continue?`);
+		await confirmationMessage.react(CONFIRM_REACTION);
+		await confirmationMessage.react(DENY_REACTION);
 
-			const filter = (reaction, user) => user.id === message.author.id && (reaction.emoji.name === CONFIRM_REACTION || reaction.emoji.name === DENY_REACTION);
-			confirmationMessage.awaitReactions(filter, { max: 1, time: 60000, errors: [`time`] }).then((collected) => {
-				const confirmation = collected.firstKey() === CONFIRM_REACTION ? true : false;
-				if (!confirmation) message.channel.send(`**Alrighty**! If you change your mind, please use the command again.`).then((msg) => msg.delete({ timeout: 3500 }));
+		const filter = (reaction, user) => user.id === message.author.id && (reaction.emoji.name === CONFIRM_REACTION || reaction.emoji.name === DENY_REACTION);
 
-				confirmationMessage.delete();
-				return resolve(confirmation);
-			}).catch(() => {
-				confirmationMessage.delete();
-				message.channel.send(`**Oh oh**... You weren't able to confirm in time, please try again!`);
-				return resolve(false);
-			});
-		});
+		try {
+			const collected = await confirmationMessage.awaitReactions(filter, { max: 1, time: 60000, errors: [`time`] });
+			confirmationMessage.delete();
+
+			const confirmation = collected.firstKey() === CONFIRM_REACTION ? true : false;
+			if (!confirmation) message.channel.send(`**Alrighty**! If you change your mind, please use the command again.`).then((msg) => msg.delete({ timeout: 3500 }));
+			return resolve(confirmation);
+
+		} catch {
+			confirmationMessage.delete();
+			message.channel.send(`**Oh oh**... You weren't able to confirm in time, please try again!`);
+			return resolve(false);
+		}
 	});
 }
 
@@ -594,8 +598,11 @@ async function requestChannel (client, message) {
 	const pollMessage = await message.channel.send(`Please respond with a **mention** of the preferred channel.`);
 	const responseChannel = await collectResponse(message);
 
+	if (!responseChannel) {
+		pollMessage.delete();
+		return false;
+	}
 	message.channel.bulkDelete([pollMessage, responseChannel], true);
-	if (!responseChannel) return false;
 
 	const newChannel = await parseChannel(client, responseChannel, responseChannel.content);
 	return newChannel ? newChannel : false;
@@ -605,8 +612,11 @@ async function requestMessage (message) {
 	const pollMessage = await message.channel.send(`Please respond with the **ID** of the preferred message.`);
 	const responseMessage = await collectResponse(message);
 
+	if (!responseMessage) {
+		pollMessage.delete();
+		return false;
+	}
 	message.channel.bulkDelete([pollMessage, responseMessage], true);
-	if (!responseMessage) return false;
 
 	const newMessage = await parseMessage(message, null, responseMessage.content);
 	return newMessage ? newMessage : false;
@@ -616,8 +626,11 @@ async function requestRole (message) {
 	const pollMessage = await message.channel.send(`Please respond with a **mention** of the preferred role.`);
 	const responseRole = await collectResponse(message);
 
+	if (!responseRole) {
+		pollMessage.delete();
+		return false;
+	}
 	message.channel.bulkDelete([pollMessage, responseRole], true);
-	if (!responseRole) return false;
 
 	const newRole = await parseRole(responseRole, responseRole.content);
 	return newRole ? newRole : false;
@@ -627,8 +640,11 @@ async function requestEmoji (message) {
 	const pollMessage = await message.channel.send(`Please respond with the preferred **emoji**.`);
 	const responseEmoji = await collectResponse(message);
 
+	if (!responseEmoji) {
+		pollMessage.delete();
+		return false;
+	}
 	message.channel.bulkDelete([pollMessage, responseEmoji], true);
-	if (!responseEmoji) return false;
 
 	const newEmoji = await parseEmoji(message, responseEmoji.content);
 	return newEmoji ? newEmoji : false;

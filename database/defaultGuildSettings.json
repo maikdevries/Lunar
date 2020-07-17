@@ -56,15 +56,15 @@
 			"restricted": false
 		},
 		"invite": {
-			"enabled": false,
+			"enabled": true,
 			"restricted": true
 		},
 		"kick": {
-			"enabled": false,
+			"enabled": true,
 			"restricted": false
 		},
 		"nickname": {
-			"enabled": false,
+			"enabled": true,
 			"restricted": false
 		},
 		"settings": {

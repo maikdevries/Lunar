@@ -1,13 +1,13 @@
 {
   "name": "lunar",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A public Discord bot written in NodeJS that allows for easy customisation.",
   "engines": {
     "node": ">=14.0.0"
   },
   "main": "bot.js",
   "scripts": {
-	"start": "node -r dotenv/config bot.js"
+    "start": "node -r dotenv/config bot.js"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,6 @@
     "better-sqlite3": "^7.1.0",
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
-    "enmap": "^5.3.2"
+    "enmap": "^5.3.3"
   }
 }

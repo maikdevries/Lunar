@@ -68,7 +68,7 @@ function API (options) {
 	return new Promise((resolve, reject) => {
 		https.request(options, (res) => {
 			if (res.statusCode === 401) return reject(`UNAUTHORISED`);
-			//if (res.statusCode !== 200) return resolve(false);
+			if (res.statusCode !== 200) return resolve(false);
 
 			const rawData = [];
 			res.on(`data`, (chunk) => rawData.push(chunk));

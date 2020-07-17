@@ -33,8 +33,8 @@ async function execute (client, guilds) {
 async function getVideo (client, guildID) {
 	const videoSettings = await getGuildSettings(client, guildID);
 
-	if (!videoSettings.settings.enabled) return client.youtube.delete(videoSettings.guild);
-	if (!videoSettings.settings.username || !videoSettings.settings.channels.length) {
+	if (!videoSettings?.settings?.enabled) return client.youtube.delete(videoSettings.guild);
+	if (!videoSettings.settings.username || !videoSettings.settings.channels?.length) {
 		client.youtube.delete(videoSettings.guild);
 		return console.error(`Cannot send YouTube announcement, setup not complete for guild: ${videoSettings.guild}`);
 	}
@@ -80,12 +80,12 @@ async function validateChannel (client, message, channelName) {
 	const path = `search?part=snippet&maxResults=1&q=${encodeURI(channelName)}&type=channel&key=${process.env.YOUTUBE_VALIDATE_KEY}`;
 	const channelInfo = await request.getYouTube(path);
 
-	if (channelInfo.error) {
+	if (!channelInfo || channelInfo.error) {
 		message.channel.send(`**Oh no**... Something went wrong! Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
 		return false;
 	}
 
-	if (!channelInfo?.items?.[0] || channelInfo.items[0].snippet.title.toLowerCase() !== channelName.toLowerCase()) {
+	if (!channelInfo.items?.[0] || channelInfo.items?.[0]?.snippet.title.toLowerCase() !== channelName.toLowerCase()) {
 		message.channel.send(`**Ehh**... This doesn't seem to be a valid YouTube channel. Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
 		return false;
 	}
@@ -98,7 +98,7 @@ async function setLatestVideo (client, message, channelID) {
 	const videoSettings = await getGuildSettings(client, message.guild.id);
 
 	const [channelSnippet, channelContent, videoSnippet] = await getData(null, channelID, true);
-	if (channelContent.error || videoSnippet.error || !channelContent?.items?.[0] || !videoSnippet?.items?.[0]) {
+	if (!channelContent?.items?.[0] || !videoSnippet?.items?.[0] || channelContent.error || videoSnippet.error) {
 		message.channel.send(`**Oh no**... Something went wrong! Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
 		return false;
 	}

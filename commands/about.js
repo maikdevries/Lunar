@@ -13,13 +13,15 @@ module.exports = {
 }
 
 
-function execute (client, message, ignore) {
+async function execute (client, message, ignore) {
 	const embed = new MessageEmbed()
-		.setAuthor(`The latest information on ${client.user.username}`, client.user.avatarURL())
+		.setAuthor(`Technical information on ${client.user.username}`, client.user.avatarURL())
+		.setDescription(`The latest technical information on ${client.user.username}:`)
 		.addField(`Version`, package.version, true)
-		.addField(`Commit`, `[${getCommit()}](${package.homepage}/commit/${getCommit()})`, true)
-		.addField(`Source code`, `[GitHub repository](${package.homepage})`)
-		.addField(`Invite link`, `[Link to invite this bot to your server](https://lunar.marvonon.com)`)
+		.addField(`Commit`, `[${await getCommit()}](${package.homepage}/commit/${await getCommit()})`, true)
+		.addField(`Source code`, `[GitHub repository](${package.homepage})`, true)
+		.addField(`Public invite`, `[lunar.marvonon.com](https://lunar.marvonon.com)`, true)
+		.addField(`Support`, `https://discord.gg/aMeGvFD`, true)
 		.setColor(`#233A54`)
 		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
 		.setTimestamp(Date.now());
@@ -27,7 +29,7 @@ function execute (client, message, ignore) {
 	return message.channel.send({ embed });
 }
 
-function getCommit () {
+async function getCommit () {
 	return execSync(`git rev-parse HEAD`)
 		.toString()
 		.trim()

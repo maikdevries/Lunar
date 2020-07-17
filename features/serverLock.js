@@ -10,7 +10,7 @@ module.exports = {
 function memberLock (client, member) {
 	const guildSettings = client.settings.get(member.guild.id, `serverLock`);
 
-	if (!guildSettings.enabled) return;
+	if (!guildSettings?.enabled) return;
 	if (!guildSettings.role || !guildSettings.message) return console.error(`Cannot manage server lock for guild members, setup not complete for guild: ${member.guild.id}!`);
 	if (!guildPermissionsCheck(client, member.guild, [`MANAGE_ROLES`])) return console.error(`Missing permissions (MANAGE_ROLES) to add lock role for guild: ${member.guild.id}!`);
 
@@ -18,10 +18,12 @@ function memberLock (client, member) {
 }
 
 async function memberUnlock (client, reaction, user) {
-	if (reaction.partial) await reaction.fetch().catch((error) => console.error(`Something went wrong when fetching a partial reaction: ${error}`));
+	try { if (reaction.partial) reaction = await reaction.fetch() }
+	catch (error) { return console.error(`Something went wrong when fetching a partial reaction: ${error}`) }
+
 	const guildSettings = client.settings.get(reaction.message.guild.id, `serverLock`);
 
-	if (!guildSettings.enabled) return;
+	if (!guildSettings?.enabled) return;
 	if (!guildSettings.role || !guildSettings.message) return console.error(`Cannot manage server lock for guild members, setup not complete for guild: ${member.guild.id}!`);
 	if (!guildPermissionsCheck(client, reaction.message.guild, [`MANAGE_ROLES`])) return console.error(`Missing permissions (MANAGE_ROLES) to remove lock role for guild: ${member.guild.id}!`);
 

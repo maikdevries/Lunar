@@ -15,14 +15,14 @@ const youtube = require(`./features/youtube.js`);
 
 // Client setup function to be executed as soon as client instance has fully loaded
 client.on(`ready`, async () => {
-	await client.user.setUsername(process.env.DISCORD_USERNAME)
-		.catch((error) => console.error(`Something went wrong when setting the client's username: ${error}`));
+	try { await client.user.setUsername(process.env.DISCORD_USERNAME) }
+	catch (error) { console.error(`Something went wrong when setting the client's username: ${error}`) }
 
-	await client.user.setAvatar(`./avatar.png`)
-		.catch((error) => console.error(`Something went wrong when setting the client's avatar: ${error}`));
+	try { await client.user.setActivity(process.env.DISCORD_ACTIVITY, { type: `PLAYING` }) }
+	catch (error) { console.error(`Something went wrong when setting the client's activity: ${error}`) }
 
-	await client.user.setActivity(process.env.DISCORD_ACTIVITY, { type: `PLAYING` })
-		.catch((error) => console.error(`Something went wrong when setting the client's activity: ${error}`));
+	try { await client.user.setAvatar(`./avatar.png`) }
+	catch (error) { console.error(`Something went wrong when setting the client's avatar: ${error}`) }
 
 	await database.setup(client);
 	await commandHandler.setup();
