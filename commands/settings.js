@@ -237,7 +237,7 @@ function commandPrefixSettings (client, message, newPrefix) {
 	if (!newPrefix) return message.channel.send(`**Ouch**! You didn't specify what to change the prefix to! Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	client.settings.set(message.guild.id, newPrefix, `commands.prefix`);
-	return message.channel.send(`**Nice**! Successfully changed the commands prefix to **${newPrefix}**`).then((msg) => msg.delete({ timeout: 3500 }));
+	return message.channel.send(`**Nice**! Successfully changed the commands prefix to \`${newPrefix}\``).then((msg) => msg.delete({ timeout: 3500 }));
 }
 
 function commandChangeRestrictionSettings (client, message, command, boolean) {
