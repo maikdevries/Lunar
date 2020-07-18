@@ -1,3 +1,5 @@
+require(`dotenv`).config()
+
 const Discord = require(`discord.js`);
 const client = new Discord.Client({ partials: [`MESSAGE`, `REACTION`] });
 
@@ -94,7 +96,8 @@ process.on(`unhandledRejection`, (error) => {
 	console.error(`Something went wrong, an unhandled promise rejection: ${error}`);
 });
 
-process.on(`SIGINT`, () => {
+process.on(`uncaughtException`, (error) => {
+	console.error(`Something went wrong, an unhandled exception: ${error}`);
 	client.destroy();
 	process.exit();
 });

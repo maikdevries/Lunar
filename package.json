@@ -6,9 +6,6 @@
     "node": ">=14.0.0"
   },
   "main": "bot.js",
-  "scripts": {
-    "start": "node -r dotenv/config bot.js"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/maikdevries/Lunar.git"
