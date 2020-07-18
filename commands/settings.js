@@ -128,6 +128,8 @@ function commandSettings (client, message, args) {
 		case `nickname`:
 		case `slowmode`: return commandSpecificSettings(client, message, args, args[1]);
 
+		case 'list': return listGuildSettings(client, message, `commands`);
+
 		default: return message.channel.send(possibleSettings(client, COMMANDS_SETTINGS));
 	}
 }
@@ -137,6 +139,8 @@ function reactionRoleSettings (client, message, args) {
 		case `enabled`: return handleEnabledSettings(client, message, args[2], `reactionRole`);
 
 		case `messages`: return handleReactionRoleSettings(client, message, args[2], args[3], args[4], args[5], args[6]);
+
+		case `list`: return listGuildSettings(client, message, `reactionRole`);
 
 		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, REACTION_MESSAGES]));
 	}
@@ -150,6 +154,8 @@ function serverLockSettings (client, message, args) {
 
 		case `message`: return serverLockMessageSettings(client, message, args[2], args[3], args[4], []);
 
+		case `list`: return listGuildSettings(client, message, `serverLock`);
+
 		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, LOCK_ROLE, LOCK_MESSAGE]));
 	}
 }
@@ -161,6 +167,8 @@ function streamStatusSettings (client, message, args) {
 		case `streamerRole`: return addRoleSettings(client, message, args[2], `streamStatus.streamerRole`);
 
 		case `statusRole`: return addRoleSettings(client, message, args[2], `streamStatus.statusRole`);
+
+		case `list`: return listGuildSettings(client, message, `streamStatus`);
 
 		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, STATUS_STREAMER, STATUS_ROLE]));
 	}
@@ -176,6 +184,8 @@ function twitchSettings (client, message, args) {
 
 		case `messages`: return handleMessageSettings(client, message, args[2], args.slice(3).join(` `), `twitch`);
 
+		case `list`: return listGuildSettings(client, message, `twitch`);
+
 		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, FEATURE_USERNAME, LIST_CHANNELS, LIST_MESSAGES]));
 	}
 }
@@ -185,6 +195,8 @@ function welcomeMessageSettings (client, message, args) {
 		case `welcome`: return welcomeMessageSharedSettings(client, message, args, `welcome`);
 
 		case `leave`: return welcomeMessageSharedSettings(client, message, args, `leave`);
+
+		case `list`: return listGuildSettings(client, message, `welcomeMessage`);
 
 		default: return message.channel.send(possibleSettings(client, [WELCOME_WELCOME, WELCOME_LEAVE]));
 	}
@@ -199,6 +211,8 @@ function youtubeSettings (client, message, args) {
 		case `channels`: return handleChannelSettings(client, message, args[2], args[3], `youtube`, ['MENTION_EVERYONE']);
 
 		case `messages`: return handleMessageSettings(client, message, args[2], args.slice(3).join(` `), `youtube`);
+
+		case `list`: return listGuildSettings(client, message, `youtube`);
 
 		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, FEATURE_USERNAME, LIST_CHANNELS, LIST_MESSAGES]));
 	}
@@ -539,6 +553,10 @@ function changeUsernameSettings (client, message, newUsername, path) {
 
 	client.settings.set(message.guild.id, newUsername, `${path}.username`);
 	return message.channel.send(`**Nice**! Successfully changed the username!`).then((msg) => msg.delete({ timeout: 3500 }));
+}
+
+function listGuildSettings (client, message, path) {
+	return message.channel.send(`Current settings for the **${path}** feature:\n\`\`\`JSON\n${JSON.stringify(client.settings.get(message.guild.id, path), null, `\t`)}\`\`\``, { split: true });
 }
 
 
