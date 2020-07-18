@@ -1,4 +1,4 @@
-const { channelPermissionsCheck } = require(`./../shared/permissionCheck.js`);
+const { channelPermissionsCheck, guildPermissionsCheck } = require(`./../shared/permissionCheck.js`);
 const validateTwitchChannel = require(`./../features/twitch.js`).validateChannel;
 const validateYouTubeChannel = require(`./../features/youtube.js`).validateChannel;
 
@@ -51,7 +51,7 @@ async function commandsSetup (client, message) {
 
 	let newChannel;
 	if (response.content === `NO`) newChannel = `NO`;
-	else newChannel = await settings.parseChannel(client, response, response.content);
+	else newChannel = await settings.parseChannel(client, response, response.content, []);
 
 	message.channel.bulkDelete([pollChannel, response], true);
 	if (!newChannel) return;
@@ -63,6 +63,8 @@ async function commandsSetup (client, message) {
 }
 
 async function reactionRoleSetup (client, message) {
+	if (!guildPermissionsCheck(client, message.guild, ['MANAGE_ROLES'])) return message.channel.send(`**Oh no**! I'm missing the '**Manage Roles**' permission! Try again after granting it!`).then((msg) => msg.delete({ timeout: 3500 }));
+
 	const pollMessage = await message.channel.send(`Let's go through the process of setting up a **Reaction Role**! What message we talking?`);
 	const newMessage = await settings.requestMessage(message);
 
@@ -86,6 +88,8 @@ async function reactionRoleSetup (client, message) {
 }
 
 async function serverLockSetup (client, message) {
+	if (!guildPermissionsCheck(client, message.guild, ['MANAGE_ROLES'])) return message.channel.send(`**Oh no**! I'm missing the '**Manage Roles**' permission! Try again after granting it!`).then((msg) => msg.delete({ timeout: 3500 }));
+
 	const pollRole = await message.channel.send(`Let me walk you through the setup for the **Server Lock** feature. First of all, what is the role that will lock members out of the Discord?`);
 	const newRole = await settings.requestRole(message);
 
@@ -93,7 +97,7 @@ async function serverLockSetup (client, message) {
 	if (!newRole) return;
 
 	const pollChannel = await message.channel.send(`Second of all, in what channel can new members unlock the Discord?`);
-	const newChannel = await settings.requestChannel(client, message);
+	const newChannel = await settings.requestChannel(client, message, ['ADD_REACTIONS']);
 
 	pollChannel.delete();
 	if (!newChannel) return;
@@ -121,6 +125,8 @@ async function serverLockSetup (client, message) {
 }
 
 async function streamStatusSetup (client, message) {
+	if (!guildPermissionsCheck(client, message.guild, ['MANAGE_ROLES'])) return message.channel.send(`**Oh no**! I'm missing the '**Manage Roles**' permission! Try again after granting it!`).then((msg) => msg.delete({ timeout: 3500 }));
+
 	let pollRole = await message.channel.send(`Let's go through the setup for **Stream Status**. First on the list, is there a required role to receive the shoutout? If not, respond with '**NO**'.`);
 	const response = await settings.collectResponse(message);
 	if (!response) return pollRole.delete();
@@ -156,7 +162,7 @@ async function twitchSetup (client, message) {
 	if (!newUsername) return;
 
 	const pollChannel = await message.channel.send(`What Discord channel do you want to receive the livestream announcements?`);
-	const newChannel = await settings.requestChannel(client, message);
+	const newChannel = await settings.requestChannel(client, message, ['MENTION_EVERYONE']);
 
 	pollChannel.delete();
 	if (!newChannel) return;
@@ -188,7 +194,7 @@ async function welcomeMessageSetup (client, message) {
 	switch (welcomeMessage.content) {
 		case `Yes`: {
 			const pollChannel = await message.channel.send(`What is the channel you'd like to have them sent to?`);
-			const newChannel = await settings.requestChannel(client, message);
+			const newChannel = await settings.requestChannel(client, message, []);
 
 			pollChannel.delete();
 			if (!newChannel) return;
@@ -213,7 +219,7 @@ async function welcomeMessageSetup (client, message) {
 	switch (leaveMessage.content) {
 		case `Yes`: {
 			const pollChannel = await message.channel.send(`What is the channel you'd like to have them sent to?`);
-			const newChannel = await settings.requestChannel(client, message);
+			const newChannel = await settings.requestChannel(client, message, []);
 
 			pollChannel.delete();
 			if (!newChannel) return;
@@ -243,7 +249,7 @@ async function youtubeSetup (client, message) {
 	if (!newUsername) return;
 
 	const pollChannel = await message.channel.send(`In what channel will these announcements be posted?`);
-	const newChannel = await settings.requestChannel(client, message);
+	const newChannel = await settings.requestChannel(client, message, ['MENTION_EVERYONE']);
 
 	pollChannel.delete();
 	if (!newChannel) return;

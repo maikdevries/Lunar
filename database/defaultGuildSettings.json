@@ -89,8 +89,15 @@
 			],
 			"messages": [
 				"We've got a new member! Welcome [MEMBER]!",
-				"Hi [MEMBER]! **Welcome to the Discord**!",
-				"[MEMBER] is to be welcomed to the server!"
+				"Hi [MEMBER]! Welcome to the Discord!",
+				"[MEMBER] is to be welcomed to the server!",
+				"Don't worry, [MEMBER] is here to help us out!",
+				"A friend has joined the party! [MEMBER] get yourself a drink!",
+				"[MEMBER] made it just in time, nice!",
+				"A green bean has joined, be nice to [MEMBER] everyone!",
+				"[MEMBER] is here to answer all of our questions, right?",
+				"Did you arrive by chopper, plane or hovercraft, [MEMBER]?",
+				"Look who is here! [MEMBER] is ready for all the fun!"
 			]
 		},
 		"leave": {
@@ -100,7 +107,10 @@
 			],
 			"messages": [
 				"[MEMBER] has fallen and will be remembered...",
-				"Rest in peace, [MEMBER]. You won't be forgotten."
+				"Rest in peace, [MEMBER]. You won't be forgotten.",
+				"I can't believe you've done this [MEMBER]...",
+				"May we meet again, [MEMBER]",
+				"Don't worry [MEMBER], I don't hate you but you leaving us does hurt."
 			]
 		}
 	},

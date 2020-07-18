@@ -116,7 +116,7 @@ function commandSettings (client, message, args) {
 	switch (args[1]) {
 		case `prefix`: return commandPrefixSettings(client, message, args[2]);
 
-		case `restrictedChannel`: return handleChannelSettings(client, message, args[2], args[3], `commands`);
+		case `restrictedChannel`: return handleChannelSettings(client, message, args[2], args[3], `commands`, []);
 
 		case `ask`: return commandAskSettings(client, message, args);
 
@@ -148,7 +148,7 @@ function serverLockSettings (client, message, args) {
 
 		case `role`: return addRoleSettings(client, message, args[2], `serverLock.role`);
 
-		case `message`: return serverLockMessageSettings(client, message, args[2], args[3], args[4]);
+		case `message`: return serverLockMessageSettings(client, message, args[2], args[3], args[4], []);
 
 		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, LOCK_ROLE, LOCK_MESSAGE]));
 	}
@@ -172,7 +172,7 @@ function twitchSettings (client, message, args) {
 
 		case `username`: return handleUsernameSettings(client, message, args.slice(2).join(` `), `twitch`);
 
-		case `channels`: return handleChannelSettings(client, message, args[2], args[3], `twitch`);
+		case `channels`: return handleChannelSettings(client, message, args[2], args[3], `twitch`, ['MENTION_EVERYONE']);
 
 		case `messages`: return handleMessageSettings(client, message, args[2], args.slice(3).join(` `), `twitch`);
 
@@ -196,7 +196,7 @@ function youtubeSettings (client, message, args) {
 
 		case `username`: return handleUsernameSettings(client, message, args[2], `youtube`);
 
-		case `channels`: return handleChannelSettings(client, message, args[2], args[3], `youtube`);
+		case `channels`: return handleChannelSettings(client, message, args[2], args[3], `youtube`, ['MENTION_EVERYONE']);
 
 		case `messages`: return handleMessageSettings(client, message, args[2], args.slice(3).join(` `), `youtube`);
 
@@ -246,7 +246,7 @@ function commandChangeRestrictionSettings (client, message, command, boolean) {
 }
 
 async function serverLockMessageSettings (client, message, channelMention, messageMention, emojiMention) {
-	const newChannel = await parseChannel(client, message, channelMention);
+	const newChannel = await parseChannel(client, message, channelMention, []);
 	if (!newChannel) return;
 
 	if (!await parseMessage(message, newChannel, messageMention)) return;
@@ -262,7 +262,7 @@ function welcomeMessageSharedSettings (client, message, args, path) {
 	switch (args[2]) {
 		case `enabled`: return handleEnabledSettings(client, message, args[3], `welcomeMessage.${path}`);
 
-		case `channels`: return handleChannelSettings(client, message, args[3], args[4], `welcomeMessage.${path}`);
+		case `channels`: return handleChannelSettings(client, message, args[3], args[4], `welcomeMessage.${path}`, []);
 
 		case `messages`: {
 			const newMessage = args.slice(4).join(` `);
@@ -285,9 +285,9 @@ function handleEnabledSettings (client, message, arg, path) {
 	}
 }
 
-function handleChannelSettings (client, message, action, arg, path) {
+function handleChannelSettings (client, message, action, arg, path, permissions) {
 	switch (action) {
-		case `add`: return addChannelSettings(client, message, arg, path);
+		case `add`: return addChannelSettings(client, message, arg, path, permissions);
 
 		case `remove`: return removeChannelSettings(client, message, arg, path);
 
@@ -364,8 +364,8 @@ function changeEnabledSettings (client, message, boolean, path) {
 	return message.channel.send(`**Nice**! Successfully changed the \`enabled\` property of **${path}** to **${boolean}**!`).then((msg) => msg.delete({ timeout: 3500 }));
 }
 
-async function addChannelSettings (client, message, channelMention, path) {
-	const channel = await parseChannel(client, message, channelMention);
+async function addChannelSettings (client, message, channelMention, path, permissions) {
+	const channel = await parseChannel(client, message, channelMention, permissions);
 	if (!channel) return;
 
 	client.settings.push(message.guild.id, channel.id, `${path}.channels`);
@@ -373,7 +373,7 @@ async function addChannelSettings (client, message, channelMention, path) {
 }
 
 async function removeChannelSettings (client, message, channelMention, path) {
-	const channel = await parseChannel(client, message, channelMention);
+	const channel = await parseChannel(client, message, channelMention, []);
 	if (!channel) return;
 
 	client.settings.remove(message.guild.id, channel.id, `${path}.channels`);
@@ -544,9 +544,10 @@ function changeUsernameSettings (client, message, newUsername, path) {
 
 function collectResponse (message) {
 	return new Promise(async (resolve) => {
-		const filter = (msg) => msg.author.id === message.author.id;
 
 		try {
+			const filter = (msg) => msg.author.id === message.author.id;
+
 			const collected = await message.channel.awaitMessages(filter, { max: 1, time: 60000, errors: [`time`] });
 			return resolve(collected.first());
 		} catch {
@@ -562,9 +563,9 @@ function confirmChange (message) {
 		await confirmationMessage.react(CONFIRM_REACTION);
 		await confirmationMessage.react(DENY_REACTION);
 
-		const filter = (reaction, user) => user.id === message.author.id && (reaction.emoji.name === CONFIRM_REACTION || reaction.emoji.name === DENY_REACTION);
-
 		try {
+			const filter = (reaction, user) => user.id === message.author.id && (reaction.emoji.name === CONFIRM_REACTION || reaction.emoji.name === DENY_REACTION);
+
 			const collected = await confirmationMessage.awaitReactions(filter, { max: 1, time: 60000, errors: [`time`] });
 			confirmationMessage.delete();
 
@@ -594,7 +595,7 @@ function possibleSettings (client, settings) {
 }
 
 
-async function requestChannel (client, message) {
+async function requestChannel (client, message, permissions) {
 	const pollMessage = await message.channel.send(`Please respond with a **mention** of the preferred channel.`);
 	const responseChannel = await collectResponse(message);
 
@@ -604,7 +605,7 @@ async function requestChannel (client, message) {
 	}
 	message.channel.bulkDelete([pollMessage, responseChannel], true);
 
-	const newChannel = await parseChannel(client, responseChannel, responseChannel.content);
+	const newChannel = await parseChannel(client, responseChannel, responseChannel.content, permissions);
 	return newChannel ? newChannel : false;
 }
 
@@ -665,7 +666,7 @@ async function parseRole (message, roleMention) {
 	return message.guild.roles.cache.get(matches[1]);
 }
 
-async function parseChannel (client, message, channelMention) {
+async function parseChannel (client, message, channelMention, permissions) {
 	if (!message.mentions.channels.size || !channelMention) {
 		message.channel.send(`**Ouch**! You forgot to mention a channel in your message! Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
 		return false;
@@ -677,7 +678,15 @@ async function parseChannel (client, message, channelMention) {
 		return false;
 	}
 
-	return client.channels.cache.get(matches[1]);
+	const channel = client.channels.cache.get(matches[1]);
+	allPermissions = permissions.concat([`VIEW_CHANNEL`, `SEND_MESSAGES`, `MANAGE_MESSAGES`]);
+
+	if (!channelPermissionsCheck(client, channel, allPermissions)) {
+		message.channel.send(`**Ooh**! I'm missing any of the following permissions in that channel: **${allPermissions.join(`, `)}**. Please try again!`);
+		return false;
+	}
+
+	return channel;
 }
 
 async function parseEmoji (message, emojiMention) {
