@@ -43,6 +43,8 @@ async function execute (client, message) {
 	if (message.edits.length > 3) return message.channel.send(`**Excuse me**, third time wasn't the charm for you. Please send a new message instead of editing the original.`).then((msg) => msg.delete({ timeout: 3500 }));
 	if (command.args && !args.length) return message.channel.send(`**Oh no**! You didn't provide any arguments for this command to work properly! The proper usage would be: \`${command.usage.replace(/\[PREFIX\]/, guildSettings.prefix)}\`. Edit your message to correctly use this command!`).then((msg) => msg.delete({ timeout: 3500 }));
 
+	if (!message.member.hasPermission(command.permissions)) return message.channel.send(`**Golly**! You don't have the right permissions to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
+
 	try {
 		await command.execute(client, message, args);
 		return message.delete();

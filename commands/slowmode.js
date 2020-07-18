@@ -4,6 +4,7 @@ module.exports = {
 	name: `slowmode`,
 	aliases: [`slow`],
 	description: `A command that turns on/off slowmode for the current channel`,
+	permissions: [`MANAGE_CHANNELS`],
 	args: true,
 	usage: `[PREFIX]slowmode [number]`,
 	execute
@@ -11,7 +12,6 @@ module.exports = {
 
 
 async function execute (client, message, args) {
-	if (!message.member.hasPermission(`MANAGE_CHANNELS`)) return message.channel.send(`**Golly**! You don't have the right permissions to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
 	if (!channelPermissionsCheck(client, message.channel, [`MANAGE_CHANNELS`])) return message.channel.send(`**Yikes**! It seems like I don't have the right permissions to do this.`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	const numberOfSeconds = parseInt(args[0]);

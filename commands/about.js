@@ -7,6 +7,7 @@ module.exports = {
 	name: `about`,
 	aliases: [`version`],
 	description: `A command to get the latest technical information on the bot`,
+	permissions: [],
 	args: false,
 	usage: `[PREFIX]about`,
 	execute

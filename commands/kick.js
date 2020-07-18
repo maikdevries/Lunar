@@ -4,6 +4,7 @@ module.exports = {
 	name: `kick`,
 	aliases: [],
 	description: `A command to kick a member from the server`,
+	permissions: [`KICK_MEMBERS`],
 	args: true,
 	usage: `[PREFIX]kick @[member(s)] (reason)`,
 	execute
@@ -11,7 +12,6 @@ module.exports = {
 
 
 async function execute (client, message, args) {
-	if (!message.member.hasPermission(`KICK_MEMBERS`)) return message.channel.send(`**Oh no**! You don't have the right perks to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
 	if (!guildPermissionsCheck(client, message.guild, [`KICK_MEMBERS`])) return message.channel.send(`**Yikes**! It seems like I don't have the right permissions to do this.`).then((msg) => msg.delete({ timeout: 3500 }));
 	if (!message.mentions.members?.size) return message.channel.send(`**Oh snap**! You forgot to mention the person you would like to kick! Try again.`).then((msg) => msg.delete({ timeout: 3500 }));
 

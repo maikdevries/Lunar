@@ -8,6 +8,7 @@ module.exports = {
 	name: `setup`,
 	aliases: [],
 	description: `A command used to easily configure the bot one feature at a time`,
+	permissions: [`MANAGE_GUILD`],
 	args: false,
 	usage: `[PREFIX]setup [feature]`,
 	execute
@@ -15,7 +16,6 @@ module.exports = {
 
 
 function execute (client, message, args) {
-	if (!message.member.hasPermission(`MANAGE_GUILD`)) return message.channel.send(`**Oh no**! You don't have the right perks to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
 	if (!channelPermissionsCheck(client, message.channel, [`ADD_REACTIONS`])) return message.channel.send(`**Oh no**! You don't have the right perks to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	switch (args[0]) {

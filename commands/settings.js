@@ -73,6 +73,7 @@ module.exports = {
 	name: `settings`,
 	aliases: [`options`],
 	description: `A command used to change guild settings for the current Discord guild`,
+	permissions: [`MANAGE_GUILD`],
 	args: false,
 	usage: `[PREFIX]settings [feature] [property] (sub-properties) (operation) (value)`,
 	execute,
@@ -90,7 +91,6 @@ module.exports = {
 
 
 async function execute (client, message, args) {
-	if (!message.member.hasPermission(`MANAGE_GUILD`)) return message.channel.send(`**Oh no**! You don't have the right perks to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
 	if (!channelPermissionsCheck(client, message.channel, [`ADD_REACTIONS`])) return message.channel.send(`**Yikes**! It seems like I don't have the right permissions to do this.`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	switch (args[0]) {

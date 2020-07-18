@@ -4,6 +4,7 @@ module.exports = {
 	name: `nickname`,
 	aliases: [`nick`, `name`],
 	description: `A command that changes the nickname of a member in a guild`,
+	permissions: [`MANAGE_NICKNAMES`],
 	args: true,
 	usage: `[PREFIX]nickname @[user] [name]`,
 	execute
@@ -11,7 +12,6 @@ module.exports = {
 
 
 async function execute (client, message, args) {
-	if (!message.member.hasPermission(`MANAGE_NICKNAMES`)) return message.channel.send(`**Beans**! You don't have the right permissions to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
 	if (!guildPermissionsCheck(client, message.guild, [`MANAGE_NICKNAMES`])) return message.channel.send(`**Yikes**! It seems like I don't have the right permissions to do this.`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	const member = message.mentions.members?.first();
