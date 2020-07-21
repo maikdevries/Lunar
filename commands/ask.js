@@ -2,7 +2,9 @@ module.exports = {
 	name: `ask`,
 	aliases: [`8ball`],
 	description: `A command that randomly answers the question it is asked`,
-	permissions: [],
+	memberPermissions: [],
+	guildPermissions: [],
+	channelPermissions: [],
 	args: true,
 	usage: `[PREFIX]ask [question]?`,
 	execute

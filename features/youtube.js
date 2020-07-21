@@ -1,6 +1,6 @@
 const { MessageEmbed } = require(`discord.js`);
 
-const { channelPermissionsCheck } = require(`./../shared/permissionCheck.js`);
+const { channelPermissionsCheck } = require(`./../shared/functions.js`);
 const request = require(`./../shared/httpsRequest.js`);
 
 const MINUTES_A_GUILD = (1440 / (10000 / 9)) * 1.05;
@@ -50,13 +50,15 @@ async function getVideo (client, guildID) {
 
 async function sendVideoAnnouncement (client, videoSettings, channelInfo, videoInfo) {
 	const shortVideoDescription = (videoInfo.items[0].snippet.description).replace(/^([\s\S]{237}[^\s]*)[\s\S]*/, `$1`);
+	const videoThumbnail = videoInfo.items[0].snippet.thumbnails.maxres || videoInfo.items[0].snippet.thumbnails.standard || videoInfo.items[0].snippet.thumbnails.high;
+
 	const embed = new MessageEmbed()
 		.setAuthor(`${channelInfo.items[0].snippet.title} has uploaded a new YouTube video!`, channelInfo.items[0].snippet.thumbnails.high.url)
 		.setTitle(videoInfo.items[0].snippet.title)
 		.setURL(`https://www.youtube.com/watch?v=${videoInfo.items[0].snippet.resourceId.videoId}`)
 		.setDescription(`${shortVideoDescription}...\n\n[**Watch the video here!**](https://www.youtube.com/watch?v=${videoInfo.items[0].snippet.resourceId.videoId})`)
 		.setColor(`#FF0000`)
-		.setImage(videoInfo.items[0].snippet.thumbnails.maxres.url)
+		.setImage(videoThumbnail.url)
 		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
 		.setTimestamp(new Date(videoInfo.items[0].snippet.publishedAt));
 

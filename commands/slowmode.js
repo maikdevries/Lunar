@@ -1,19 +1,17 @@
-const { channelPermissionsCheck } = require(`./../shared/permissionCheck.js`);
-
 module.exports = {
 	name: `slowmode`,
 	aliases: [`slow`],
 	description: `A command that turns on/off slowmode for the current channel`,
-	permissions: [`MANAGE_CHANNELS`],
+	memberPermissions: [`MANAGE_CHANNELS`],
+	guildPermissions: [],
+	channelPermissions: [`MANAGE_CHANNELS`],
 	args: true,
 	usage: `[PREFIX]slowmode [number]`,
 	execute
 }
 
 
-async function execute (client, message, args) {
-	if (!channelPermissionsCheck(client, message.channel, [`MANAGE_CHANNELS`])) return message.channel.send(`**Yikes**! It seems like I don't have the right permissions to do this.`).then((msg) => msg.delete({ timeout: 3500 }));
-
+async function execute (ignore, message, args) {
 	const numberOfSeconds = parseInt(args[0]);
 	if (isNaN(numberOfSeconds)) return message.channel.send(`**Ah**, that doesn't seem to be a number. Please try again!`).then((msg) => msg.delete({ timeout: 3500 }));
 

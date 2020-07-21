@@ -1,4 +1,4 @@
-const { channelPermissionsCheck, guildPermissionsCheck } = require(`./../shared/permissionCheck.js`);
+const { guildPermissionsCheck } = require(`./../shared/functions.js`);
 const validateTwitchChannel = require(`./../features/twitch.js`).validateChannel;
 const validateYouTubeChannel = require(`./../features/youtube.js`).validateChannel;
 
@@ -8,7 +8,9 @@ module.exports = {
 	name: `setup`,
 	aliases: [],
 	description: `A command used to easily configure the bot one feature at a time`,
-	permissions: [`MANAGE_GUILD`],
+	memberPermissions: [`MANAGE_GUILD`],
+	guildPermissions: [],
+	channelPermissions: [`ADD_REACTIONS`],
 	args: false,
 	usage: `[PREFIX]setup [feature]`,
 	execute
@@ -16,8 +18,6 @@ module.exports = {
 
 
 function execute (client, message, args) {
-	if (!channelPermissionsCheck(client, message.channel, [`ADD_REACTIONS`])) return message.channel.send(`**Oh no**! You don't have the right perks to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
-
 	switch (args[0]) {
 		case `commands`: return commandsSetup(client, message);
 
@@ -45,7 +45,7 @@ async function commandsSetup (client, message) {
 	if (!newPrefix) return pollPrefix.delete();
 	message.channel.bulkDelete([pollPrefix, newPrefix], true);
 
-	let pollChannel = await message.channel.send(`Almost done, what channel do you want to restrict commands to? Say '**NO**' if not applicable.`);
+	let pollChannel = await message.channel.send(`Almost done, what channel do you want to restrict commands to? Please **mention** the channel or say '**NO**' if not applicable.`);
 	const response = await settings.collectResponse(message);
 	if (!response) return pollChannel.delete();
 
@@ -78,7 +78,7 @@ async function reactionRoleSetup (client, message) {
 	if (!newReaction) return;
 
 	const pollRole = await message.channel.send(`Finally, what role do members get by reacting with that emoji to the message?`);
-	const newRole = await settings.requestRole(message);
+	const newRole = await settings.requestRole(client, message);
 
 	pollRole.delete();
 	if (!newRole) return;
@@ -91,7 +91,7 @@ async function serverLockSetup (client, message) {
 	if (!guildPermissionsCheck(client, message.guild, ['MANAGE_ROLES'])) return message.channel.send(`**Oh no**! I'm missing the '**Manage Roles**' permission! Try again after granting it!`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	const pollRole = await message.channel.send(`Let me walk you through the setup for the **Server Lock** feature. First of all, what is the role that will lock members out of the Discord?`);
-	const newRole = await settings.requestRole(message);
+	const newRole = await settings.requestRole(client, message);
 
 	pollRole.delete();
 	if (!newRole) return;
@@ -127,19 +127,19 @@ async function serverLockSetup (client, message) {
 async function streamStatusSetup (client, message) {
 	if (!guildPermissionsCheck(client, message.guild, ['MANAGE_ROLES'])) return message.channel.send(`**Oh no**! I'm missing the '**Manage Roles**' permission! Try again after granting it!`).then((msg) => msg.delete({ timeout: 3500 }));
 
-	let pollRole = await message.channel.send(`Let's go through the setup for **Stream Status**. First on the list, is there a required role to receive the shoutout? If not, respond with '**NO**'.`);
+	let pollRole = await message.channel.send(`Let's go through the setup for **Stream Status**. First on the list, is there a required role to receive the shoutout? Please **mention** the role or if not, respond with '**NO**'.`);
 	const response = await settings.collectResponse(message);
 	if (!response) return pollRole.delete();
 
 	let requiredRole;
 	if (response.content === `NO`) requiredRole = `NO`;
-	else requiredRole = await settings.parseRole(response, response.content);
+	else requiredRole = await settings.parseRole(client, response, response.content);
 
 	message.channel.bulkDelete([pollRole, response], true);
 	if (!requiredRole) return;
 
 	pollRole = await message.channel.send(`Let's go through the setup for **Stream Status**. Secondly, what is the shoutout role?`);
-	const statusRole = await settings.requestRole(message);
+	const statusRole = await settings.requestRole(client, message);
 
 	pollRole.delete();
 	if (!statusRole) return;
@@ -152,7 +152,7 @@ async function streamStatusSetup (client, message) {
 }
 
 async function twitchSetup (client, message) {
-	const pollUsername = await message.channel.send(`Time to set up the next feature: **Twitch**! What Twitch channel do you want to receive announcements for?`);
+	const pollUsername = await message.channel.send(`Time to set up the next feature: **Twitch**! What **Twitch** channel do you want to receive announcements for?`);
 	const usernameMessage = await settings.collectResponse(message);
 
 	if (!usernameMessage) return pollUsername.delete();

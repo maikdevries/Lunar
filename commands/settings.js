@@ -1,6 +1,6 @@
 const { MessageEmbed } = require(`discord.js`);
 
-const { channelPermissionsCheck } = require(`./../shared/permissionCheck.js`);
+const { channelPermissionsCheck, rolePositionCheck } = require(`./../shared/functions.js`);
 const validateTwitchChannel = require(`./../features/twitch.js`).validateChannel;
 const validateYouTubeChannel = require(`./../features/youtube.js`).validateChannel;
 
@@ -42,6 +42,8 @@ const REACTION_CLEAR = { name: `clear`, description: `Clear messages/reactions/r
 const STATUS_STREAMER = { name: `streamerRole`, description: `Set a required role to be eligible to get the currently livestreaming role` };
 const STATUS_ROLE = { name: `statusRole`, description: `Set the currently livestreaming role` };
 
+const SETTINGS_LIST = { name: `list`, description: `List the current settings for this feature` };
+
 const COMMAND_RESTRICT = { name: `restricted`, description: `Enable or disable command restriction to specified channel(s)` };
 
 const COMMANDS_PREFIX = { name: `prefix`, description: `Set the command prefix for this Discord server` };
@@ -54,7 +56,7 @@ const COMMANDS_INVITE = { name: `invite`, description: `Change settings related 
 const COMMANDS_KICK = { name: `kick`, description: `Change settings related to the kick command` };
 const COMMANDS_NICKNAME = { name: `nickname`, description: `Change settings related to the nickname command` };
 const COMMANDS_SLOWMODE = { name: `slowmode`, description: `Change settings related to the slowmode command` };
-const COMMANDS_SETTINGS = [COMMANDS_PREFIX, COMMANDS_RESTRICTED_CHANNEL, COMMANDS_ASK, COMMANDS_ABOUT, COMMANDS_BAN, COMMANDS_CLEAR, COMMANDS_INVITE, COMMANDS_KICK, COMMANDS_NICKNAME, COMMANDS_SLOWMODE];
+const COMMANDS_SETTINGS = [SETTINGS_LIST, COMMANDS_PREFIX, COMMANDS_RESTRICTED_CHANNEL, COMMANDS_ASK, COMMANDS_ABOUT, COMMANDS_BAN, COMMANDS_CLEAR, COMMANDS_INVITE, COMMANDS_KICK, COMMANDS_NICKNAME, COMMANDS_SLOWMODE];
 
 const WELCOME_WELCOME = { name: `welcome`, description: `Change settings related to welcome messages` };
 const WELCOME_LEAVE = { name: `leave`, description: `Change settings related to leave messages` };
@@ -73,7 +75,9 @@ module.exports = {
 	name: `settings`,
 	aliases: [`options`],
 	description: `A command used to change guild settings for the current Discord guild`,
-	permissions: [`MANAGE_GUILD`],
+	memberPermissions: [`MANAGE_GUILD`],
+	guildPermissions: [],
+	channelPermissions: [`ADD_REACTIONS`],
 	args: false,
 	usage: `[PREFIX]settings [feature] [property] (sub-properties) (operation) (value)`,
 	execute,
@@ -91,8 +95,6 @@ module.exports = {
 
 
 async function execute (client, message, args) {
-	if (!channelPermissionsCheck(client, message.channel, [`ADD_REACTIONS`])) return message.channel.send(`**Yikes**! It seems like I don't have the right permissions to do this.`).then((msg) => msg.delete({ timeout: 3500 }));
-
 	switch (args[0]) {
 		case `commands`: return commandSettings(client, message, args);
 
@@ -142,7 +144,7 @@ function reactionRoleSettings (client, message, args) {
 
 		case `list`: return listGuildSettings(client, message, `reactionRole`);
 
-		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, REACTION_MESSAGES]));
+		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, REACTION_MESSAGES, SETTINGS_LIST]));
 	}
 }
 
@@ -156,7 +158,7 @@ function serverLockSettings (client, message, args) {
 
 		case `list`: return listGuildSettings(client, message, `serverLock`);
 
-		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, LOCK_ROLE, LOCK_MESSAGE]));
+		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, LOCK_ROLE, LOCK_MESSAGE, SETTINGS_LIST]));
 	}
 }
 
@@ -170,7 +172,7 @@ function streamStatusSettings (client, message, args) {
 
 		case `list`: return listGuildSettings(client, message, `streamStatus`);
 
-		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, STATUS_STREAMER, STATUS_ROLE]));
+		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, STATUS_STREAMER, STATUS_ROLE, SETTINGS_LIST]));
 	}
 }
 
@@ -186,7 +188,7 @@ function twitchSettings (client, message, args) {
 
 		case `list`: return listGuildSettings(client, message, `twitch`);
 
-		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, FEATURE_USERNAME, LIST_CHANNELS, LIST_MESSAGES]));
+		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, FEATURE_USERNAME, LIST_CHANNELS, LIST_MESSAGES, SETTINGS_LIST]));
 	}
 }
 
@@ -198,7 +200,7 @@ function welcomeMessageSettings (client, message, args) {
 
 		case `list`: return listGuildSettings(client, message, `welcomeMessage`);
 
-		default: return message.channel.send(possibleSettings(client, [WELCOME_WELCOME, WELCOME_LEAVE]));
+		default: return message.channel.send(possibleSettings(client, [WELCOME_WELCOME, WELCOME_LEAVE, SETTINGS_LIST]));
 	}
 }
 
@@ -214,7 +216,7 @@ function youtubeSettings (client, message, args) {
 
 		case `list`: return listGuildSettings(client, message, `youtube`);
 
-		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, FEATURE_USERNAME, LIST_CHANNELS, LIST_MESSAGES]));
+		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, FEATURE_USERNAME, LIST_CHANNELS, LIST_MESSAGES, SETTINGS_LIST]));
 	}
 }
 
@@ -434,7 +436,7 @@ async function resetMessageSettings (client, message, path) {
 }
 
 async function addRoleSettings (client, message, roleMention, path) {
-	const role = await parseRole(message, roleMention);
+	const role = await parseRole(client, message, roleMention);
 	if (!role) return;
 
 	client.settings.set(message.guild.id, role.id, path);
@@ -447,7 +449,7 @@ async function addReactionRoleMessageSettings (client, message, messageMention) 
 	const newReaction = await requestEmoji(message);
 	if (!newReaction) return;
 
-	const newRole = await requestRole(message);
+	const newRole = await requestRole(client, message);
 	if (!newRole) return;
 
 	return addReactionRoleSettings(client, message, messageMention, newReaction, newRole);
@@ -459,7 +461,7 @@ async function addReactionRoleReactionSettings (client, message, messageMention,
 	const newReaction = await parseEmoji(message, reactionMention);
 	if (!newReaction) return;
 
-	const newRole = await requestRole(message);
+	const newRole = await requestRole(client, message);
 	if (!newRole) return;
 
 	return addReactionRoleSettings(client, message, messageMention, newReaction, newRole);
@@ -471,7 +473,7 @@ async function addReactionRoleRoleSettings (client, message, messageMention, rea
 	const newReaction = await parseEmoji(message, reactionMention);
 	if (!newReaction) return;
 
-	const newRole = await parseRole(message, roleMention);
+	const newRole = await parseRole(client, message, roleMention);
 	if (!newRole) return;
 
 	return addReactionRoleSettings(client, message, messageMention, newReaction, newRole);
@@ -504,7 +506,7 @@ async function removeReactionRoleRoleSettings (client, message, messageMention, 
 	newReaction = await parseEmoji(message, reactionMention);
 	if (!newReaction) return;
 
-	newRole = await parseRole(message, roleMention);
+	newRole = await parseRole(client, message, roleMention);
 	if (!newRole) return;
 
 	client.settings.remove(message.guild.id, newRole.id, `reactionRole.messages[${messageMention}][${newReaction}]`);
@@ -641,7 +643,7 @@ async function requestMessage (message) {
 	return newMessage ? newMessage : false;
 }
 
-async function requestRole (message) {
+async function requestRole (client, message) {
 	const pollMessage = await message.channel.send(`Please respond with a **mention** of the preferred role.`);
 	const responseRole = await collectResponse(message);
 
@@ -651,7 +653,7 @@ async function requestRole (message) {
 	}
 	message.channel.bulkDelete([pollMessage, responseRole], true);
 
-	const newRole = await parseRole(responseRole, responseRole.content);
+	const newRole = await parseRole(client, responseRole, responseRole.content);
 	return newRole ? newRole : false;
 }
 
@@ -669,7 +671,7 @@ async function requestEmoji (message) {
 	return newEmoji ? newEmoji : false;
 }
 
-async function parseRole (message, roleMention) {
+async function parseRole (client, message, roleMention) {
 	if (!message.mentions.roles.size || !roleMention) {
 		message.channel.send(`**Ouch**! You forgot to mention a role in your message! Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
 		return false;
@@ -678,6 +680,11 @@ async function parseRole (message, roleMention) {
 	const matches = roleMention.match(/^<@&(\d+)>$/);
 	if (!matches) {
 		message.channel.send(`**Oops**! This doesn't seem to be a role! Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
+		return false;
+	}
+
+	if (!rolePositionCheck(client, message.guild.id, matches[1])) {
+		message.channel.send(`**Err**... This role is positioned above mine! Please move my role up in the server settings and try again!`).then((msg) => msg.delete({ timeout: 3500 }));
 		return false;
 	}
 

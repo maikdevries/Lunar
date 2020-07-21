@@ -1,19 +1,17 @@
-const { guildPermissionsCheck } = require(`./../shared/permissionCheck.js`);
-
 module.exports = {
 	name: `nickname`,
 	aliases: [`nick`, `name`],
 	description: `A command that changes the nickname of a member in a guild`,
 	permissions: [`MANAGE_NICKNAMES`],
+	guildPermissions: [`MANAGE_NICKNAMES`],
+	channelPermissions: [],
 	args: true,
 	usage: `[PREFIX]nickname @[user] [name]`,
 	execute
 }
 
 
-async function execute (client, message, args) {
-	if (!guildPermissionsCheck(client, message.guild, [`MANAGE_NICKNAMES`])) return message.channel.send(`**Yikes**! It seems like I don't have the right permissions to do this.`).then((msg) => msg.delete({ timeout: 3500 }));
-
+async function execute (ignore, message, args) {
 	const member = message.mentions.members?.first();
 	if (!member) return message.channel.send(`**Oh snap**! You forgot to mention the person you're trying to change the name of.`).then((msg) => msg.delete({ timeout: 3500 }));
 	if (member.hasPermission(`MANAGE_NICKNAMES`)) return message.channel.send(`**Uhm**... You can't change the nickname of someone with the same privileges as yourself!`).then((msg) => msg.delete({ timeout: 3500 }));

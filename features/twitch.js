@@ -1,6 +1,6 @@
 const { MessageEmbed } = require(`discord.js`);
 
-const { channelPermissionsCheck } = require(`./../shared/permissionCheck.js`);
+const { channelPermissionsCheck } = require(`./../shared/functions.js`);
 const request = require(`./../shared/httpsRequest.js`);
 
 const GUILDS_A_MINUTE = (800 / 5) * .95;
@@ -29,12 +29,13 @@ async function setup (client) {
 async function loopGuilds (client, guilds) {
 	const timer = new Promise((ignore) => setTimeout((ignore), 60000));
 
-	for (let i = 0; i < guilds.length; i += GUILDS_A_MINUTE) {
-		await execute(client, guilds.slice(i, i + GUILDS_A_MINUTE));
-		await timer;
-	}
-
-	return setTimeout(() => setup(client), 60000);
+	if (guilds.length) {
+		for (let i = 0; i < guilds.length; i += GUILDS_A_MINUTE) {
+			await execute(client, guilds.slice(i, i + GUILDS_A_MINUTE));
+			await timer;
+		}
+		return setup(client);
+	} else return setTimeout(() => setup(client), 60000);
 }
 
 async function execute (client, guilds) {
@@ -76,7 +77,7 @@ function sendStreamAnnouncement (client, streamSettings, streamInfo, userInfo, g
 		.setAuthor(`${streamInfo.data[0].user_name} is now LIVE on Twitch!`, userInfo.data[0].profile_image_url)
 		.setTitle(streamInfo.data[0].title)
 		.setURL(`https://twitch.tv/${streamInfo.data[0].user_name}`)
-		.setDescription(`**${streamInfo.data[0].user_name}** is playing **${gameInfo.data[0].name}** with **${streamInfo.data[0].viewer_count}** people watching!\n\n[**Come watch the stream!**](https://twitch.tv/${streamInfo.data[0].user_name})`)
+		.setDescription(`**${streamInfo.data[0].user_name}** is playing **${gameInfo.data[0].name}** with **${streamInfo.data[0].viewer_count}** viewer(s) watching!\n\n[**Come watch the stream!**](https://twitch.tv/${streamInfo.data[0].user_name})`)
 		.setColor(`#6441A5`)
 		.setThumbnail((gameInfo.data[0].box_art_url).replace(`{width}`, `300`).replace(`{height}`, `400`))
 		.setImage(`${(streamInfo.data[0].thumbnail_url).replace(`{width}`, `1920`).replace(`{height}`, `1080`)}?date=${Date.now()}`)

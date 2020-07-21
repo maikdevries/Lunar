@@ -5,9 +5,11 @@ const package = require(`./../package.json`);
 
 module.exports = {
 	name: `about`,
-	aliases: [`version`],
+	aliases: [`version`, `info`],
 	description: `A command to get the latest technical information on the bot`,
-	permissions: [],
+	memberPermissions: [],
+	guildPermissions: [],
+	channelPermissions: [],
 	args: false,
 	usage: `[PREFIX]about`,
 	execute

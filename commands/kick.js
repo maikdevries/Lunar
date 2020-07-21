@@ -1,18 +1,17 @@
-const { guildPermissionsCheck } = require(`./../shared/permissionCheck.js`);
-
 module.exports = {
 	name: `kick`,
 	aliases: [],
 	description: `A command to kick a member from the server`,
-	permissions: [`KICK_MEMBERS`],
+	memberPermissions: [`KICK_MEMBERS`],
+	guildPermissions: [`KICK_MEMBERS`],
+	channelPermissions: [],
 	args: true,
 	usage: `[PREFIX]kick @[member(s)] (reason)`,
 	execute
 }
 
 
-async function execute (client, message, args) {
-	if (!guildPermissionsCheck(client, message.guild, [`KICK_MEMBERS`])) return message.channel.send(`**Yikes**! It seems like I don't have the right permissions to do this.`).then((msg) => msg.delete({ timeout: 3500 }));
+async function execute (ignore, message, args) {
 	if (!message.mentions.members?.size) return message.channel.send(`**Oh snap**! You forgot to mention the person you would like to kick! Try again.`).then((msg) => msg.delete({ timeout: 3500 }));
 
 	message.mentions.members.forEach(async (member) => {

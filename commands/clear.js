@@ -2,7 +2,9 @@ module.exports = {
 	name: `clear`,
 	aliases: [`purge`, `remove`, `delete`],
 	description: `A command to clear a given number of messages in a channel`,
-	permissions: [`MANAGE_MESSAGES`],
+	memberPermissions: [`MANAGE_MESSAGES`],
+	guildPermissions: [],
+	channelPermissions: [],
 	args: true,
 	usage: `[PREFIX]clear [number]/@[user]`,
 	execute

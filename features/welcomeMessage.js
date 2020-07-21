@@ -1,4 +1,4 @@
-const { channelPermissionsCheck } = require(`./../shared/permissionCheck.js`);
+const { channelPermissionsCheck } = require(`./../shared/functions.js`);
 
 module.exports = {
 	description: `Sends out a welcome/leave message on a member joining/leaving the Discord server`,

@@ -1,19 +1,17 @@
-const { channelPermissionsCheck } = require(`./../shared/permissionCheck.js`);
-
 module.exports = {
 	name: `invite`,
 	aliases: [`link`],
 	description: `A command to generate an invite link to the current channel`,
-	permissions: [`CREATE_INSTANT_INVITE`],
+	memberPermissions: [`CREATE_INSTANT_INVITE`],
+	guildPermissions: [],
+	channelPermissions: [`CREATE_INSTANT_INVITE`],
 	args: false,
 	usage: `[PREFIX]invite`,
 	execute
 }
 
 
-async function execute (client, message, ignored) {
-	if (!channelPermissionsCheck(client, message.channel, [`CREATE_INSTANT_INVITE`])) return message.channel.send(`**Yikes**! It seems like I don't have the right permissions to do this.`).then((msg) => msg.delete({ timeout: 3500 }));
-
+async function execute (ignore, message, ignored) {
 	try {
 		const invite = await message.channel.createInvite({ maxUses: 0, unique: true, reason: `Created for ${message.author.username} through the invite command` });
 		return message.channel.send(`**Great**! You can now invite all of your friends through ${invite} for the next 24 hours.`);

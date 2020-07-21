@@ -1,4 +1,4 @@
-const { guildPermissionsCheck } = require(`./../shared/permissionCheck.js`);
+const { guildPermissionsCheck, rolePositionCheck } = require(`./../shared/functions.js`);
 
 module.exports = {
 	description: `Adds/removes role to member based on reaction added/removed`,
@@ -19,6 +19,7 @@ async function roleAdd (client, reaction, user) {
 	const roles = guildSettings.messages[reaction.message.id][reaction.emoji.id || reaction.emoji.name];
 	const member = reaction.message.guild.members.cache.get(user.id);
 
+	if (!roles.every((role) => rolePositionCheck(client, reaction.message.guild.id, role))) return console.error(`Client role lower than role when adding reaction role for guild: ${reaction.message.guild.id}`);
 	if (roles) return member.roles.add(roles).catch((error) => console.error(`Something went wrong when adding a reaction role: ${error}`));
 }
 
@@ -34,5 +35,6 @@ async function roleRemove (client, reaction, user) {
 	const roles = guildSettings.messages[reaction.message.id][reaction.emoji.id || reaction.emoji.name];
 	const member = reaction.message.guild.members.cache.get(user.id);
 
+	if (!roles.every((role) => rolePositionCheck(client, reaction.message.guild.id, role))) return console.error(`Client role lower than role when removing reaction role for guild: ${reaction.message.guild.id}`);
 	if (roles) return member.roles.remove(roles).catch((error) => console.error(`Something went wrong when removing a reaction role: ${error}`));
 }
