@@ -683,7 +683,7 @@ async function parseRole (client, message, roleMention) {
 		return false;
 	}
 
-	if (!rolePositionCheck(client, message.guild.id, matches[1])) {
+	if (!rolePositionCheck(client, message.guild, matches[1])) {
 		message.channel.send(`**Err**... This role is positioned above mine! Please move my role up in the server settings and try again!`).then((msg) => msg.delete({ timeout: 3500 }));
 		return false;
 	}

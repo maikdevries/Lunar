@@ -14,7 +14,7 @@ function memberLock (client, member) {
 	if (!guildSettings.role || !guildSettings.message) return console.error(`Cannot manage server lock for guild members, setup not complete for guild: ${member.guild.id}!`);
 
 	if (!guildPermissionsCheck(client, member.guild, [`MANAGE_ROLES`])) return console.error(`Missing permissions (MANAGE_ROLES) to add lock role for guild: ${member.guild.id}!`);
-	if (!rolePositionCheck(client, member.guild.id, guildSettings.role)) return console.error(`Client role lower than role when adding server lock role for guild: ${member.guild.id}`);
+	if (!rolePositionCheck(client, member.guild, guildSettings.role)) return console.error(`Client role lower than role when adding server lock role for guild: ${member.guild.id}`);
 
 	return member.roles.add(guildSettings.role).catch((error) => console.error(`Something went wrong when locking a new member: ${error}`));
 }
@@ -29,7 +29,7 @@ async function memberUnlock (client, reaction, user) {
 	if (!guildSettings.role || !guildSettings.message) return console.error(`Cannot manage server lock for guild members, setup not complete for guild: ${member.guild.id}!`);
 
 	if (!guildPermissionsCheck(client, reaction.message.guild, [`MANAGE_ROLES`])) return console.error(`Missing permissions (MANAGE_ROLES) to remove lock role for guild: ${member.guild.id}!`);
-	if (!rolePositionCheck(client, reaction.message.guild.id, guildSettings.role)) return console.error(`Client role lower than role when removing server lock role for guild: ${reaction.message.guild.id}`);
+	if (!rolePositionCheck(client, reaction.message.guild, guildSettings.role)) return console.error(`Client role lower than role when removing server lock role for guild: ${reaction.message.guild.id}`);
 
 	const emojiKey = reaction.emoji.id || reaction.emoji.name;
 	if (guildSettings.message[reaction.message.id] !== emojiKey) return;

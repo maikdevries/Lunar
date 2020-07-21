@@ -13,7 +13,7 @@ function setStatus (client, ignore, newPresence) {
 	if (!guildSettings.statusRole) return console.error(`Cannot manage shoutout role for livestreaming members, setup not complete for guild: ${newPresence.guild.id}!`);
 
 	if (!guildPermissionsCheck(client, newPresence.guild, [`MANAGE_ROLES`])) return console.error(`Missing permissions (MANAGE_ROLES) to add shoutout livestreaming role for guild: ${newPresence.guild.id}!`);
-	if (!rolePositionCheck(client, newPresence.guild.id, guildSettings.statusRole)) return console.error(`Client role lower than role for stream status for guild: ${newPresence.guild.id}`);
+	if (!rolePositionCheck(client, newPresence.guild, guildSettings.statusRole)) return console.error(`Client role lower than role for stream status for guild: ${newPresence.guild.id}`);
 
 	if (guildSettings.streamerRole && !newPresence.member?.roles.cache.has(guildSettings.streamerRole)) return newPresence.member.roles.remove(guildSettings.statusRole).catch((error) => console.error(`Something went wrong, cannot remove shoutout livestreaming role for guild: ${newPresence.guild.id}, ${error}`));
 

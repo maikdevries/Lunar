@@ -17,7 +17,9 @@ function guildPermissionsCheck (client, guild, permissions) {
 	return permissions.every((permission) => botMember.hasPermission(permission));
 }
 
-function rolePositionCheck (client, guildID, roleID) {
-	clientRole = client.guilds.cache.get(guildID).roles.cache.find((role) => role.managed && role.client === client);
+function rolePositionCheck (client, guild, roleID) {
+	const botMember = guild.members.cache.get(client.user.id);
+	const clientRole = guild.roles.cache.find((role) => role.managed && role.members.every((member) => member.id === botMember.id));
+
 	return clientRole.comparePositionTo(roleID) > 0;
 }
