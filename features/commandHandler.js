@@ -39,7 +39,7 @@ async function execute (client, message) {
 	if (!command) return;
 
 	if (!guildSettings[command.name]?.enabled) return disabledCommand(message.channel);
-	if (guildSettings[command.name].restricted && !guildSettings.channels?.includes(message.channel.id)) return restrictedCommand(message.channel);
+	if (guildSettings[command.name].restricted && guildSettings.channels.length && !guildSettings.channels.includes(message.channel.id)) return restrictedCommand(message.channel);
 	if (command.args && !args.length) return missingArgument(message.channel, command.args);
 
 	if (!message.member.hasPermission(command.memberPermissions)) return memberMissingPermissions(message.channel);
