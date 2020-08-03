@@ -12,7 +12,7 @@ async function missingChannelPermissions (client, message, channel, permissions)
 	const channelPermissions = channel.permissionsFor(botMember);
 
 	const missingPermissions = [];
-	for (const permission in permissions) if (!channelPermissions.has(permission)) missingPermissions.push(permission);
+	for (const permission of permissions) if (!channelPermissions.has(permission)) missingPermissions.push(permission);
 
 	if (missingPermissions.length) {
 		if (message) clientMissingPermissions(message.channel, missingPermissions);
@@ -26,7 +26,7 @@ async function missingGuildPermissions (client, message, guild, permissions) {
 	const botMember = guild.members.cache.get(client.user.id);
 
 	const missingPermissions = [];
-	for (const permission in permissions) if (!botMember.hasPermission(permission)) missingPermissions.push(permission);
+	for (const permission of permissions) if (!botMember.hasPermission(permission)) missingPermissions.push(permission);
 
 	if (missingPermissions.length) {
 		if (message) clientMissingPermissions(message.channel, missingPermissions);

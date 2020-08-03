@@ -15,10 +15,10 @@ module.exports = {
 
 
 async function setup () {
-	const commandFiles = (await fs.readdir(`../commands`)).filter((file) => file.endsWith(`.js`));
+	const commandFiles = (await fs.readdir(`./commands`)).filter((file) => file.endsWith(`.js`));
 
 	for (const file of commandFiles) {
-		const command = require(`../commands/${file}`);
+		const command = require(`./../commands/${file}`);
 		commands.set(command.name, command);
 	}
 }
