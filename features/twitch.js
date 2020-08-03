@@ -1,7 +1,8 @@
 const { MessageEmbed } = require(`discord.js`);
 
-const { channelPermissionsCheck } = require(`./../shared/functions.js`);
-const request = require(`./../shared/httpsRequest.js`);
+const { missingChannelPermissions } = require(`../shared/functions.js`);
+const { getTwitch, hasTwitchToken, validateTwitchToken, getTwitchToken } = require(`../shared/httpsRequest.js`);
+const { somethingWrong, missingArgument, invalidArgument } = require(`../shared/messages.js`);
 
 const GUILDS_A_MINUTE = (800 / 5) * .95;
 
@@ -20,7 +21,7 @@ module.exports = {
 
 
 async function setup (client) {
-	if (!await request.hasTwitchToken()) await request.getTwitchToken();
+	if (!await hasTwitchToken()) await getTwitchToken();
 
 	const guilds = Array.from((client.settings.filter((guild) => guild.twitch.enabled)).keys());
 	return loopGuilds(client, guilds);
@@ -51,11 +52,11 @@ async function getStream (client, guildID) {
 		return console.error(`Cannot send Twitch announcement, setup not complete for guild: ${streamSettings.guild}!`);
 	}
 
-	try { await request.validateTwitchToken() }
-	catch { await request.getTwitchToken() }
+	try { await validateTwitchToken() }
+	catch { await getTwitchToken() }
 
 	const path = `streams?user_login=${streamSettings.settings.username}`;
-	const streamInfo = await request.getTwitch(path);
+	const streamInfo = await getTwitch(path);
 	if (!streamInfo?.data) return;
 
 	if (!streamInfo.data[0] && streamSettings.streaming) {
@@ -84,11 +85,11 @@ function sendStreamAnnouncement (client, streamSettings, streamInfo, userInfo, g
 		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
 		.setTimestamp(new Date(streamInfo.data[0].started_at));
 
-	streamSettings.settings.channels.forEach((channelID) => {
+	streamSettings.settings.channels.forEach(async (channelID) => {
 		const channel = client.channels.cache.get(channelID);
 
 		if (!channel) return console.error(`Cannot send Twitch announcement for channel: ${channelID}, it no longer exists!`);
-		if (!channelPermissionsCheck(client, channel, [`VIEW_CHANNEL`, `SEND_MESSAGES`, `MENTION_EVERYONE`])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out Twitch announcement for channel: ${channel.id}!`);
+		if (await missingChannelPermissions(client, null, channel, [`VIEW_CHANNEL`, `SEND_MESSAGES`, `MENTION_EVERYONE`])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out Twitch announcement for channel: ${channel.id}!`);
 
 		const message = streamSettings.settings.messages[Math.floor(Math.random() * streamSettings.settings.messages.length)];
 		return channel.send(message, { embed }).then((msg) => client.twitch.push(streamSettings.guild, { 'channelID': msg.channel.id, 'messageID': msg.id }, `sentMessages`));
@@ -111,7 +112,7 @@ async function updateStreamAnnouncement (client, streamSettings) {
 		const editedEmbed = new MessageEmbed(message.embeds[0])
 			.setAuthor(`${newStreamInfo.data[0].user_name} is now LIVE on Twitch!`, newUserInfo.data[0].profile_image_url)
 			.setTitle(newStreamInfo.data[0].title)
-			.setDescription(`**${newStreamInfo.data[0].user_name}** is playing **${newGameInfo.data[0].name}** with **${newStreamInfo.data[0].viewer_count}** people watching!\n\n[**Come watch the stream!**](https://twitch.tv/${newStreamInfo.data[0].user_name})`)
+			.setDescription(`**${newStreamInfo.data[0].user_name}** is playing **${newGameInfo.data[0].name}** with **${newStreamInfo.data[0].viewer_count}** viewer(s) watching!\n\n[**Come watch the stream!**](https://twitch.tv/${newStreamInfo.data[0].user_name})`)
 			.setThumbnail((newGameInfo.data[0].box_art_url).replace(`{width}`, `300`).replace(`{height}`, `400`))
 			.setImage(`${(newStreamInfo.data[0].thumbnail_url).replace(`{width}`, `1920`).replace(`{height}`, `1080`)}?date=${Date.now()}`)
 			.setTimestamp(new Date(newStreamInfo.data[0].started_at));
@@ -148,25 +149,25 @@ async function setStreamAnnouncementOffline (client, streamSettings) {
 
 async function validateChannel (message, channelName) {
 	if (!channelName) {
-		message.channel.send(`**Ouch**... You forgot to name a Twitch channel. Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
+		await missingArgument(message.channel, `Twitch channel`);
 		return false;
 	}
 
-	if (!request.hasTwitchToken()) await request.getTwitchToken();
+	if (!hasTwitchToken()) await getTwitchToken();
 
-	try { await request.validateTwitchToken() }
-	catch { await request.getTwitchToken() }
+	try { await validateTwitchToken() }
+	catch { await getTwitchToken() }
 
 	const path = `users?login=${encodeURI(channelName)}`;
-	const channelInfo = await request.getTwitch(path);
+	const channelInfo = await getTwitch(path);
 
 	if (!channelInfo?.data) {
-		message.channel.send(`**Oh no**... Something went wrong! Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
+		await somethingWrong(message.channel);
 		return false;
 	}
 
 	if (!channelInfo.data[0]) {
-		message.channel.send(`**Ehh**... This doesn't seem to be a valid Twitch channel. Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
+		await invalidArgument(message.channel, `Twitch channel`);
 		return false;
 	}
 
@@ -187,14 +188,14 @@ async function getGuildSettings (client, guildID) {
 async function getData (userUsername, streamUsername, gameID, videoUsername) {
 	let [userInfo, streamInfo, gameInfo, videoInfo] = [null, null, null, null];
 
-	if (userUsername) userInfo = await request.getTwitch(`users?login=${userUsername}`);
-	if (streamUsername) streamInfo = await request.getTwitch(`streams?user_login=${streamUsername}`);
+	if (userUsername) userInfo = await getTwitch(`users?login=${userUsername}`);
+	if (streamUsername) streamInfo = await getTwitch(`streams?user_login=${streamUsername}`);
 
-	if (gameID && streamInfo) gameInfo = await request.getTwitch(`games?id=${streamInfo.data?.[0]?.game_id}`);
-	else if (gameID) gameInfo = await request.getTwitch(`games?id=${gameID}`);
+	if (gameID && streamInfo) gameInfo = await getTwitch(`games?id=${streamInfo.data?.[0]?.game_id}`);
+	else if (gameID) gameInfo = await getTwitch(`games?id=${gameID}`);
 
-	if (videoUsername && userInfo) videoInfo = await request.getTwitch(`videos?user_id=${userInfo.data?.[0]?.id}&first=1&type=archive`);
-	else if (videoUsername) videoInfo = await request.getTwitch(`videos?user_id=${videoUsername}&first=1&type=archive`);
+	if (videoUsername && userInfo) videoInfo = await getTwitch(`videos?user_id=${userInfo.data?.[0]?.id}&first=1&type=archive`);
+	else if (videoUsername) videoInfo = await getTwitch(`videos?user_id=${videoUsername}&first=1&type=archive`);
 
 	return [userInfo, streamInfo, gameInfo, videoInfo];
 }

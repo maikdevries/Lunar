@@ -1,7 +1,8 @@
 const { Collection } = require(`discord.js`);
 const fs = require(`fs`).promises;
 
-const { channelPermissionsCheck, guildPermissionsCheck } = require(`./../shared/functions.js`);
+const { missingChannelPermissions, missingGuildPermissions } = require(`../shared/functions.js`);
+const { somethingWrong, missingArgument, memberMissingPermissions, disabledCommand, restrictedCommand } = require(`../shared/messages.js`);
 
 const commands = new Collection();
 
@@ -14,10 +15,10 @@ module.exports = {
 
 
 async function setup () {
-	const commandFiles = (await fs.readdir(`./commands`)).filter((file) => file.endsWith(`.js`));
+	const commandFiles = (await fs.readdir(`../commands`)).filter((file) => file.endsWith(`.js`));
 
 	for (const file of commandFiles) {
-		const command = require(`./../commands/${file}`);
+		const command = require(`../commands/${file}`);
 		commands.set(command.name, command);
 	}
 }
@@ -28,29 +29,27 @@ async function execute (client, message) {
 
 	const guildSettings = client.settings.get(message.guild.id, `commands`);
 
-	if (message.author.bot || message.channel.type !== `text` || !message.content.startsWith(guildSettings.prefix)) return;
-	if (!channelPermissionsCheck(client, message.channel, [`SEND_MESSAGES`, `MANAGE_MESSAGES`])) return console.error(`Missing permissions (SEND_MESSAGES or MANAGE_MESSAGES) to execute command for guild: ${message.guild.id}!`);
+	if (!message.content.startsWith(guildSettings.prefix || message.author.bot || message.channel.type !== `text`)) return;
+	if (await missingChannelPermissions(client, message, message.channel, [`SEND_MESSAGES`, `MANAGE_MESSAGES`])) return console.error(`Missing permissions (SEND_MESSAGES or MANAGE_MESSAGES) to execute command for guild: ${message.guild.id}!`);
 
 	const args = message.content.slice(guildSettings.prefix.length).split(/ +/);
 	const commandName = args.shift().toLowerCase();
 
-	const command = commands.get(commandName) || commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
+	const command = commands.get(commandName) || commands.find((cmd) => cmd.aliases?.includes(commandName));
 	if (!command) return;
 
-	if (!guildSettings[command.name]?.enabled) return message.channel.send(`**Err**... This command has been disabled by the server owner.`).then((msg) => msg.delete({ timeout: 3500 }));
-	if (guildSettings[command.name].restricted && guildSettings.channels?.length && !guildSettings.channels.includes(message.channel.id)) return message.channel.send(`**Oops**! This command cannot be used in this channel!`).then((msg) => msg.delete({ timeout: 3500 }));
+	if (!guildSettings[command.name]?.enabled) return disabledCommand(message.channel);
+	if (guildSettings[command.name].restricted && !guildSettings.channels?.includes(message.channel.id)) return restrictedCommand(message.channel);
+	if (command.args && !args.length) return missingArgument(message.channel, command.args);
 
-	if (message.edits.length > 3) return message.channel.send(`**Excuse me**, third time wasn't the charm for you. Please send a new message instead of editing the original.`).then((msg) => msg.delete({ timeout: 3500 }));
-	if (command.args && !args.length) return message.channel.send(`**Oh no**! You didn't provide any arguments for this command to work properly! The proper usage would be: \`${command.usage.replace(/\[PREFIX\]/, guildSettings.prefix)}\`. Edit your message to correctly use this command!`).then((msg) => msg.delete({ timeout: 3500 }));
-
-	if (!message.member.hasPermission(command.memberPermissions)) return message.channel.send(`**Golly**! You don't have the right permissions to do this!`).then((msg) => msg.delete({ timeout: 3500 }));
-	if (!channelPermissionsCheck(client, message.channel, command.channelPermissions) || !guildPermissionsCheck(client, message.guild, command.guildPermissions)) return message.channel.send(`**Yikes**! It seems like I don't have the right permissions to do this.`).then((msg) => msg.delete({ timeout: 3500 }));
+	if (!message.member.hasPermission(command.memberPermissions)) return memberMissingPermissions(message.channel);
+	if (await missingChannelPermissions(client, message, message.channel, command.channelPermissions) || await missingGuildPermissions(client, message, message.guild, command.guildPermissions)) return;
 
 	try {
-		await command.execute(client, message, args);
-		return message.delete();
+		await message.delete();
+		return await command.execute(client, message, args);
 	} catch (error) {
 		console.error(`Something went wrong when executing a command: ${error}`);
-		return message.channel.send(`**Oops**! Something went terribly wrong! Please try again later.`).then((msg) => msg.delete({ timeout: 3500 }));
+		return somethingWrong(message.channel);
 	}
 }

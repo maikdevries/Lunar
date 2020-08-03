@@ -1,7 +1,8 @@
 const { MessageEmbed } = require(`discord.js`);
 
-const { channelPermissionsCheck } = require(`./../shared/functions.js`);
-const request = require(`./../shared/httpsRequest.js`);
+const { missingChannelPermissions } = require(`../shared/functions.js`);
+const { getYouTube } = require(`../shared/httpsRequest.js`);
+const { somethingWrong, missingArgument, invalidArgument } = require(`../shared/messages.js`);
 
 const MINUTES_A_GUILD = (1440 / (10000 / 9)) * 1.05;
 
@@ -62,11 +63,11 @@ async function sendVideoAnnouncement (client, videoSettings, channelInfo, videoI
 		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
 		.setTimestamp(new Date(videoInfo.items[0].snippet.publishedAt));
 
-	videoSettings.settings.channels.forEach((channelID) => {
+	videoSettings.settings.channels.forEach(async (channelID) => {
 		const channel = client.channels.cache.get(channelID);
 
 		if (!channel) return console.error(`Cannot send YouTube video announcement for channel: ${channelID}, it no longer exists!`);
-		if (!channelPermissionsCheck(client, channel, [`VIEW_CHANNEL`, `SEND_MESSAGES`, `MENTION_EVERYONE`])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send YouTube video announcement for channel: ${channel.id}!`);
+		if (await missingChannelPermissions(client, null, channel, [`VIEW_CHANNEL`, `SEND_MESSAGES`, `MENTION_EVERYONE`])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send YouTube video announcement for channel: ${channel.id}!`);
 
 		const message = videoSettings.settings.messages[Math.floor(Math.random() * videoSettings.settings.messages.length)];
 		return channel.send(message, { embed });
@@ -75,13 +76,13 @@ async function sendVideoAnnouncement (client, videoSettings, channelInfo, videoI
 
 async function validateChannel (client, message, channelURL) {
 	if (!channelURL) {
-		message.channel.send(`**Ouch**... You forgot to link to a YouTube channel. Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
+		await missingArgument(message.channel, `YouTube channel URL`);
 		return false;
 	}
 
 	const matches = channelURL.match(/youtube.com\/channel\/([a-zA-Z0-9_\-]{3,24}).*/);
 	if (!matches) {
-		message.channel.send(`**Ehh**... This doesn't seem to be a valid YouTube URL. Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
+		await invalidArgument(message.channel, `YouTube channel URL`);
 		return false;
 	}
 
@@ -95,12 +96,12 @@ async function setLatestVideo (client, message, channelID) {
 	const [channelSnippet, channelContent, videoSnippet] = await getData(null, channelID, true);
 
 	if (!videoSnippet?.items?.[0] || channelContent.error || videoSnippet.error) {
-		message.channel.send(`**Oh no**... Something went wrong! Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
+		await somethingWrong(message.channel);
 		return false;
 	}
 
 	if (!channelContent?.items?.[0]) {
-		message.channel.send(`**Ehh**... This doesn't seem to be a valid YouTube channel. Try again!`).then((msg) => msg.delete({ timeout: 3500 }));
+		await invalidArgument(message.channel, `YouTube channel`);
 		return false;
 	}
 
@@ -121,9 +122,9 @@ async function getGuildSettings (client, guildID) {
 async function getData (snippetChannel, contentChannel, snippetVideo) {
 	let [channelSnippet, channelContent, videoSnippet] = [null, null, null];
 
-	if (snippetChannel) channelSnippet = await request.getYouTube(`channels?part=snippet&id=${snippetChannel}&key=${process.env.YOUTUBE_VIDEO_KEY}`);
-	if (contentChannel) channelContent = await request.getYouTube(`channels?part=contentDetails&id=${contentChannel}&key=${process.env.YOUTUBE_VIDEO_KEY}`);
-	if (snippetVideo && channelContent?.items?.[0]) videoSnippet = await request.getYouTube(`playlistItems?part=snippet&maxResults=1&playlistId=${channelContent.items[0].contentDetails.relatedPlaylists.uploads}&key=${process.env.YOUTUBE_VIDEO_KEY}`);
+	if (snippetChannel) channelSnippet = await getYouTube(`channels?part=snippet&id=${snippetChannel}&key=${process.env.YOUTUBE_VIDEO_KEY}`);
+	if (contentChannel) channelContent = await getYouTube(`channels?part=contentDetails&id=${contentChannel}&key=${process.env.YOUTUBE_VIDEO_KEY}`);
+	if (snippetVideo && channelContent?.items?.[0]) videoSnippet = await getYouTube(`playlistItems?part=snippet&maxResults=1&playlistId=${channelContent.items[0].contentDetails.relatedPlaylists.uploads}&key=${process.env.YOUTUBE_VIDEO_KEY}`);
 
 	return [channelSnippet, channelContent, videoSnippet];
 }

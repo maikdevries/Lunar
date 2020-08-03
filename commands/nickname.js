@@ -1,30 +1,26 @@
+const { successful, missingMention, memberSamePermissions, longNickname } = require(`../shared/messages.js`);
+
 module.exports = {
 	name: `nickname`,
 	aliases: [`nick`, `name`],
 	description: `A command that changes the nickname of a member in a guild`,
-	permissions: [`MANAGE_NICKNAMES`],
+	memberPermissions: [`MANAGE_NICKNAMES`],
 	guildPermissions: [`MANAGE_NICKNAMES`],
 	channelPermissions: [],
-	args: true,
-	usage: `[PREFIX]nickname @[user] [name]`,
+	args: `@[member] [nickname]`,
 	execute
 }
 
 
 async function execute (ignore, message, args) {
 	const member = message.mentions.members?.first();
-	if (!member) return message.channel.send(`**Oh snap**! You forgot to mention the person you're trying to change the name of.`).then((msg) => msg.delete({ timeout: 3500 }));
-	if (member.hasPermission(`MANAGE_NICKNAMES`)) return message.channel.send(`**Uhm**... You can't change the nickname of someone with the same privileges as yourself!`).then((msg) => msg.delete({ timeout: 3500 }));
+	if (!member) return missingMention(message.channel, `member`);
+	if (member.hasPermission(`MANAGE_NICKNAMES`)) return memberSamePermissions(message.channel);
 
 	const nickname = args.slice(1).join(` `);
-	if (!nickname.length) return message.channel.send(`**Ah**! You need to provide a new nickname!`).then((msg) => msg.delete({ timeout: 3500 }));
-	if (nickname.length > 32) return message.channel.send(`**Hmmm**... A nickname can't be longer than 32 characters due to a Discord limitation.`).then((msg) => msg.delete({ timeout: 3500 }));
+	if (!nickname.length) return missingArgument(message.channel, `nickname`);
+	if (nickname.length > 32) return longNickname(message.channel);
 
-	try {
-		const changedMember = await member.setNickname(nickname);
-		return message.channel.send(`**Great**! You've successfully changed their nickname to ${changedMember.displayName}!`).then((msg) => msg.delete({ timeout: 3500 }));
-	} catch (error) {
-		console.error(`Something went wrong when trying to change a nickname: ${error}`);
-		return message.channel.send(`**Oops**! A thing or two went wrong... Try again later!`).then((msg) => msg.delete({ timeout: 3500 }));
-	}
+	await member.setNickname(nickname);
+	return successful(message.channel);
 }

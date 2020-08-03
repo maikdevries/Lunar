@@ -5,15 +5,12 @@ module.exports = {
 	memberPermissions: [],
 	guildPermissions: [],
 	channelPermissions: [],
-	args: true,
-	usage: `[PREFIX]ask [question]?`,
+	args: false,
 	execute
 }
 
 
 async function execute (client, message, args) {
-	if (!args[args.length - 1].endsWith(`?`)) return message.channel.send(`**Hmmm**, you forgot to ask a question!`).then((msg) => msg.delete({ timeout: 3500 }));
-
 	const { messages } = client.settings.get(message.guild.id, `commands.ask`);
 	return message.channel.send(`> ${message.member}: ${args.join(` `)}\n${messages[Math.floor(Math.random() * messages.length)]}`, { disableMentions: 'everyone' });
 }

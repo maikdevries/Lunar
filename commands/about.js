@@ -1,7 +1,7 @@
 const { execSync } = require(`child_process`);
 const { MessageEmbed } = require(`discord.js`);
 
-const package = require(`./../package.json`);
+const package = require(`../package.json`);
 
 module.exports = {
 	name: `about`,
@@ -11,7 +11,6 @@ module.exports = {
 	guildPermissions: [],
 	channelPermissions: [],
 	args: false,
-	usage: `[PREFIX]about`,
 	execute
 }
 

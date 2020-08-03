@@ -49,11 +49,6 @@ client.on(`message`, (message) => {
 	commandHandler.execute(client, message);
 });
 
-// Triggers the message event to support message edits
-client.on(`messageUpdate`, (ignore, newMessage) => {
-	client.emit(`message`, newMessage);
-});
-
 // Adds a shoutout Discord role to currently streaming members
 client.on(`presenceUpdate`, (oldPresence, newPresence) => {
 	streamStatus.setStatus(client, oldPresence, newPresence);
