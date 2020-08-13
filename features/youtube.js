@@ -122,9 +122,9 @@ async function getGuildSettings (client, guildID) {
 async function getData (snippetChannel, contentChannel, snippetVideo) {
 	let [channelSnippet, channelContent, videoSnippet] = [null, null, null];
 
-	if (snippetChannel) channelSnippet = await getYouTube(`channels?part=snippet&id=${snippetChannel}&key=${process.env.YOUTUBE_VIDEO_KEY}`);
-	if (contentChannel) channelContent = await getYouTube(`channels?part=contentDetails&id=${contentChannel}&key=${process.env.YOUTUBE_VIDEO_KEY}`);
-	if (snippetVideo && channelContent?.items?.[0]) videoSnippet = await getYouTube(`playlistItems?part=snippet&maxResults=1&playlistId=${channelContent.items[0].contentDetails.relatedPlaylists.uploads}&key=${process.env.YOUTUBE_VIDEO_KEY}`);
+	if (snippetChannel) channelSnippet = await getYouTube(`channels?part=snippet&id=${snippetChannel}&key=${process.env.YOUTUBE_KEY}`);
+	if (contentChannel) channelContent = await getYouTube(`channels?part=contentDetails&id=${contentChannel}&key=${process.env.YOUTUBE_KEY}`);
+	if (snippetVideo && channelContent?.items?.[0]) videoSnippet = await getYouTube(`playlistItems?part=snippet&maxResults=1&playlistId=${channelContent.items[0].contentDetails.relatedPlaylists.uploads}&key=${process.env.YOUTUBE_KEY}`);
 
 	return [channelSnippet, channelContent, videoSnippet];
 }

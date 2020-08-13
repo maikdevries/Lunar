@@ -18,7 +18,7 @@ async function execute (ignore, message, args) {
 	message.mentions.members.forEach(async (member) => {
 		if (member.hasPermission(`BAN_MEMBERS`)) return memberSamePermissions(message.channel);
 
-		await member.ban({ days: 7, reason: args[1] });
+		await member.ban({ days: 7, reason: args.slice(1).join(` `) });
 		return successful(message.channel);
 	});
 }

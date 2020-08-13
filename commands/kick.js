@@ -18,7 +18,7 @@ async function execute (ignore, message, args) {
 	message.mentions.members.forEach(async (member) => {
 		if (member.hasPermission(`KICK_MEMBERS`) || member.hasPermission(`BAN_MEMBERS`)) return memberSamePermissions(message.channel);
 
-		await member.kick(args[1]);
+		await member.kick(args.slice(1).join(` `));
 		return successful(message.channel);
 	});
 }
