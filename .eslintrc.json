@@ -7,7 +7,7 @@
 		"es6": true
 	},
 	"parserOptions": {
-		"ecmaVersion": 2020
+		"ecmaVersion": 2021
 	},
 	"rules": {
 		"for-direction": "error",
@@ -164,7 +164,8 @@
 			{
 				"allowShortCircuit": false,
 				"allowTernary": true,
-				"allowTaggedTemplates": false
+				"allowTaggedTemplates": false,
+				"enforceForJSX": true
 			}
 		],
 		"no-unused-labels": "error",
@@ -486,6 +487,8 @@
 		"yield-star-spacing": ["error", "both"],
 		"no-loss-of-precision": "error",
 		"no-promise-executor-return": "error",
-		"no-unreachable-loop": "error"
+		"no-unreachable-loop": "error",
+		"no-nonoctal-decimal-escape": "error",
+		"no-unsafe-optional-chaining": ["error", { "disallowArithmeticOperators": true }]
 	}
 }
