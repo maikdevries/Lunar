@@ -4,7 +4,7 @@ const { missingChannelPermissions } = require(`../shared/functions.js`);
 const { getYouTube } = require(`../shared/httpsRequest.js`);
 const { somethingWrong, missingArgument, invalidArgument } = require(`../shared/messages.js`);
 
-const MINUTES_A_GUILD = (1440 / (10000 / 9)) * 1.05;
+const MINUTES_A_GUILD = (1440 / (10000 / 4)) * 1.05;
 
 const defaultYouTubeSettings = {
 	"guild": "",
@@ -19,7 +19,7 @@ module.exports = {
 };
 
 
-async function setup (client) {
+function setup (client) {
 	const guilds = Array.from((client.settings.filter((guild) => guild.youtube.enabled)).keys());
 	return execute(client, guilds);
 }

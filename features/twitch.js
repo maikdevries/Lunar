@@ -28,12 +28,10 @@ async function setup (client) {
 }
 
 async function loopGuilds (client, guilds) {
-	const timer = new Promise((ignore) => setTimeout((ignore), 60000));
-
 	if (guilds.length) {
 		for (let i = 0; i < guilds.length; i += GUILDS_A_MINUTE) {
 			await execute(client, guilds.slice(i, i + GUILDS_A_MINUTE));
-			await timer;
+			await new Promise((ignore) => setTimeout((ignore), 60000));
 		}
 		return setup(client);
 	} else return setTimeout(() => setup(client), 60000);

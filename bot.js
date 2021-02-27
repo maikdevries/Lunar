@@ -23,8 +23,9 @@ client.once(`ready`, async () => {
 
 	await database.setup(client);
 	await commandHandler.setup();
-	await youtube.setup(client);
-	await twitch.setup(client);
+
+	youtube.setup(client);
+	twitch.setup(client);
 
 	const eventFiles = (await fs.readdir(`./events`)).filter((file) => file.endsWith(`.js`));
 	for (const file of eventFiles) {
