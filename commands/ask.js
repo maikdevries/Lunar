@@ -5,7 +5,7 @@ module.exports = {
 	memberPermissions: [],
 	guildPermissions: [],
 	channelPermissions: [],
-	args: false,
+	args: `[question]`,
 	execute
 }
 
