@@ -14,6 +14,8 @@ const DENY_REACTION = `🚫`;
 const BOOLEAN_TRUE = { name: `true`, description: `Set this setting to true` };
 const BOOLEAN_FALSE = { name: `false`, description: `Set this setting to false` };
 
+const RESET = { name: `reset`, description: `Reset configuration options related to this feature or entire Discord server` };
+
 const CHANNEL_ADD = { name: `add`, description: `Add a channel to the list` };
 const CHANNEL_REMOVE = { name: `remove`, description: `Remove a channel from the list` };
 const CHANNEL_CLEAR = { name: `clear`, description: `Clear the list of channels` };
@@ -57,7 +59,7 @@ const COMMANDS_INVITE = { name: `invite`, description: `Change settings related 
 const COMMANDS_KICK = { name: `kick`, description: `Change settings related to the kick command` };
 const COMMANDS_NICKNAME = { name: `nickname`, description: `Change settings related to the nickname command` };
 const COMMANDS_SLOWMODE = { name: `slowmode`, description: `Change settings related to the slowmode command` };
-const COMMANDS_SETTINGS = [SETTINGS_LIST, COMMANDS_PREFIX, COMMANDS_RESTRICTED_CHANNEL, COMMANDS_ASK, COMMANDS_ABOUT, COMMANDS_BAN, COMMANDS_CLEAR, COMMANDS_INVITE, COMMANDS_KICK, COMMANDS_NICKNAME, COMMANDS_SLOWMODE];
+const COMMANDS_SETTINGS = [SETTINGS_LIST, RESET, COMMANDS_PREFIX, COMMANDS_RESTRICTED_CHANNEL, COMMANDS_ASK, COMMANDS_ABOUT, COMMANDS_BAN, COMMANDS_CLEAR, COMMANDS_INVITE, COMMANDS_KICK, COMMANDS_NICKNAME, COMMANDS_SLOWMODE];
 
 const WELCOME_WELCOME = { name: `welcome`, description: `Change settings related to welcome messages` };
 const WELCOME_LEAVE = { name: `leave`, description: `Change settings related to leave messages` };
@@ -69,7 +71,7 @@ const FEATURE_STREAMSTATUS = { name: `streamStatus`, description: `Change settin
 const FEATURE_TWITCH = { name: `twitch`, description: `Change settings related to the Twitch feature` };
 const FEATURE_WELCOMEMESSAGE = { name: `welcomeMessage`, description: `Change settings related to the Welcome Message feature` };
 const FEATURE_YOUTUBE = { name: `youtube`, description: `Change settings related to the YouTube feature` };
-const FEATURE_SETTINGS = [FEATURE_COMMANDS, FEATURE_REACTIONROLE, FEATURE_SERVERLOCK, FEATURE_STREAMSTATUS, FEATURE_TWITCH, FEATURE_WELCOMEMESSAGE, FEATURE_YOUTUBE];
+const FEATURE_SETTINGS = [FEATURE_COMMANDS, FEATURE_REACTIONROLE, FEATURE_SERVERLOCK, FEATURE_STREAMSTATUS, FEATURE_TWITCH, FEATURE_WELCOMEMESSAGE, FEATURE_YOUTUBE, RESET];
 
 
 module.exports = {
@@ -110,6 +112,8 @@ async function execute (client, message, args) {
 
 		case `youtube`: return youtubeSettings(client, message, args);
 
+		case `reset`: return resetSettings(client, message, ``);
+
 		default: return message.channel.send(possibleSettings(client, FEATURE_SETTINGS));
 	}
 }
@@ -130,7 +134,9 @@ function commandSettings (client, message, args) {
 		case `nickname`:
 		case `slowmode`: return commandSpecificSettings(client, message, args, args[1]);
 
-		case 'list': return listGuildSettings(client, message, `commands`);
+		case `list`: return listGuildSettings(client, message, `commands`);
+
+		case `reset`: return resetSettings(client, message, `commands`);
 
 		default: return message.channel.send(possibleSettings(client, COMMANDS_SETTINGS));
 	}
@@ -144,7 +150,9 @@ function reactionRoleSettings (client, message, args) {
 
 		case `list`: return listGuildSettings(client, message, `reactionRole`);
 
-		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, REACTION_MESSAGES, SETTINGS_LIST]));
+		case `reset`: return resetSettings(client, message, `reactionRole`);
+
+		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, REACTION_MESSAGES, SETTINGS_LIST, RESET]));
 	}
 }
 
@@ -158,7 +166,9 @@ function serverLockSettings (client, message, args) {
 
 		case `list`: return listGuildSettings(client, message, `serverLock`);
 
-		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, LOCK_ROLE, LOCK_MESSAGE, SETTINGS_LIST]));
+		case `reset`: return resetSettings(client, message, `serverLock`);
+
+		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, LOCK_ROLE, LOCK_MESSAGE, SETTINGS_LIST, RESET]));
 	}
 }
 
@@ -172,7 +182,9 @@ function streamStatusSettings (client, message, args) {
 
 		case `list`: return listGuildSettings(client, message, `streamStatus`);
 
-		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, STATUS_STREAMER, STATUS_ROLE, SETTINGS_LIST]));
+		case `reset`: return resetSettings(client, message, `streamStatus`);
+
+		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, STATUS_STREAMER, STATUS_ROLE, SETTINGS_LIST, RESET]));
 	}
 }
 
@@ -188,7 +200,9 @@ function twitchSettings (client, message, args) {
 
 		case `list`: return listGuildSettings(client, message, `twitch`);
 
-		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, FEATURE_USERNAME, LIST_CHANNELS, LIST_MESSAGES, SETTINGS_LIST]));
+		case `reset`: return resetSettings(client, message, `twitch`);
+
+		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, FEATURE_USERNAME, LIST_CHANNELS, LIST_MESSAGES, SETTINGS_LIST, RESET]));
 	}
 }
 
@@ -200,7 +214,9 @@ function welcomeMessageSettings (client, message, args) {
 
 		case `list`: return listGuildSettings(client, message, `welcomeMessage`);
 
-		default: return message.channel.send(possibleSettings(client, [WELCOME_WELCOME, WELCOME_LEAVE, SETTINGS_LIST]));
+		case `reset`: return resetSettings(client, message, `welcomeMessage`);
+
+		default: return message.channel.send(possibleSettings(client, [WELCOME_WELCOME, WELCOME_LEAVE, SETTINGS_LIST, RESET]));
 	}
 }
 
@@ -216,7 +232,9 @@ function youtubeSettings (client, message, args) {
 
 		case `list`: return listGuildSettings(client, message, `youtube`);
 
-		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, FEATURE_USERNAME, LIST_CHANNELS, LIST_MESSAGES, SETTINGS_LIST]));
+		case `reset`: return resetSettings(client, message, `youtube`);
+
+		default: return message.channel.send(possibleSettings(client, [FEATURE_ENABLE, FEATURE_USERNAME, LIST_CHANNELS, LIST_MESSAGES, SETTINGS_LIST, RESET]));
 	}
 }
 
@@ -559,6 +577,13 @@ function changeUsernameSettings (client, message, newUsername, path) {
 
 function listGuildSettings (client, message, path) {
 	return message.channel.send(`Current settings for the **${path}** feature:\n\`\`\`JSON\n${JSON.stringify(client.settings.get(message.guild.id, path), null, `\t`)}\`\`\``, { split: true });
+}
+
+async function resetSettings (client, message, path) {
+	if (!await confirmChange(message)) return;
+
+	client.settings.set(message.guild.id, (defaultGuildSettings[path] || defaultGuildSettings), (path.length ? path : null));
+	return successful(message.channel);
 }
 
 
