@@ -27,7 +27,7 @@ function setup (client) {
 async function execute (client, guilds) {
 	await guilds.forEach((guildID) => getVideo(client, guildID));
 
-	return setTimeout(() => setup(client), ((MINUTES_A_GUILD * guilds.length < 60000) ? (MINUTES_A_GUILD * 60000) : (MINUTES_A_GUILD * guilds.length * 60000)));
+	return setTimeout(() => setup(client), ((MINUTES_A_GUILD * guilds.length < 1) ? 60000 : (MINUTES_A_GUILD * guilds.length * 60000)));
 }
 
 

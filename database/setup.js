@@ -42,7 +42,7 @@ async function setup (client) {
 
 async function ensureGuilds (client) {
 	client.guilds.cache.forEach((guild) => {
-		if (!client.settings.has(guild.id)) return client.emit(`guildCreate`, guild);
+		if (!client.settings.has(guild.id)) return client.settings.set(guild.id, defaultGuildSettings)
 		return client.settings.ensure(guild.id, defaultGuildSettings);
 	});
 }
