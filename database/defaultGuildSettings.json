@@ -78,6 +78,10 @@
 		"slowmode": {
 			"enabled": true,
 			"restricted": false
+		},
+		"spotify": {
+			"enabled": true,
+			"restricted": true
 		}
 	},
 

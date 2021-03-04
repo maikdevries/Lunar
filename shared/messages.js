@@ -12,7 +12,8 @@ module.exports = {
 	disabledCommand, restrictedCommand,
 	invalidRange, missingBoolean,
 	wrongChannelForMessage, rolePositionHigher,
-	longNickname
+	longNickname,
+	nothingFound
 }
 
 
@@ -44,6 +45,8 @@ async function wrongChannelForMessage (channel) { return failure(channel, `That 
 async function rolePositionHigher (channel) { return failure(channel, `This role is higher up in the role hierarchy, please move up my role in the Discord server settings.`) }
 
 async function longNickname (channel) { return failure(channel, `A nickname can't be longer than 32 characters.`) }
+
+async function nothingFound (channel) { return failure(channel, `There were no tracks or albums matching your search query.`) }
 
 
 function success (channel, message) { return sendMessage(channel, `**${sMessage[Math.floor(Math.random() * sMessage.length)]}**! ${message}`, 3500) }

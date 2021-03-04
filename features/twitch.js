@@ -151,7 +151,7 @@ async function validateChannel (message, channelName) {
 		return false;
 	}
 
-	if (!hasTwitchToken()) await getTwitchToken();
+	if (!await hasTwitchToken()) await getTwitchToken();
 
 	try { await validateTwitchToken() }
 	catch { await getTwitchToken() }
