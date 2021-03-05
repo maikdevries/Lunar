@@ -2,7 +2,7 @@ const { Collection } = require(`discord.js`);
 const fs = require(`fs`).promises;
 
 const { missingChannelPermissions, missingGuildPermissions } = require(`../shared/functions.js`);
-const { somethingWrong, missingArgument, memberMissingPermissions, disabledCommand, restrictedCommand } = require(`../shared/messages.js`);
+const { somethingWrong, missingArgument, memberMissingPermissions, disabledCommand, restrictedCommand, noAttempts } = require(`../shared/messages.js`);
 
 const commands = new Collection();
 
@@ -37,6 +37,8 @@ async function execute (client, message) {
 
 	const command = commands.get(commandName) || commands.find((cmd) => cmd.aliases?.includes(commandName));
 	if (!command) return;
+
+	if (message.edits.length > 3) return noAttempts(message.channel);
 
 	if (!guildSettings[command.name]?.enabled) return disabledCommand(message.channel);
 	if (guildSettings[command.name].restricted && guildSettings.channels.length && !guildSettings.channels.includes(message.channel.id)) return restrictedCommand(message.channel);

@@ -13,7 +13,7 @@ module.exports = {
 	invalidRange, missingBoolean,
 	wrongChannelForMessage, rolePositionHigher,
 	longNickname,
-	nothingFound
+	nothingFound, noAttempts
 }
 
 
@@ -47,7 +47,7 @@ async function rolePositionHigher (channel) { return failure(channel, `This role
 async function longNickname (channel) { return failure(channel, `A nickname can't be longer than 32 characters.`) }
 
 async function nothingFound (channel) { return failure(channel, `There were no tracks or albums matching your search query.`) }
-
+async function noAttempts (channel) { return failure(channel, `Third time wasn't the charm for you. Please send a new message instead of editing the original.`) }
 
 function success (channel, message) { return sendMessage(channel, `**${sMessage[Math.floor(Math.random() * sMessage.length)]}**! ${message}`, 3500) }
 function failure (channel, message) { return sendMessage(channel, `**${fMessage[Math.floor(Math.random() * fMessage.length)]}**... ${message}`, 5000) }
