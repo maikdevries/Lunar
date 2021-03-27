@@ -7,7 +7,7 @@ module.exports = {
 	memberPermissions: [`KICK_MEMBERS`],
 	guildPermissions: [`KICK_MEMBERS`],
 	channelPermissions: [],
-	args: `@[member(s)] (reason)`,
+	args: `[member(s)] (reason)`,
 	execute
 }
 

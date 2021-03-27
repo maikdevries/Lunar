@@ -10,7 +10,7 @@ module.exports = {
 	memberPermissions: [],
 	guildPermissions: [],
 	channelPermissions: [],
-	args: `[track|album] [query]`,
+	args: `[track | album] [query]`,
 	execute
 }
 

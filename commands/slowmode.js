@@ -3,7 +3,7 @@ const { successful, invalidArgument, invalidRange } = require(`../shared/message
 module.exports = {
 	name: `slowmode`,
 	aliases: [`slow`],
-	description: `A command that turns on/off slowmode for the current channel`,
+	description: `A command that manages slowmode for the current channel`,
 	memberPermissions: [`MANAGE_CHANNELS`],
 	guildPermissions: [],
 	channelPermissions: [`MANAGE_CHANNELS`],

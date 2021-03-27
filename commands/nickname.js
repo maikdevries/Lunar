@@ -7,7 +7,7 @@ module.exports = {
 	memberPermissions: [`MANAGE_NICKNAMES`],
 	guildPermissions: [`MANAGE_NICKNAMES`],
 	channelPermissions: [],
-	args: `@[member] [nickname]`,
+	args: `[member] [nickname]`,
 	execute
 }
 

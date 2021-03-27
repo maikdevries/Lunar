@@ -7,7 +7,7 @@ module.exports = {
 	memberPermissions: [`MANAGE_MESSAGES`],
 	guildPermissions: [],
 	channelPermissions: [`MANAGE_MESSAGES`],
-	args: `[number]|@[member]`,
+	args: `[number | member]`,
 	execute
 }
 
