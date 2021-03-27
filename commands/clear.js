@@ -7,19 +7,19 @@ module.exports = {
 	memberPermissions: [`MANAGE_MESSAGES`],
 	guildPermissions: [],
 	channelPermissions: [`MANAGE_MESSAGES`],
-	args: `[number]/@[member]`,
+	args: `[number]|@[member]`,
 	execute
 }
 
 
 async function execute (ignore, message, args) {
 	const userToPurge = parseInt(args[0]) ? false : message.mentions.users?.first();
-	let numberOfMessages = userToPurge ? 99 : parseInt(args[0]);
+	let numberOfMessages = userToPurge ? 100 : parseInt(args[0]);
 
 	if (isNaN(numberOfMessages)) return invalidArgument(message.channel, `number`);
-	if (numberOfMessages < 1 || numberOfMessages > 99) return invalidRange(message.channel, 1, 99);
+	if (numberOfMessages < 1 || numberOfMessages > 100) return invalidRange(message.channel, 1, 100);
 
-	let messages = await message.channel.messages.fetch({ limit: numberOfMessages + 1 });
+	let messages = await message.channel.messages.fetch({ limit: numberOfMessages });
 
 	if (userToPurge) messages = messages.filter((msg) => msg.author.id === userToPurge.id);
 	else messages = messages.filter((msg) => msg.id !== message.id);
