@@ -5,7 +5,7 @@ Lunar is a public Discord bot written in <b><a href="https://nodejs.org">NodeJS<
 <br>
 It makes use of the <b><a href="https://github.com/discordjs/discord.js">discord.js</a></b> library to interact with the official <b><a href="https://discordapp.com/developers/docs/intro">Discord API</a></b> to serve your needs.
 <br><br>
-<b><a href="https://lunar.marvonon.com">Invite Lunar to your Discord</a></b>
+<b><a href="https://lunar.maikdevries.com">Invite Lunar to your Discord</a></b>
 <br>
 </p>
 

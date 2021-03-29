@@ -1,7 +1,7 @@
 So you've invited Lunar to your Discord and are now curious on how to set it all up - you've come to the right place! This quick start guide will take you through the first few steps in a matter of minutes. So let's get started, shall we?
 
 ### **How to set up Lunar - the easy way**
-**0** - If you haven't done so already, [invite](https://lunar.marvonon.com) the bot to your Discord.
+**0** - If you haven't done so already, [invite](https://lunar.maikdevries.com) the bot to your Discord.
 
 **1** - Double check that the bot has the right permissions and is above all other non-administrative roles:
 
