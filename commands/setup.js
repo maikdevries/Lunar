@@ -56,8 +56,8 @@ async function commandsSetup (client, message) {
 	message.channel.bulkDelete([pollChannel, response], true);
 	if (!newChannel) return;
 
-	client.settings.set(message.guild.id, newPrefix.content, `commands.prefix`);
-	if (newChannel !== `NO`) client.settings.set(message.guild.id, [newChannel.id], `commands.channels`);
+	await client.settings.set(`${message.guild.id}.commands.prefix`, newPrefix.content);
+	if (newChannel !== `NO`) await client.settings.set(`${message.guild.id}.commands.channels`, [newChannel.id]);
 
 	return successfulSetup(message.channel, `settings`);
 }
@@ -83,7 +83,7 @@ async function reactionRoleSetup (client, message) {
 	pollRole.delete();
 	if (!newRole) return;
 
-	client.settings.set(message.guild.id, true, `reactionRole.enabled`);
+	await client.settings.set(`${message.guild.id}.reactionRole.enabled`, true);
 	return settings.addReactionRoleSettings(client, message, newMessage, newReaction, newRole);
 }
 
@@ -117,9 +117,9 @@ async function serverLockSetup (client, message) {
 	pollReaction.delete();
 	if (!newEmoji) return;
 
-	client.settings.set(message.guild.id, newRole.id, `serverLock.role`);
-	client.settings.set(message.guild.id, { [newMessage]: newEmoji }, `serverLock.message`)
-	client.settings.set(message.guild.id, true, `serverLock.enabled`);
+	await client.settings.set(`${message.guild.id}.serverLock.role`, newRole.id);
+	await client.settings.set(`${message.guild.id}.serverLock.message`, { [newMessage]: newEmoji });
+	await client.settings.set(`${message.guild.id}.serverLock.enabled`, true);
 
 	return successful(message.channel);
 }
@@ -144,9 +144,9 @@ async function streamStatusSetup (client, message) {
 	pollRole.delete();
 	if (!statusRole) return;
 
-	if (requiredRole !== `NO`) client.settings.set(message.guild.id, requiredRole.id, `streamStatus.streamerRole`);
-	client.settings.set(message.guild.id, statusRole.id, `streamStatus.statusRole`);
-	client.settings.set(message.guild.id, true, `streamStatus.enabled`);
+	if (requiredRole !== `NO`) await client.settings.set(`${message.guild.id}.streamStatus.streamerRole`, requiredRole.id);
+	await client.settings.set(`${message.guild.id}.streamStatus.statusRole`, statusRole.id);
+	await client.settings.set(`${message.guild.id}.streamStatus.enabled`, true);
 
 	return successful(message.channel);
 }
@@ -173,13 +173,13 @@ async function twitchSetup (client, message) {
 	if (!newMessage) return pollMessage.delete();
 	message.channel.bulkDelete([pollMessage, newMessage], true);
 
-	client.settings.set(message.guild.id, newUsername, `twitch.username`);
-	client.settings.set(message.guild.id, [newChannel.id], `twitch.channels`);
+	await client.settings.set(`${message.guild.id}.twitch.username`, newUsername);
+	await client.settings.set(`${message.guild.id}.twitch.channels`, [newChannel.id]);
 
-	if (newMessage.content !== `NO`) client.settings.set(message.guild.id, [newMessage.content], `twitch.messages`);
-	else client.settings.set(message.guild.id, [], `twitch.messages`);
+	if (newMessage.content !== `NO`) await client.settings.set(`${message.guild.id}.twitch.messages`, [newMessage.content]);
+	else await client.settings.set(`${message.guild.id}.twitch.messages`, []);
 
-	client.settings.set(message.guild.id, true, `twitch.enabled`);
+	await client.settings.set(`${message.guild.id}.twitch.enabled`, true);
 
 	return successfulSetup(message.channel, `settings`);
 }
@@ -199,8 +199,8 @@ async function welcomeMessageSetup (client, message) {
 			pollChannel.delete();
 			if (!newChannel) return;
 
-			client.settings.set(message.guild.id, [newChannel.id], `welcomeMessage.welcome.channels`);
-			client.settings.set(message.guild.id, true, `welcomeMessage.welcome.enabled`);
+			await client.settings.set(`${message.guild.id}.welcomeMessage.welcome.channels`, [newChannel.id]);
+			await client.settings.set(`${message.guild.id}.welcomeMessage.welcome.enabled`, true);
 
 			successfulSetup(message.channel, `settings`);
 		}
@@ -224,8 +224,8 @@ async function welcomeMessageSetup (client, message) {
 			pollChannel.delete();
 			if (!newChannel) return;
 
-			client.settings.set(message.guild.id, [newChannel.id], `welcomeMessage.leave.channels`);
-			client.settings.set(message.guild.id, true, `welcomeMessage.leave.enabled`);
+			await client.settings.set(`${message.guild.id}.welcomeMessage.leave.channels`, [newChannel.id]);
+			await client.settings.set(`${message.guild.id}.welcomeMessage.leave.enabled`, true);
 
 			successfulSetup(message.channel, `settings`);
 		}
@@ -260,13 +260,13 @@ async function youtubeSetup (client, message) {
 	if (!newMessage) return pollMessage.delete();
 	message.channel.bulkDelete([pollMessage, newMessage], true);
 
-	client.settings.set(message.guild.id, newUsername, `youtube.username`);
-	client.settings.set(message.guild.id, [newChannel.id], `youtube.channels`);
+	await client.settings.set(`${message.guild.id}.youtube.username`, newUsername);
+	await client.settings.set(`${message.guild.id}.youtube.channels`, [newChannel.id]);
 
-	if (newMessage.content !== `NO`) client.settings.set(message.guild.id, [newMessage.content], `youtube.messages`);
-	else client.settings.set(message.guild.id, [], `youtube.messages`);
+	if (newMessage.content !== `NO`) await client.settings.set(`${message.guild.id}.youtube.messages`, [newMessage.content]);
+	else await client.settings.set(`${message.guild.id}.youtube.messages`, []);
 
-	client.settings.set(message.guild.id, true, `youtube.enabled`);
+	await client.settings.set(`${message.guild.id}.youtube.enabled`, true);
 
 	return successfulSetup(message.channel, `settings`);
 }

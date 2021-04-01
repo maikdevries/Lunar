@@ -1,4 +1,6 @@
-const Enmap = require(`enmap`);
+require(`dotenv`).config()
+const Josh = require(`@joshdb/core`);
+const provider = require(`@joshdb/mongo`);
 
 const defaultGuildSettings = require(`./defaultGuildSettings.json`);
 
@@ -9,40 +11,45 @@ module.exports = {
 
 
 async function setup (client) {
-	client.settings = new Enmap({
+	client.settings = new Josh({
 		name: `settings`,
-		fetchAll: false,
-		autoFetch: true,
-		cloneLevel: `deep`,
+		provider,
+		providerOptions: {
+			collection: `settings`,
+			dbName: `Lunar`,
+			url: `mongodb+srv://${process.env.DATABASE_URL}?retryWrites=true&w=majority`
+		},
 		ensureProps: true
 	});
 
-	client.twitch = new Enmap({
+	client.twitch = new Josh({
 		name: `twitch`,
-		fetchAll: false,
-		autoFetch: true,
-		cloneLevel: `deep`,
+		provider,
+		providerOptions: {
+			collection: `twitch`,
+			dbName: `Lunar`,
+			url: `mongodb+srv://${process.env.DATABASE_URL}?retryWrites=true&w=majority`
+		},
 		ensureProps: true
 	});
 
-	client.youtube = new Enmap({
+	client.youtube = new Josh({
 		name: `youtube`,
-		fetchAll: false,
-		autoFetch: true,
-		cloneLevel: `deep`,
+		provider,
+		providerOptions: {
+			collection: `youtube`,
+			dbName: `Lunar`,
+			url: `mongodb+srv://${process.env.DATABASE_URL}?retryWrites=true&w=majority`
+		},
 		ensureProps: true
 	});
-
-	await client.settings.defer;
-	await client.twitch.defer;
-	await client.youtube.defer;
 
 	return await ensureGuilds(client);
 }
 
-async function ensureGuilds (client) {
-	client.guilds.cache.forEach((guild) => {
-		if (!client.settings.has(guild.id)) return client.settings.set(guild.id, defaultGuildSettings)
-		return client.settings.ensure(guild.id, defaultGuildSettings);
+function ensureGuilds (client) {
+	client.guilds.cache.forEach(async (guild) => {
+		if (!await client.settings.has(guild.id)) return await client.settings.set(guild.id, defaultGuildSettings)
+		return await client.settings.ensure(guild.id, defaultGuildSettings);
 	});
 }

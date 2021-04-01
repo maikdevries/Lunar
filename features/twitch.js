@@ -23,7 +23,7 @@ module.exports = {
 async function setup (client) {
 	if (!await hasTwitchToken()) await getTwitchToken();
 
-	const guilds = Array.from((client.settings.filter((guild) => guild.twitch.enabled)).keys());
+	const guilds = Object.keys(await client.settings.filter(`twitch.enabled`, true));
 	return loopGuilds(client, guilds);
 }
 
@@ -44,9 +44,9 @@ async function execute (client, guilds) {
 async function getStream (client, guildID) {
 	const streamSettings = await getGuildSettings(client, guildID);
 
-	if (!streamSettings?.settings?.enabled) return client.twitch.delete(streamSettings.guild);
+	if (!streamSettings?.settings?.enabled) return await client.twitch.delete(streamSettings.guild);
 	if (!streamSettings.settings.username || !streamSettings.settings.channels?.length) {
-		client.twitch.delete(streamSettings.guild);
+		await client.twitch.delete(streamSettings.guild);
 		return console.error(`Cannot send Twitch announcement, setup not complete for guild: ${streamSettings.guild}!`);
 	}
 
@@ -58,15 +58,15 @@ async function getStream (client, guildID) {
 	if (!streamInfo?.data) return;
 
 	if (!streamInfo.data[0] && streamSettings.streaming) {
-		client.twitch.set(streamSettings.guild, false, `streaming`);
+		await client.twitch.set(`${streamSettings.guild}.streaming`, false);
 		await setStreamAnnouncementOffline(client, streamSettings);
-		if (!client.twitch.get(streamSettings.guild, `streaming`)) return client.twitch.delete(streamSettings.guild);
+		if (!await client.twitch.get(`${streamSettings.guild}.streaming`)) return await client.twitch.delete(streamSettings.guild);
 	} else {
 		if (streamSettings.streaming) return await updateStreamAnnouncement(client, streamSettings);
-		client.twitch.set(streamSettings.guild, true, `streaming`);
+		await client.twitch.set(`${streamSettings.guild}.streaming`, true);
 
 		const [newUserInfo, newStreamInfo, newGameInfo, newVideoInfo] = await getData(streamSettings.settings.username, streamSettings.settings.username, true, null);
-		if (!newUserInfo?.data?.[0] || !newStreamInfo?.data?.[0] || !newGameInfo?.data?.[0]) return client.twitch.set(streamSettings.guild, false, `streaming`);
+		if (!newUserInfo?.data?.[0] || !newStreamInfo?.data?.[0] || !newGameInfo?.data?.[0]) return await client.twitch.set(`${streamSettings.guild}.streaming`, false);
 		else return sendStreamAnnouncement(client, streamSettings, newStreamInfo, newUserInfo, newGameInfo);
 	}
 }
@@ -90,7 +90,7 @@ function sendStreamAnnouncement (client, streamSettings, streamInfo, userInfo, g
 		if (await missingChannelPermissions(client, null, channel, [`VIEW_CHANNEL`, `SEND_MESSAGES`, `MENTION_EVERYONE`])) return console.error(`Missing permissions (VIEW_CHANNEL or SEND_MESSAGES or MENTION_EVERYONE) to send out Twitch announcement for channel: ${channel.id}!`);
 
 		const message = streamSettings.settings.messages[Math.floor(Math.random() * streamSettings.settings.messages.length)];
-		return channel.send(message, { embed }).then((msg) => client.twitch.push(streamSettings.guild, { 'channelID': msg.channel.id, 'messageID': msg.id }, `sentMessages`));
+		return channel.send(message, { embed }).then(async (msg) => await client.twitch.push(`${streamSettings.guild}.sentMessages`, { 'channelID': msg.channel.id, 'messageID': msg.id }, false));
 	});
 }
 
@@ -121,7 +121,7 @@ async function updateStreamAnnouncement (client, streamSettings) {
 
 async function setStreamAnnouncementOffline (client, streamSettings) {
 	const [newUserInfo, newStreamInfo, newGameInfo, newVideoInfo] = await getData(streamSettings.settings.username, null, null, true);
-	if (!newUserInfo?.data?.[0] || !newVideoInfo?.data?.[0]) return client.twitch.set(streamSettings.guild, true, `streaming`);
+	if (!newUserInfo?.data?.[0] || !newVideoInfo?.data?.[0]) return await client.twitch.set(`${streamSettings.guild}.streaming`, true);
 
 	streamSettings.sentMessages.forEach(async (savedMessage) => {
 		const channel = client.channels.cache.get(savedMessage.channelID);
@@ -174,13 +174,13 @@ async function validateChannel (message, channelName) {
 
 
 async function getGuildSettings (client, guildID) {
-	const guildSettings = client.settings.get(guildID, `twitch`);
-	client.twitch.ensure(guildID, defaultTwitchSettings);
+	const guildSettings = await client.settings.get(`${guildID}.twitch`);
+	await client.twitch.ensure(guildID, defaultTwitchSettings);
 
-	client.twitch.set(guildID, guildID, `guild`);
-	client.twitch.set(guildID, guildSettings, `settings`);
+	await client.twitch.set(`${guildID}.guild`, guildID);
+	await client.twitch.set(`${guildID}.settings`, guildSettings);
 
-	return client.twitch.get(guildID);
+	return await client.twitch.get(guildID);
 }
 
 async function getData (userUsername, streamUsername, gameID, videoUsername) {

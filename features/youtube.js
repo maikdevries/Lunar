@@ -19,8 +19,8 @@ module.exports = {
 };
 
 
-function setup (client) {
-	const guilds = Array.from((client.settings.filter((guild) => guild.youtube.enabled)).keys());
+async function setup (client) {
+	const guilds = Object.keys(await client.settings.filter(`youtube.enabled`, true));
 	return execute(client, guilds);
 }
 
@@ -34,9 +34,9 @@ async function execute (client, guilds) {
 async function getVideo (client, guildID) {
 	const videoSettings = await getGuildSettings(client, guildID);
 
-	if (!videoSettings?.settings?.enabled) return client.youtube.delete(videoSettings.guild);
+	if (!videoSettings?.settings?.enabled) return await client.youtube.delete(videoSettings.guild);
 	if (!videoSettings.settings.username || !videoSettings.settings.channels?.length) {
-		client.youtube.delete(videoSettings.guild);
+		await client.youtube.delete(videoSettings.guild);
 		return console.error(`Cannot send YouTube announcement, setup not complete for guild: ${videoSettings.guild}`);
 	}
 
@@ -46,7 +46,7 @@ async function getVideo (client, guildID) {
 	if (videoSnippet.items[0].snippet.resourceId.videoId === videoSettings.lastVideo) return;
 	await sendVideoAnnouncement(client, videoSettings, channelSnippet, videoSnippet);
 
-	return client.youtube.set(videoSettings.guild, videoSnippet.items[0].snippet.resourceId.videoId, `lastVideo`);
+	return await client.youtube.set(`${videoSettings.guild}.lastVideo`, videoSnippet.items[0].snippet.resourceId.videoId);
 }
 
 async function sendVideoAnnouncement (client, videoSettings, channelInfo, videoInfo) {
@@ -105,18 +105,18 @@ async function setLatestVideo (client, message, channelID) {
 		return false;
 	}
 
-	return client.youtube.set(videoSettings.guild, videoSnippet.items[0].snippet.resourceId.videoId, `lastVideo`);
+	return await client.youtube.set(`${videoSettings.guild}.lastVideo`, videoSnippet.items[0].snippet.resourceId.videoId);
 }
 
 
 async function getGuildSettings (client, guildID) {
-	const guildSettings = client.settings.get(guildID, `youtube`);
-	client.youtube.ensure(guildID, defaultYouTubeSettings);
+	const guildSettings = await client.settings.get(`${guildID}.youtube`);
+	await client.youtube.ensure(guildID, defaultYouTubeSettings);
 
-	client.youtube.set(guildID, guildID, `guild`);
-	client.youtube.set(guildID, guildSettings, `settings`);
+	await client.youtube.set(`${guildID}.guild`, guildID);
+	await client.youtube.set(`${guildID}.settings`, guildSettings);
 
-	return client.youtube.get(guildID);
+	return await client.youtube.get(guildID);
 }
 
 async function getData (snippetChannel, contentChannel, snippetVideo) {

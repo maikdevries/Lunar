@@ -31,8 +31,8 @@ client.once(`ready`, async () => {
 	for (const file of eventFiles) {
 		const event = require(`./events/${file}`);
 
-		if (event.once) client.once(event.name, (...args) => event.execute(client, ...args));
-		else client.on(event.name, (...args) => event.execute(client, ...args));
+		if (event.once) client.once(event.name, async (...args) => await event.execute(client, ...args));
+		else client.on(event.name, async (...args) => await event.execute(client, ...args));
 	}
 
 	console.log(`${client.user.username} has loaded successfully and is now online!`);

@@ -15,7 +15,7 @@ module.exports = {
 
 
 async function execute (client, message, args) {
-	const guildSettings = client.settings.get(message.guild.id, `commands`);
+	const guildSettings = await client.settings.get(`${message.guild.id}.commands`);
 
 	const embed = new MessageEmbed()
 		.setAuthor(`How to use the bot:`, client.user.avatarURL())

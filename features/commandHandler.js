@@ -27,7 +27,7 @@ async function execute (client, message) {
 	try { if (message.partial) message = await message.fetch() }
 	catch (error) { return console.error(`An error occurred fetching a partial message: ${error}`) }
 
-	const guildSettings = client.settings.get(message.guild.id, `commands`);
+	const guildSettings = await client.settings.get(`${message.guild.id}.commands`);
 
 	if (!message.content.startsWith(guildSettings.prefix || message.author.bot || message.channel.type !== `text`)) return;
 	if (await missingChannelPermissions(client, message, message.channel, [`SEND_MESSAGES`, `MANAGE_MESSAGES`])) return console.error(`Missing permissions (SEND_MESSAGES or MANAGE_MESSAGES) to execute command for guild: ${message.guild.id}!`);

@@ -7,8 +7,8 @@ module.exports = {
 };
 
 
-function memberAdd (client, member) {
-	const guildSettings = client.settings.get(member.guild.id, `welcomeMessage.welcome`);
+async function memberAdd (client, member) {
+	const guildSettings = await client.settings.get(`${member.guild.id}.welcomeMessage.welcome`);
 
 	if (!guildSettings?.enabled) return;
 	if (!guildSettings.channels?.length) return console.error(`Cannot send welcome message, setup not complete for guild: ${member.guild.id}!`);
@@ -24,8 +24,8 @@ function memberAdd (client, member) {
 	});
 }
 
-function memberRemove (client, member) {
-	const guildSettings = client.settings.get(member.guild.id, `welcomeMessage.leave`);
+async function memberRemove (client, member) {
+	const guildSettings = await client.settings.get(`${member.guild.id}.welcomeMessage.leave`);
 
 	if (!guildSettings?.enabled) return;
 	if (!guildSettings.channels?.length) return console.error(`Cannot send leave message, setup not complete for guild: ${member.guild.id}!`);

@@ -11,6 +11,6 @@ module.exports = {
 
 
 async function execute (client, message, args) {
-	const { messages } = client.settings.get(message.guild.id, `commands.ask`);
+	const messages = await client.settings.get(`${message.guild.id}.commands.ask.messages`);
 	return message.channel.send(`> ${message.member}: ${args.join(` `)}\n${messages[Math.floor(Math.random() * messages.length)]}`, { disableMentions: 'everyone' });
 }

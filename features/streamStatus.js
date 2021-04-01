@@ -7,7 +7,7 @@ module.exports = {
 
 
 async function setStatus (client, ignore, newPresence) {
-	const guildSettings = client.settings.get(newPresence.guild.id, `streamStatus`);
+	const guildSettings = await client.settings.get(`${newPresence.guild.id}.streamStatus`);
 
 	if (!guildSettings?.enabled) return;
 	if (!guildSettings.statusRole) return console.error(`Cannot manage shoutout role for livestreaming members, setup not complete for guild: ${newPresence.guild.id}!`);

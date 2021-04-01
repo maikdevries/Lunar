@@ -11,7 +11,7 @@ async function roleAdd (client, reaction, user) {
 	try { if (reaction.partial) reaction = await reaction.fetch() }
 	catch (error) { return console.error(`Something went wrong when fetching a partial reaction: ${error}`) }
 
-	const guildSettings = client.settings.get(reaction.message.guild.id, `reactionRole`);
+	const guildSettings = await client.settings.get(`${reaction.message.guild.id}.reactionRole`);
 	const roles = guildSettings.messages[reaction.message.id]?.[reaction.emoji.id || reaction.emoji.name];
 
 	if (!guildSettings.enabled || typeof roles === `undefined` || roles === null) return;
@@ -27,7 +27,7 @@ async function roleRemove (client, reaction, user) {
 	try { if (reaction.partial) reaction = await reaction.fetch() }
 	catch (error) { return console.error(`Something went wrong when fetching a partial reaction: ${error}`) }
 
-	const guildSettings = client.settings.get(reaction.message.guild.id, `reactionRole`);
+	const guildSettings = await client.settings.get(`${reaction.message.guild.id}.reactionRole`);
 	const roles = guildSettings.messages[reaction.message.id]?.[reaction.emoji.id || reaction.emoji.name];
 
 	if (!guildSettings.enabled || typeof roles === `undefined` || roles === null) return;

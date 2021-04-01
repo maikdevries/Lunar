@@ -267,15 +267,15 @@ function commandSpecificSettings (client, message, args, command) {
 	}
 }
 
-function commandPrefixSettings (client, message, newPrefix) {
+async function commandPrefixSettings (client, message, newPrefix) {
 	if (!newPrefix) return missingArgument(message.channel, `prefix`);
 
-	client.settings.set(message.guild.id, newPrefix, `commands.prefix`);
+	await client.settings.set(`${message.guild.id}.commands.prefix`, newPrefix);
 	return successful(message.channel);
 }
 
-function commandChangeRestrictionSettings (client, message, command, boolean) {
-	client.settings.set(message.guild.id, boolean, `commands[${command}].restricted`);
+async function commandChangeRestrictionSettings (client, message, command, boolean) {
+	await client.settings.set(`${message.guild.id}.commands.${command}.restricted`, boolean);
 	return successful(message.channel);
 }
 
@@ -288,7 +288,7 @@ async function serverLockMessageSettings (client, message, channelMention, messa
 	const emoji = await parseEmoji(message, emojiMention);
 	if (!emoji) return;
 
-	client.settings.set(message.guild.id, { [messageMention]: emoji }, `serverLock.message`);
+	await client.settings.set(`${message.guild.id}.serverLock.message`, { [messageMention]: emoji });
 	return successful(message.channel);
 }
 
@@ -394,8 +394,8 @@ async function handleUsernameSettings (client, message, username, path) {
 }
 
 
-function changeEnabledSettings (client, message, boolean, path) {
-	client.settings.set(message.guild.id, boolean, `${path}.enabled`);
+async function changeEnabledSettings (client, message, boolean, path) {
+	await client.settings.set(`${message.guild.id}.${path}.enabled`, boolean);
 	return successful(message.channel);
 }
 
@@ -403,7 +403,7 @@ async function addChannelSettings (client, message, channelMention, path, permis
 	const channel = await parseChannel(client, message, channelMention, permissions);
 	if (!channel) return;
 
-	client.settings.push(message.guild.id, channel.id, `${path}.channels`);
+	await client.settings.push(`${message.guild.id}.${path}.channels`, channel.id, false);
 	return successful(message.channel);
 }
 
@@ -411,36 +411,36 @@ async function removeChannelSettings (client, message, channelMention, path) {
 	const channel = await parseChannel(client, message, channelMention, []);
 	if (!channel) return;
 
-	client.settings.remove(message.guild.id, channel.id, `${path}.channels`);
+	await client.settings.remove(`${message.guild.id}.${path}.channels`, channel.id);
 	return successful(message.channel);
 }
 
 async function clearChannelSettings (client, message, path) {
 	if (!await confirmChange(message)) return;
 
-	client.settings.set(message.guild.id, [], `${path}.channels`);
+	await client.settings.set(`${message.guild.id}.${path}.channels`, []);
 	return successful(message.channel);
 }
 
-function addMessageSettings (client, message, response, path) {
+async function addMessageSettings (client, message, response, path) {
 	if (!response) return missingArgument(message.channel, `message`);
 
-	client.settings.push(message.guild.id, response, `${path}.messages`);
+	await client.settings.push(`${message.guild.id}.${path}.messages`, response, false);
 	return successful(message.channel);
 }
 
-function removeMessageSettings (client, message, response, path) {
+async function removeMessageSettings (client, message, response, path) {
 	if (!response) return missingArgument(message.channel, `message`);
-	if (!client.settings.includes(message.guild.id, response, `${path}.messages`)) return invalidArgument(message.channel, `message`);
+	if (!await client.settings.includes(`${message.guild.id}.${path}.messages`, response)) return invalidArgument(message.channel, `message`);
 
-	client.settings.remove(message.guild.id, response, `${path}.messages`);
+	await client.settings.remove(`${message.guild.id}.${path}.messages`, response);
 	return successful(message.channel);
 }
 
 async function clearMessageSettings (client, message, path) {
 	if (!await confirmChange(message)) return;
 
-	client.settings.set(message.guild.id, [], `${path}.messages`);
+	await client.settings.set(`${message.guild.id}.${path}.messages`, []);
 	return successful(message.channel);
 }
 
@@ -450,7 +450,7 @@ async function resetMessageSettings (client, message, path) {
 	let settings = defaultGuildSettings;
 	path.split(`.`).forEach((key) => settings = settings[key]);
 
-	client.settings.set(message.guild.id, settings.messages, `${path}.messages`);
+	await client.settings.set(`${message.guild.id}.${path}.messages`, settings.messages);
 	return successful(message.channel);
 }
 
@@ -458,7 +458,7 @@ async function addRoleSettings (client, message, roleMention, path) {
 	const role = await parseRole(client, message, roleMention);
 	if (!role) return;
 
-	client.settings.set(message.guild.id, role.id, path);
+	await client.settings.set(`${message.guild.id}.${path}`, role.id);
 	return successful(message.channel);
 }
 
@@ -502,7 +502,7 @@ async function removeReactionRoleMessageSettings (client, message, messageMentio
 	if (!await parseMessage(message, null, messageMention)) return;
 	if (!await confirmChange(message)) return;
 
-	client.settings.delete(message.guild.id, `reactionRole.messages[${messageMention}]`);
+	await client.settings.delete(`${message.guild.id}.reactionRole.messages.${messageMention}`);
 	return successful(message.channel);
 }
 
@@ -514,7 +514,7 @@ async function removeReactionRoleReactionSettings (client, message, messageMenti
 
 	if (!await confirmChange(message)) return;
 
-	client.settings.delete(message.guild.id, `reactionRole.messages[${messageMention}][${newReaction}]`);
+	await client.settings.delete(`${message.guild.id}.reactionRole.messages.${messageMention}.${newReaction}`);
 	return successful(message.channel);
 }
 
@@ -527,14 +527,14 @@ async function removeReactionRoleRoleSettings (client, message, messageMention, 
 	newRole = await parseRole(client, message, roleMention);
 	if (!newRole) return;
 
-	client.settings.remove(message.guild.id, newRole.id, `reactionRole.messages[${messageMention}][${newReaction}]`);
+	await client.settings.remove(`${message.guild.id}.reactionRole.messages.${messageMention}.${newReaction}`, newRole.id);
 	return successful(message.channel);
 }
 
 async function clearReactionRoleMessageSettings (client, message) {
 	if (!await confirmChange(message)) return;
 
-	client.settings.set(message.guild.id, {}, `reactionRole.messages`);
+	await client.settings.set(`${message.guild.id}.reactionRole.messages`, {});
 	return successful(message.channel);
 }
 
@@ -543,7 +543,7 @@ async function clearReactionRoleReactionSettings (client, message, messageMentio
 
 	if (!await confirmChange(message)) return;
 
-	client.settings.set(message.guild.id, {}, `reactionRole.messages[${messageMention}]`);
+	await client.settings.set(`${message.guild.id}.reactionRole.messages.${messageMention}`, {});
 	return successful(message.channel);
 }
 
@@ -555,34 +555,31 @@ async function clearReactionRoleRoleSettings (client, message, messageMention, r
 
 	if (!await confirmChange(message)) return;
 
-	client.settings.set(message.guild.id, [], `reactionRole.messages[${messageMention}][${newReaction}]`);
+	await client.settings.set(`${message.guild.id}.reactionRole.messages.${messageMention}.${newReaction}`, []);
 	return successful(message.channel);
 }
 
-function addReactionRoleSettings (client, message, newMessage, newReaction, newRole) {
-	client.settings.ensure(message.guild.id, newMessage, `reactionRole.messages`);
-	client.settings.ensure(message.guild.id, newReaction, `reactionRole.messages.${newMessage}`);
-	client.settings.ensure(message.guild.id, [], `reactionRole.messages.${newMessage}.${newReaction}`);
-
-	client.settings.push(message.guild.id, newRole.id, `reactionRole.messages.${newMessage}.${newReaction}`);
+async function addReactionRoleSettings (client, message, newMessage, newReaction, newRole) {
+	await client.settings.ensure(`${message.guild.id}.reactionRole.messages.${newMessage}.${newReaction}`, []);
+	await client.settings.push(`${message.guild.id}.reactionRole.messages.${newMessage}.${newReaction}`, newRole.id, false);
 	return successful(message.channel);
 }
 
-function changeUsernameSettings (client, message, newUsername, path) {
+async function changeUsernameSettings (client, message, newUsername, path) {
 	if (!newUsername) return;
 
-	client.settings.set(message.guild.id, newUsername, `${path}.username`);
+	await client.settings.set(`${message.guild.id}.${path}.username`, newUsername);
 	return successful(message.channel);
 }
 
-function listGuildSettings (client, message, path) {
-	return message.channel.send(`Current settings for the **${path}** feature:\n\`\`\`JSON\n${JSON.stringify(client.settings.get(message.guild.id, path), null, `\t`)}\`\`\``, { split: true });
+async function listGuildSettings (client, message, path) {
+	return message.channel.send(`Current settings for the **${path}** feature:\n\`\`\`JSON\n${JSON.stringify(await client.settings.get(`${message.guild.id}.${path}`), null, `\t`)}\`\`\``, { split: true });
 }
 
 async function resetSettings (client, message, path) {
 	if (!await confirmChange(message)) return;
 
-	client.settings.set(message.guild.id, (defaultGuildSettings[path] || defaultGuildSettings), (path.length ? path : null));
+	await client.settings.set(`${message.guild.id}${path.length ? `.${path}` : ``}`, (defaultGuildSettings[path] || defaultGuildSettings));
 	return successful(message.channel);
 }
 

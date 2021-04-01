@@ -8,7 +8,7 @@ module.exports = {
 
 
 async function memberLock (client, member) {
-	const guildSettings = client.settings.get(member.guild.id, `serverLock`);
+	const guildSettings = await client.settings.get(`${member.guild.id}.serverLock`);
 
 	if (!guildSettings?.enabled) return;
 	if (!guildSettings.role || !guildSettings.message) return console.error(`Cannot manage server lock for guild members, setup not complete for guild: ${member.guild.id}!`);
@@ -23,7 +23,7 @@ async function memberUnlock (client, reaction, user) {
 	try { if (reaction.partial) reaction = await reaction.fetch() }
 	catch (error) { return console.error(`Something went wrong when fetching a partial reaction: ${error}`) }
 
-	const guildSettings = client.settings.get(reaction.message.guild.id, `serverLock`);
+	const guildSettings = await client.settings.get(`${reaction.message.guild.id}.serverLock`);
 
 	if (!guildSettings?.enabled) return;
 	if (!guildSettings.role || !guildSettings.message) return console.error(`Cannot manage server lock for guild members, setup not complete for guild: ${member.guild.id}!`);

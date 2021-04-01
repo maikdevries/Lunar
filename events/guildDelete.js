@@ -1,7 +1,7 @@
 module.exports = {
 	name: `guildDelete`,
 	once: false,
-	execute(client, guild) {
-		client.settings.delete(guild.id);
+	async execute(client, guild) {
+		await client.settings.delete(guild.id);
 	}
 };
