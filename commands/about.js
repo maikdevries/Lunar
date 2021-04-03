@@ -22,7 +22,7 @@ async function execute (client, message, ignore) {
 		.addField(`Version`, package.version, true)
 		.addField(`Commit`, `[${await getCommit()}](${package.homepage}/commit/${await getCommit()})`, true)
 		.addField(`Source code`, `[GitHub repository](${package.homepage})`, true)
-		.addField(`Public invite`, `[lunar.maikdevries.com](https://lunar.maikdevries.com)`, true)
+		.addField(`Public invite`, `[maikdevries.com/lunar](https://maikdevries.com/lunar)`, true)
 		.addField(`Support`, `https://discord.gg/aMeGvFD`, true)
 		.setColor(`#233A54`)
 		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
