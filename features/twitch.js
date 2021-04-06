@@ -59,8 +59,7 @@ async function getStream (client, guildID) {
 
 	if (!streamInfo.data[0] && streamSettings.streaming) {
 		await client.twitch.set(`${streamSettings.guild}.streaming`, false);
-		await setStreamAnnouncementOffline(client, streamSettings);
-		if (!await client.twitch.get(`${streamSettings.guild}.streaming`)) return await client.twitch.delete(streamSettings.guild);
+		return await setStreamAnnouncementOffline(client, streamSettings);
 	} else {
 		if (streamSettings.streaming) return await updateStreamAnnouncement(client, streamSettings);
 		await client.twitch.set(`${streamSettings.guild}.streaming`, true);
@@ -100,12 +99,12 @@ async function updateStreamAnnouncement (client, streamSettings) {
 
 	streamSettings.sentMessages.forEach(async (savedMessage) => {
 		const channel = client.channels.cache.get(savedMessage.channelID);
-		if (!channel) return console.error(`Cannot update Twitch announcement for channel: ${savedMessage.channelID}, it no longer exists!`);
+		if (!channel) return await client.twitch.remove(`${streamSettings.guild}.sentMessages`, (message) => message.messageID === savedMessage.messageID);
 
 		try { var message = await channel.messages.fetch(savedMessage.messageID) }
-		catch (error) { return console.error(`Something went wrong when fetching a twitch announcement: ${error}`) }
+		catch (error) { return await client.twitch.remove(`${streamSettings.guild}.sentMessages`, (message) => message.messageID === savedMessage.messageID) }
 
-		if (!message?.embeds?.[0]) return console.error(`Cannot update Twitch announcement for message: ${savedMessage.messageID}, it no longer exists!`);
+		if (!message?.embeds?.[0]) return await client.twitch.remove(`${streamSettings.guild}.sentMessages`, (message) => message.messageID === savedMessage.messageID);
 
 		const editedEmbed = new MessageEmbed(message.embeds[0])
 			.setAuthor(`${newStreamInfo.data[0].user_name} is now LIVE on Twitch!`, newUserInfo.data[0].profile_image_url)
@@ -125,12 +124,12 @@ async function setStreamAnnouncementOffline (client, streamSettings) {
 
 	streamSettings.sentMessages.forEach(async (savedMessage) => {
 		const channel = client.channels.cache.get(savedMessage.channelID);
-		if (!channel) return console.error(`Cannot take Twitch announcement offline for channel: ${savedMessage.channelID}, it no longer exists!`);
+		if (!channel) return await client.twitch.remove(`${streamSettings.guild}.sentMessages`, (message) => message.messageID === savedMessage.messageID);
 
 		try { var message = await channel.messages.fetch(savedMessage.messageID) }
-		catch (error) { return console.error(`Something went wrong when fetching a twitch announcement: ${error}`) }
+		catch (error) { return await client.twitch.remove(`${streamSettings.guild}.sentMessages`, (message) => message.messageID === savedMessage.messageID) }
 
-		if (!message?.embeds?.[0]) return console.error(`Cannot take Twitch announcement offline for message: ${savedMessage.messageID}, it no longer exists!`);
+		if (!message?.embeds?.[0]) return await client.twitch.remove(`${streamSettings.guild}.sentMessages`, (message) => message.messageID === savedMessage.messageID);
 
 		const editedEmbed = new MessageEmbed(message.embeds[0])
 			.setAuthor(`${newUserInfo.data[0].display_name} was LIVE on Twitch!`, newUserInfo.data[0].profile_image_url)
