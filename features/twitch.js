@@ -59,7 +59,8 @@ async function getStream (client, guildID) {
 
 	if (!streamInfo.data[0] && streamSettings.streaming) {
 		await client.twitch.set(`${streamSettings.guild}.streaming`, false);
-		return await setStreamAnnouncementOffline(client, streamSettings);
+		await setStreamAnnouncementOffline(client, streamSettings);
+		if (!await client.twitch.get(`${streamSettings.guild}.streaming`)) return await client.twitch.set(`${streamSettings.guild}.sentMessages`, []);
 	} else {
 		if (streamSettings.streaming) return await updateStreamAnnouncement(client, streamSettings);
 		await client.twitch.set(`${streamSettings.guild}.streaming`, true);
