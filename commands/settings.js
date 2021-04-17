@@ -38,7 +38,7 @@ const REACTION_MESSAGES = { name: `messages`, description: `Manage reaction role
 const REACTION_MESSAGE = { name: `message`, description: `Change the reaction role messages` };
 const REACTION_REACTION = { name: `reaction`, description: `Change the reaction role reactions for a specific message` };
 const REACTION_ROLE = { name: `role`, description: `Change the reaction role roles for a specific message and reaction` };
-const REACTION_ADD = { name: `add`, description: `Add message/reaction/role to reaction role` };
+const REACTION_ADD = { name: `add`, description: `Create a new Reaction Role` };
 const REACTION_REMOVE = { name: `remove`, description: `Remove message/reaction/role from reaction role` };
 const REACTION_CLEAR = { name: `clear`, description: `Clear messages/reactions/roles from reaction role` };
 
@@ -348,16 +348,7 @@ function handleMessageSettings (client, message, action, arg, path) {
 
 function handleReactionRoleSettings (client, message, action, object, messageMention, reactionMention, roleMention) {
 	switch (action) {
-		case `add`:
-			switch (object) {
-				case `message`: return addReactionRoleMessageSettings(client, message, messageMention);
-
-				case `reaction`: return addReactionRoleReactionSettings(client, message, messageMention, reactionMention);
-
-				case `role`: return addReactionRoleRoleSettings(client, message, messageMention, reactionMention, roleMention);
-
-				default: return message.channel.send(possibleSettings(client, [REACTION_MESSAGE, REACTION_REACTION, REACTION_ROLE]));
-			}
+		case `add`: return addReactionRoleMessageSettings(client, message, object);
 
 		case `remove`:
 			switch (object) {
@@ -469,30 +460,6 @@ async function addReactionRoleMessageSettings (client, message, messageMention) 
 	if (!newReaction) return;
 
 	const newRole = await requestRole(client, message);
-	if (!newRole) return;
-
-	return addReactionRoleSettings(client, message, messageMention, newReaction, newRole);
-}
-
-async function addReactionRoleReactionSettings (client, message, messageMention, reactionMention) {
-	if (!await parseMessage(message, null, messageMention)) return;
-
-	const newReaction = await parseEmoji(message, reactionMention);
-	if (!newReaction) return;
-
-	const newRole = await requestRole(client, message);
-	if (!newRole) return;
-
-	return addReactionRoleSettings(client, message, messageMention, newReaction, newRole);
-}
-
-async function addReactionRoleRoleSettings (client, message, messageMention, reactionMention, roleMention) {
-	if (!await parseMessage(message, null, messageMention)) return;
-
-	const newReaction = await parseEmoji(message, reactionMention);
-	if (!newReaction) return;
-
-	const newRole = await parseRole(client, message, roleMention);
 	if (!newRole) return;
 
 	return addReactionRoleSettings(client, message, messageMention, newReaction, newRole);
@@ -749,13 +716,13 @@ async function parseEmoji (message, emojiMention) {
 
 async function parseMessage (message, channel, messageMention) {
 	if (!messageMention) {
-		await missingArgument(message.channel, `message`);
+		await missingArgument(message.channel, `message ID`);
 		return false;
 	}
 
 	const matches = messageMention.match(/\d{17,19}/);
 	if (!matches) {
-		await invalidArgument(message.channel, `message`);
+		await invalidArgument(message.channel, `message ID`);
 		return false;
 	}
 

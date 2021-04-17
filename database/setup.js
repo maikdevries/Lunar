@@ -1,4 +1,3 @@
-require(`dotenv`).config()
 const Josh = require(`@joshdb/core`);
 const provider = require(`@joshdb/mongo`);
 
