@@ -2,9 +2,7 @@
 	"welcomeMessage": {
 		"ADD": {
 			"enabled": false,
-			"channels": [
-
-			],
+			"channel": "",
 			"defaultMessage": "[MEMBER] has joined the Discord server!",
 			"messages": [
 				"We've got a new member! Welcome [MEMBER]!",
@@ -21,9 +19,7 @@
 		},
 		"REMOVE": {
 			"enabled": false,
-			"channels": [
-
-			],
+			"channel": "",
 			"defaultMessage": "[MEMBER] has left the Discord server!",
 			"messages": [
 				"[MEMBER] has fallen and will be remembered...",
@@ -51,18 +47,14 @@
 	"twitch": {
 		"enabled": false,
 		"username": "",
-		"channels": [
-
-		],
+		"channel": "",
 		"message": ""
 	},
 
 	"youtube": {
 		"enabled": false,
-		"channelID": "",
-		"channels": [
-
-		],
+		"username": "",
+		"channel": "",
 		"message": ""
 	}
 }

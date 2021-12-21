@@ -9,15 +9,12 @@ async function execute (client, guildMember, action) {
 	const guildSettings = await client.settings.get(`${guildMember.guild.id}.welcomeMessage[${action}]`);
 	if (!guildSettings.enabled) return;
 
+	let channel;
+	try { channel = await guildMember.guild.channels.fetch(guildSettings.channel) }
+	catch { return }
+
+	if (!checkChannelPermissions(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES'])) return;
+
 	const message = guildSettings.messages.length ? guildSettings.messages[Math.floor(Math.random() * guildSettings.messages.length)] : guildSettings.defaultMessage;
-
-	for (const channelID of guildSettings.channels) {
-		let channel;
-		try { channel = await guildMember.guild.channels.fetch(channelID) }
-		catch { continue }
-
-		if (!checkChannelPermissions(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES'])) continue;
-
-		await channel.send(message.replace(/\[MEMBER\]/, `**${guildMember.user.username}**`));
-	}
+	return await channel.send(message.replace(/\[MEMBER\]/, `**${guildMember.user.username}**`));
 }

@@ -30,7 +30,7 @@ async function getVideo (client, guildID) {
 
 	if (!guildSettings.settings.enabled) return await client.youtube.delete(guildSettings.guildID);
 
-	const [channelData, videoData] = await getData(guildSettings.settings.channelID, true);
+	const [channelData, videoData] = await getData(guildSettings.settings.username, true);
 	if (!channelData?.items?.[0] || !videoData?.items?.[0]) return;
 
 	if (videoData.items[0].snippet.resourceId.videoId === guildSettings.latestVideo) return;
@@ -51,16 +51,13 @@ async function sendVideoAnnouncement (client, guildSettings, channelData, videoD
 		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
 		.setTimestamp(new Date(videoData.items[0].snippet.publishedAt));
 
-	for (const channelID of guildSettings.settings.channels) {
-		let channel;
-		try { channel = await client.channels.fetch(channelID) }
-		catch { continue }
+	let channel;
+	try { channel = await client.channels.fetch(guildSettings.settings.channel) }
+	catch { return }
 
-		if (!checkChannelPermissions(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MENTION_EVERYONE'])) continue;
+	if (!checkChannelPermissions(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MENTION_EVERYONE'])) return;
 
-		await channel.send({ content: guildSettings.settings.message || ' ', embeds: [embed] });
-	}
-
+	await channel.send({ content: guildSettings.settings.message || ' ', embeds: [embed] });
 	return await client.youtube.set(`${guildSettings.guildID}.latestVideo`, videoData.items[0].snippet.resourceId.videoId);
 }
 
@@ -74,10 +71,10 @@ async function getGuildSettings (client, guildID) {
 	return await client.youtube.get(guildID);
 }
 
-async function getData (channelID, videoID) {
+async function getData (username, videoID) {
 	let [channelData, videoData] = [null, null];
 
-	if (channelID) channelData = await getYouTube(`channels?part=snippet&part=contentDetails&id=${channelID}&key=${process.env.YOUTUBE_KEY}`);
+	if (username) channelData = await getYouTube(`channels?part=snippet&part=contentDetails&id=${username}&key=${process.env.YOUTUBE_KEY}`);
 	if (videoID && channelData?.items?.[0]) videoData = await getYouTube(`playlistItems?part=snippet&maxResults=1&playlistId=${channelData.items[0].contentDetails.relatedPlaylists.uploads}&key=${process.env.YOUTUBE_KEY}`);
 
 	return [channelData, videoData];
