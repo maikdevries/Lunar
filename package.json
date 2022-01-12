@@ -17,10 +17,10 @@
 	},
 	"homepage": "https://github.com/maikdevries/Lunar",
 	"dependencies": {
-		"@discordjs/builders": "^0.9.0",
+		"@discordjs/builders": "^0.11.0",
 		"@joshdb/core": "^1.2.7",
 		"@joshdb/mongo": "^1.1.6",
-		"discord.js": "^13.3.1",
-		"dotenv": "^10.0.0"
+		"discord.js": "^13.5.1",
+		"dotenv": "^11.0.0"
 	}
 }

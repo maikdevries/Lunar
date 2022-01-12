@@ -74,7 +74,9 @@ async function getGuildSettings (client, guildID) {
 async function getData (username, videoID) {
 	let [channelData, videoData] = [null, null];
 
-	if (username) channelData = await getYouTube(`channels?part=snippet&part=contentDetails&id=${username}&key=${process.env.YOUTUBE_KEY}`);
+	if (username?.includes('channel')) channelData = await getYouTube(`channels?part=snippet&part=contentDetails&id=${username.split('/').at(-1)}&key=${process.env.YOUTUBE_KEY}`);
+	else if (username) channelData = await getYouTube(`channels?part=snippet&part=contentDetails&forUsername=${username.split('/').at(-1)}&key=${process.env.YOUTUBE_KEY}`);
+
 	if (videoID && channelData?.items?.[0]) videoData = await getYouTube(`playlistItems?part=snippet&maxResults=1&playlistId=${channelData.items[0].contentDetails.relatedPlaylists.uploads}&key=${process.env.YOUTUBE_KEY}`);
 
 	return [channelData, videoData];
