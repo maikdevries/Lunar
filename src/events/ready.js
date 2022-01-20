@@ -1,3 +1,5 @@
+const { readdir } = require('fs/promises');
+
 const database = require('../database/setup.js');
 const twitch = require('../features/twitch.js');
 const youtube = require('../features/youtube.js');
@@ -20,6 +22,14 @@ async function execute (client) {
 	await commandHandler.setup(client);
 	twitch.setup(client);
 	youtube.setup(client);
+
+	const eventFiles = (await readdir('./src/events')).filter((file) => file.endsWith('.js'));
+	for (const file of eventFiles) {
+		const event = require(`./${file}`);
+
+		if (event.once) client.once(event.name, async (...args) => await event.execute(client, ...args));
+		else client.on(event.name, async (...args) => await event.execute(client, ...args));
+	}
 
 	console.log(`${client.user.username} has loaded successfully and is now online!`);
 }
