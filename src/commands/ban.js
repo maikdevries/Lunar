@@ -1,9 +1,10 @@
+const { Permissions } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { memberSamePermissions, success } = require('../shared/messages.js');
 
 module.exports = {
-	memberPermissions: ['BAN_MEMBERS'],
-	guildPermissions: ['BAN_MEMBERS'],
+	memberPermissions: [Permissions.FLAGS.BAN_MEMBERS],
+	guildPermissions: [Permissions.FLAGS.BAN_MEMBERS],
 	channelPermissions: [],
 	data: new SlashCommandBuilder()
 		.setName('ban')
@@ -15,7 +16,7 @@ module.exports = {
 
 async function execute (interaction) {
 	const member = interaction.options.getMember('member');
-	if (member.permissions.has(this.memberPermissions.concat(['KICK_MEMBERS']))) return await interaction.reply({ content: memberSamePermissions(), ephemeral: true });
+	if (member.permissions.has(this.memberPermissions.concat([Permissions.FLAGS.KICK_MEMBERS]))) return await interaction.reply({ content: memberSamePermissions(), ephemeral: true });
 
 	const reason = interaction.options.getString('reason');
 

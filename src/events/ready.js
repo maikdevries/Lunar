@@ -10,14 +10,11 @@ module.exports = {
 }
 
 async function execute (client) {
-	try { await client.user.setUsername(process.env.DISCORD_USERNAME) }
-	catch (error) { console.error(`[${Date()}] ERROR: ${error}`) }
-
-	try { client.user.setActivity(process.env.DISCORD_ACTIVITY, { type: 'PLAYING' }) }
-	catch (error) { console.error(`[${Date()}] ERROR: ${error}`) }
-
-	try { await client.user.setAvatar('./avatar.png') }
-	catch (error) { console.error(`[${Date()}] ERROR: ${error}`) }
+	try {
+		await client.user.setUsername(process.env.DISCORD_USERNAME);
+		client.user.setPresence({ activities: [{ name: process.env.DISCORD_ACTIVITY, type: 'PLAYING' }] });
+		await client.user.setAvatar('./avatar.png');
+	} catch (error) { console.error(`[${Date()}] ERROR: ${error}`) }
 
 	await database.setup(client);
 	await commandHandler.setup(client);

@@ -45,7 +45,7 @@ async function execute (interaction) {
 	const duration = data.type === 'track' ? ['Duration', `${new Date(data.duration_ms).getMinutes()} minutes and ${new Date(data.duration_ms).getSeconds()} seconds`] : ['Number of tracks', data.total_tracks];
 
 	const embed = new MessageEmbed()
-		.setAuthor('Spotify', 'https://i.imgur.com/88huJuY.png')
+		.setAuthor({ name: 'Spotify', url: data.external_urls.spotify, iconURL: 'https://i.imgur.com/88huJuY.png' })
 		.setTitle(data.name)
 		.setURL(data.external_urls.spotify)
 		.setDescription(`by **${data.artists[0].name}**`)
@@ -54,7 +54,7 @@ async function execute (interaction) {
 		.addField('Listen on Spotify', data.external_urls.spotify)
 		.setColor('#1DB954')
 		.setThumbnail(data.album?.images[0].url || data.images[0].url)
-		.setFooter(`Powered by ${interaction.client.user.username}`, interaction.client.user.avatarURL())
+		.setFooter({ text: `Powered by ${interaction.client.user.username}`, iconURL: interaction.client.user.avatarURL() })
 		.setTimestamp(Date());
 
 	return await interaction.reply({ embeds: [embed] });

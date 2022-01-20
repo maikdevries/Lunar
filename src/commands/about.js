@@ -17,14 +17,14 @@ async function execute (interaction) {
 	const commit = await getCommit();
 
 	const embed = new MessageEmbed()
-		.setAuthor(`The latest information on ${interaction.client.user.username}`, interaction.client.user.avatarURL())
+		.setAuthor({ name: `The latest information on ${interaction.client.user.username}`, iconURL: interaction.client.user.avatarURL() })
 		.addField('Version', package.version, true)
 		.addField('Commit', `[${commit}](${package.homepage}/commit/${commit})`, true)
 		.addField('Repository', `[GitHub repository](${package.homepage})`, true)
 		.addField('Public invite', '[maikdevries.com/lunar](https://maikdevries.com/lunar)', true)
 		.addField('Support', 'https://discord.gg/aMeGvFD', true)
 		.setColor('#233A54')
-		.setFooter(`Powered by ${interaction.client.user.username}`, interaction.client.user.avatarURL())
+		.setFooter({ text: `Powered by ${interaction.client.user.username}`, iconURL: interaction.client.user.avatarURL() })
 		.setTimestamp(Date());
 
 	return await interaction.reply({ embeds: [embed], ephemeral: true });

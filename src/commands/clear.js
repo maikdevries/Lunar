@@ -1,10 +1,11 @@
+const { Permissions } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { success, invalidRange } = require('../shared/messages.js');
 
 module.exports = {
-	memberPermissions: ['MANAGE_MESSAGES'],
+	memberPermissions: [Permissions.FLAGS.MANAGE_MESSAGES],
 	guildPermissions: [],
-	channelPermissions: ['MANAGE_MESSAGES'],
+	channelPermissions: [Permissions.FLAGS.MANAGE_MESSAGES],
 	data: new SlashCommandBuilder()
 		.setName('clear')
 		.setDescription('Delete a number of messages or a member their messages')

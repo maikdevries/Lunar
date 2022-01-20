@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { MessageEmbed, Permissions } = require('discord.js');
 const { getYouTube } = require('../shared/https.js');
 const { checkChannelPermissions } = require('../shared/functions.js');
 
@@ -42,20 +42,20 @@ async function sendVideoAnnouncement (client, guildSettings, channelData, videoD
 	const thumbnail = videoData.items[0].snippet.thumbnails.maxres || videoData.items[0].snippet.thumbnails.standard || videoData.items[0].snippet.thumbnails.high;
 
 	const embed = new MessageEmbed()
-		.setAuthor(`${channelData.items[0].snippet.title} has uploaded a new YouTube video!`, channelData.items[0].snippet.thumbnails.high.url)
+		.setAuthor({ name: `${channelData.items[0].snippet.title} has uploaded a new YouTube video!`, url: `https://youtube.com/watch?v=${videoData.items[0].snippet.resourceId.videoId}`, iconURL: channelData.items[0].snippet.thumbnails.high.url })
 		.setTitle(videoData.items[0].snippet.title)
 		.setURL(`https://youtube.com/watch?v=${videoData.items[0].snippet.resourceId.videoId}`)
 		.setDescription(`${description}...\n\n[**Watch the video here!**](https://youtube.com/watch?v=${videoData.items[0].snippet.resourceId.videoId})`)
 		.setColor('#FF0000')
 		.setImage(thumbnail.url)
-		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
+		.setFooter({ text: `Powered by ${interaction.client.user.username}`, iconURL: interaction.client.user.avatarURL() })
 		.setTimestamp(new Date(videoData.items[0].snippet.publishedAt));
 
 	let channel;
 	try { channel = await client.channels.fetch(guildSettings.settings.channel) }
 	catch { return }
 
-	if (!checkChannelPermissions(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MENTION_EVERYONE'])) return;
+	if (!checkChannelPermissions(client, channel, [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.MENTION_EVERYONE])) return;
 
 	await channel.send({ content: guildSettings.settings.message || ' ', embeds: [embed] });
 	return await client.youtube.set(`${guildSettings.guildID}.latestVideo`, videoData.items[0].snippet.resourceId.videoId);

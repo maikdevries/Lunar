@@ -1,3 +1,4 @@
+const { Permissions } = require('discord.js');
 const { checkGuildPermissions, checkRolePosition } = require('../shared/functions.js');
 
 module.exports = {
@@ -8,7 +9,7 @@ module.exports = {
 async function execute (client, newPresence) {
 	const guildSettings = await client.settings.get(`${newPresence.guild.id}.streamStatus`);
 
-	if (!guildSettings.enabled || !await checkGuildPermissions(client, newPresence.guild, ['MANAGE_ROLES']) || !checkRolePosition(client, newPresence.guild, guildSettings.streamingRole)) return;
+	if (!guildSettings.enabled || !await checkGuildPermissions(client, newPresence.guild, [Permissions.FLAGS.MANAGE_ROLES]) || !checkRolePosition(client, newPresence.guild, guildSettings.streamingRole)) return;
 
 	if (guildSettings.requiredRole && !newPresence.member?.roles.cache.has(guildSettings.requiredRole)) return newPresence.member?.roles.remove(guildSettings.streamingRole);
 

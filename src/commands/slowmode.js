@@ -1,10 +1,11 @@
+const { Permissions } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { success, invalidRange } = require('../shared/messages.js');
 
 module.exports = {
-	memberPermissions: ['MANAGE_CHANNELS'],
+	memberPermissions: [Permissions.FLAGS.MANAGE_CHANNELS],
 	guildPermissions: [],
-	channelPermissions: ['MANAGE_CHANNELS'],
+	channelPermissions: [Permissions.FLAGS.MANAGE_CHANNELS],
 	data: new SlashCommandBuilder()
 		.setName('slowmode')
 		.setDescription('Change the minimum waiting period between messages from the same person')

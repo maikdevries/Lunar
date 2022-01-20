@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { MessageEmbed, Permissions } = require('discord.js');
 const { getTwitch, hasTwitchToken, getTwitchToken, validateTwitchToken } = require('../shared/https.js');
 const { checkChannelPermissions } = require('../shared/functions.js');
 
@@ -54,21 +54,21 @@ async function sendStreamAnnouncement (client, guildSettings) {
 	if (!userData?.data?.[0] || !streamData?.data?.[0] || !gameData?.data?.[0]) return;
 
 	const embed = new MessageEmbed()
-		.setAuthor(`${userData.data[0].display_name} is now LIVE on Twitch!`, userData.data[0].profile_image_url)
+		.setAuthor({ name: `${userData.data[0].display_name} is now LIVE on Twitch!`, url: `https://twitch.tv/${userData.data[0].login}`, iconURL: userData.data[0].profile_image_url })
 		.setTitle(streamData.data[0].title)
 		.setURL(`https://twitch.tv/${userData.data[0].login}`)
 		.setDescription(`**${userData.data[0].display_name}** is playing **${gameData.data[0].name}** with **${streamData.data[0].viewer_count}** people watching!\n\n[**Come watch the stream!**](https://twitch.tv/${userData.data[0].login})`)
 		.setColor('#6441A5')
 		.setThumbnail((gameData.data[0].box_art_url).replace('{width}', '300').replace('{height}', '400'))
 		.setImage(`${(streamData.data[0].thumbnail_url).replace('{width}', '1920').replace('{height}', '1080')}?date=${Date.now()}`)
-		.setFooter(`Powered by ${client.user.username}`, client.user.avatarURL())
+		.setFooter({ text: `Powered by ${interaction.client.user.username}`, iconURL: interaction.client.user.avatarURL() })
 		.setTimestamp(new Date(streamData.data[0].started_at));
 
 	let channel;
 	try { channel = await client.channels.fetch(guildSettings.settings.channel) }
 	catch { return }
 
-	if (!checkChannelPermissions(client, channel, ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MENTION_EVERYONE'])) return;
+	if (!checkChannelPermissions(client, channel, [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.MENTION_EVERYONE])) return;
 
 	channel.send({ content: guildSettings.settings.message || ' ', embeds: [embed] }).then(async (message) => await client.twitch.set(`${guildSettings.guildID}.sentMessage`, { channelID: channel.id, messageID: message.id }));
 	return await client.twitch.set(`${guildSettings.guildID}.streaming`, true);
@@ -104,7 +104,7 @@ async function sendVODAnnouncement (client, guildSettings) {
 	if (!message?.embeds?.[0]) return;
 
 	const updatedEmbed = new MessageEmbed(message.embeds[0])
-		.setAuthor(`${userData.data[0].display_name} was LIVE on Twitch!`, userData.data[0].profile_image_url)
+		.setAuthor({ name: `${userData.data[0].display_name} was LIVE on Twitch!`, url: videoData.data[0].url, iconURL: userData.data[0].profile_image_url })
 		.setTitle(videoData.data[0].title)
 		.setURL(videoData.data[0].url)
 		.setDescription(`Today's stream has **ended** but you can watch the **VOD**!\n\n[**Watch the VOD!**](${videoData.data[0].url})`)
