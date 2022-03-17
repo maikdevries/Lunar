@@ -46,15 +46,15 @@
 
 	"twitch": {
 		"enabled": false,
-		"username": "",
-		"channel": "",
-		"message": ""
+		"channels": [
+
+		]
 	},
 
 	"youtube": {
 		"enabled": false,
-		"username": "",
-		"channel": "",
-		"message": ""
+		"channels": [
+
+		]
 	}
 }

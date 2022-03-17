@@ -7,50 +7,54 @@ module.exports = {
 	setup
 }
 
-const GUILDS_A_MINUTE = (800 / 5) * .95;
+const CHANNELS_A_MINUTE = (800 / 5) * .95;
 
 const defaultStreamSettings = {
-	"guildID": "",
-	"streaming": false,
-	"sentMessage": {},
-	"settings": {}
+	'streaming': false,
+	'sentMessage': {},
+	'settings': {}
 }
 
 async function setup (client) {
 	if (!hasTwitchToken()) await getTwitchToken();
 
-	const guilds = Object.keys(await client.settings.filter('twitch.enabled', true));
-	return execute(client, guilds);
+	const guilds = await client.settings.filter('twitch.enabled', true);
+	for (const guildID of await client.twitch.keys) if (!await client.settings.get(`${guildID}.twitch.enabled`)) await client.twitch.delete(guildID);
+
+	const channels = [];
+	for (const [guildID, guildSettings] of Object.entries(guilds)) guildSettings.twitch.channels.forEach((channel) => channels.push({ 'guildID': guildID, ...channel }));
+
+	return execute(client, channels);
 }
 
-async function execute (client, guilds) {
-	for (let i = 0; i < guilds.length; i += GUILDS_A_MINUTE) {
-		for (const guildID of guilds.slice(i, i + GUILDS_A_MINUTE)) await getStream(client, guildID);
+async function execute (client, channels) {
+	for (let i = 0; i < channels.length; i += CHANNELS_A_MINUTE) {
+		for (const channel of channels.slice(i, i + CHANNELS_A_MINUTE)) await getStream(client, channel);
 		await new Promise((ignore) => setTimeout(ignore, 60000));
 	}
 	return setTimeout(() => setup(client), 60000);
 }
 
-async function getStream (client, guildID) {
-	const guildSettings = await getGuildSettings(client, guildID);
+async function getStream (client, channel) {
+	const channelSettings = await getChannelSettings(client, channel);
 
-	if (!guildSettings.settings.enabled) return await client.twitch.delete(guildID);
+	if (!client.settings.get(`${channelSettings.settings.guildID}.twitch.enabled`)) return await client.twitch.delete(`${channelSettings.settings.guildID}.${channelSettings.settings.username}`);
 
 	try { await validateTwitchToken() }
 	catch { await getTwitchToken() }
 
-	const [userData, streamData, gameData, videoData] = await getData(null, guildSettings.settings.username, null, null);
+	const [userData, streamData, gameData, videoData] = await getData(null, channelSettings.settings.username, null, null);
 	if (!streamData.data) return;
 
-	if (!streamData.data[0] && guildSettings.streaming) return await sendVODAnnouncement(client, guildSettings);
+	if (!streamData.data[0] && channelSettings.streaming) return await sendVODAnnouncement(client, channelSettings);
 	else {
-		if (guildSettings.streaming) return await updateStreamAnnouncement(client, guildSettings);
-		else return await sendStreamAnnouncement(client, guildSettings);
+		if (channelSettings.streaming) return await updateStreamAnnouncement(client, channelSettings);
+		else return await sendStreamAnnouncement(client, channelSettings);
 	}
 }
 
-async function sendStreamAnnouncement (client, guildSettings) {
-	const [userData, streamData, gameData, videoData] = await getData(guildSettings.settings.username, guildSettings.settings.username, true, null);
+async function sendStreamAnnouncement (client, channelSettings) {
+	const [userData, streamData, gameData, videoData] = await getData(channelSettings.settings.username, channelSettings.settings.username, true, null);
 	if (!userData?.data?.[0] || !streamData?.data?.[0] || !gameData?.data?.[0]) return;
 
 	const embed = new MessageEmbed()
@@ -61,25 +65,25 @@ async function sendStreamAnnouncement (client, guildSettings) {
 		.setColor('#6441A5')
 		.setThumbnail((gameData.data[0].box_art_url).replace('{width}', '300').replace('{height}', '400'))
 		.setImage(`${(streamData.data[0].thumbnail_url).replace('{width}', '1920').replace('{height}', '1080')}?date=${Date.now()}`)
-		.setFooter({ text: `Powered by ${interaction.client.user.username}`, iconURL: interaction.client.user.avatarURL() })
+		.setFooter({ text: `Powered by ${client.user.username}`, iconURL: client.user.avatarURL() })
 		.setTimestamp(new Date(streamData.data[0].started_at));
 
 	let channel;
-	try { channel = await client.channels.fetch(guildSettings.settings.channel) }
+	try { channel = await client.channels.fetch(channelSettings.settings.channel) }
 	catch { return }
 
 	if (!checkChannelPermissions(client, channel, [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.MENTION_EVERYONE])) return;
 
-	channel.send({ content: guildSettings.settings.message || ' ', embeds: [embed] }).then(async (message) => await client.twitch.set(`${guildSettings.guildID}.sentMessage`, { channelID: channel.id, messageID: message.id }));
-	return await client.twitch.set(`${guildSettings.guildID}.streaming`, true);
+	channel.send({ content: channelSettings.settings.message || ' ', embeds: [embed] }).then(async (message) => await client.twitch.set(`${channelSettings.settings.guildID}.${channelSettings.settings.username}.sentMessage`, { channelID: channel.id, messageID: message.id }));
+	return await client.twitch.set(`${channelSettings.settings.guildID}.${channelSettings.settings.username}.streaming`, true);
 }
 
-async function updateStreamAnnouncement (client, guildSettings) {
-	const [userData, streamData, gameData, videoData] = await getData(guildSettings.settings.username, guildSettings.settings.username, true, null);
+async function updateStreamAnnouncement (client, channelSettings) {
+	const [userData, streamData, gameData, videoData] = await getData(channelSettings.settings.username, channelSettings.settings.username, true, null);
 	if (!userData?.data?.[0] || !streamData?.data?.[0] || !gameData?.data?.[0]) return;
 
 	let channel, message;
-	try { channel = await client.channels.fetch(guildSettings.sentMessage.channelID); message = await channel.messages.fetch(guildSettings.sentMessage.messageID) }
+	try { channel = await client.channels.fetch(channelSettings.sentMessage.channelID); message = await channel.messages.fetch(channelSettings.sentMessage.messageID) }
 	catch { return }
 
 	if (!message?.embeds?.[0]) { return }
@@ -93,12 +97,12 @@ async function updateStreamAnnouncement (client, guildSettings) {
 	return message.edit({ embeds: [updatedEmbed] });
 }
 
-async function sendVODAnnouncement (client, guildSettings) {
-	const [userData, streamData, gameData, videoData] = await getData(guildSettings.settings.username, null, null, true);
+async function sendVODAnnouncement (client, channelSettings) {
+	const [userData, streamData, gameData, videoData] = await getData(channelSettings.settings.username, null, null, true);
 	if (!userData?.data?.[0] || !videoData?.data?.[0]) return;
 
 	let channel, message;
-	try { channel = await client.channels.fetch(guildSettings.sentMessage.channelID); message = await channel.messages.fetch(guildSettings.sentMessage.messageID) }
+	try { channel = await client.channels.fetch(channelSettings.sentMessage.channelID); message = await channel.messages.fetch(channelSettings.sentMessage.messageID) }
 	catch { return }
 
 	if (!message?.embeds?.[0]) return;
@@ -112,17 +116,14 @@ async function sendVODAnnouncement (client, guildSettings) {
 		.setImage(`${(videoData.data[0].thumbnail_url).replace('%{width}', '1920').replace('%{height}', '1080')}?date=${Date.now()}`);
 
 	message.edit({ embeds: [updatedEmbed] });
-	return await client.twitch.set(`${guildSettings.guildID}.streaming`, false);
+	return await client.twitch.set(`${channelSettings.settings.guildID}.${channelSettings.settings.username}.streaming`, false);
 }
 
-async function getGuildSettings (client, guildID) {
-	const guildSettings = await client.settings.get(`${guildID}.twitch`);
-	await client.twitch.ensure(guildID, defaultStreamSettings);
+async function getChannelSettings (client, channel) {
+	await client.twitch.ensure(`${channel.guildID}.${channel.username}`, defaultStreamSettings);
+	await client.twitch.set(`${channel.guildID}.${channel.username}.settings`, channel);
 
-	await client.twitch.set(`${guildID}.guildID`, guildID);
-	await client.twitch.set(`${guildID}.settings`, guildSettings);
-
-	return await client.twitch.get(guildID);
+	return await client.twitch.get(`${channel.guildID}.${channel.username}`);
 }
 
 async function getData (userUsername, streamUsername, gameID, videoUserID) {
