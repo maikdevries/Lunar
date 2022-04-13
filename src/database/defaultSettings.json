@@ -1,6 +1,6 @@
 {
 	"welcomeMessage": {
-		"ADD": {
+		"welcoming": {
 			"enabled": false,
 			"channel": "",
 			"defaultMessage": "[MEMBER] has joined the Discord server!",
@@ -17,7 +17,7 @@
 				"Look who is here! [MEMBER] is ready for all the fun!"
 			]
 		},
-		"REMOVE": {
+		"farewell": {
 			"enabled": false,
 			"channel": "",
 			"defaultMessage": "[MEMBER] has left the Discord server!",
@@ -33,15 +33,15 @@
 
 	"reactionRole": {
 		"enabled": false,
-		"messages": {
+		"channels": {
 
 		}
 	},
 
-	"streamStatus": {
+	"streamerShoutout": {
 		"enabled": false,
-		"requiredRole": "",
-		"streamingRole": ""
+		"requiredRole": [],
+		"shoutoutRole": ""
 	},
 
 	"twitch": {

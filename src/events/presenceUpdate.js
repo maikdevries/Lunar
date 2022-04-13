@@ -1,4 +1,4 @@
-const streamStatus = require('../features/streamStatus.js');
+const streamerShoutout = require('../features/streamerShoutout.js');
 
 module.exports = {
 	name: 'presenceUpdate',
@@ -7,5 +7,5 @@ module.exports = {
 }
 
 async function execute (client, oldPresence, newPresence) {
-	await streamStatus.execute(client, newPresence);
+	await streamerShoutout.execute(client, newPresence);
 }

@@ -13,7 +13,7 @@ async function execute (client, messageReaction, user, action) {
 	const guildSettings = await client.settings.get(`${messageReaction.message.guild.id}.reactionRole`);
 	if (!guildSettings.enabled) return;
 
-	const roles = guildSettings.messages[messageReaction.message.id]?.[messageReaction.emoji.id || messageReaction.emoji.name];
+	const roles = guildSettings.channels[messageReaction.message.channel.id]?.[messageReaction.message.id]?.[messageReaction.emoji.id || messageReaction.emoji.name];
 	if (!roles) return;
 
 	if (!await checkGuildPermissions(client, messageReaction.message.guild, [Permissions.FLAGS.MANAGE_ROLES])) return;

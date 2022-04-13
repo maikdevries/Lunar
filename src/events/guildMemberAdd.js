@@ -7,5 +7,5 @@ module.exports = {
 }
 
 async function execute (client, guildMember) {
-	await welcomeMessage.execute(client, guildMember, 'ADD');
+	await welcomeMessage.execute(client, guildMember, 'welcoming');
 }
