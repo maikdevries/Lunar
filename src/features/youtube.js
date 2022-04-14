@@ -72,10 +72,10 @@ async function getChannelSettings (client, channel) {
 	return await client.youtube.get(`${channel.guildID}.${channel.username}`);
 }
 
-async function getData (username, videoID) {
+async function getData (channelID, videoID) {
 	let [channelData, videoData] = [null, null];
 
-	if (username) channelData = await getYouTube(`channels?part=snippet&part=contentDetails&id=${username}&key=${process.env.YOUTUBE_KEY}`);
+	if (channelID) channelData = await getYouTube(`channels?part=snippet&part=contentDetails&id=${channelID}&key=${process.env.YOUTUBE_KEY}`);
 	if (videoID && channelData?.items?.[0]) videoData = await getYouTube(`playlistItems?part=snippet&maxResults=1&playlistId=${channelData.items[0].contentDetails.relatedPlaylists.uploads}&key=${process.env.YOUTUBE_KEY}`);
 
 	return [channelData, videoData];

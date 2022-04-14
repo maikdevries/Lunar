@@ -35,7 +35,7 @@ async function execute (interaction) {
 
 	const type = interaction.options.getSubcommand();
 	const query = `${interaction.options.getString('artist')} ${interaction.options.getString('name')}`;
-	const path = `search?q=${encodeURI(query)}&type=${type}&limit=1`;
+	const path = `search?q=${encodeURIComponent(query)}&type=${type}&limit=1`;
 
 	let data = await getSpotify(path);
 	if (!data) return await interaction.reply({ content: failure(), ephemeral: true });

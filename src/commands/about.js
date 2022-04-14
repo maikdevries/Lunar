@@ -21,8 +21,8 @@ async function execute (interaction) {
 		.addField('Version', package.version, true)
 		.addField('Commit', `[${commit}](${package.homepage}/commit/${commit})`, true)
 		.addField('Repository', `[GitHub repository](${package.homepage})`, true)
-		.addField('Public invite', '[maikdevries.com/lunar](https://maikdevries.com/lunar)', true)
-		.addField('Support', 'https://discord.gg/aMeGvFD', true)
+		.addField('Public invite', `[${process.env.WEBSITE}](https://${process.env.WEBSITE})`, true)
+		.addField('Support', `[${process.env.WEBSITE}/support](https://${process.env.WEBSITE}/support)`, true)
 		.setColor('#233A54')
 		.setFooter({ text: `Powered by ${interaction.client.user.username}`, iconURL: interaction.client.user.avatarURL() })
 		.setTimestamp(Date());

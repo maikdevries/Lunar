@@ -12,7 +12,7 @@ module.exports = {
 function success () { return `**${successPrefix[Math.floor(Math.random() * successPrefix.length)]}**! Everything went well, you're all set!` }
 function failure (message = 'Something went wrong, please try again.') { return `**${failPrefix[Math.floor(Math.random() * failPrefix.length)]}**... ${message}` }
 
-function dashboard () { return 'Launch into **Orbit** and manage Lunar\'s behaviour through **https://maikdevries.com/orbit** !' }
+function dashboard () { return `Launch into Orbit and manage ${process.env.DISCORD_USERNAME}\'s behaviour through **https://${process.env.WEBSITE}/dashboard** !` }
 function inviteCreated (invite) { return `**${successPrefix[Math.floor(Math.random() * successPrefix.length)]}**! You can now invite all of your friends through ${invite} for the next 24 hours.` }
 
 function invalidRange (lowerBound, upperBound) { return failure(`Please try again with a number between \`${lowerBound}\` and \`${upperBound}\`.`) }

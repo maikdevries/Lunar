@@ -12,7 +12,7 @@ Thanks for considering contributing to this project! With your help, I'm sure we
 
 **Did you write a patch that fixes a bug?**
 
-* Open a [new GitHub pull request](https://github.com/maikdevries/Lunar/pull/new/master) with the patch.
+* Open a [new GitHub pull request](https://github.com/maikdevries/Lunar/pull/new/main) with the patch.
 
 * Ensure the PR description clearly describes the problem and solution. Include the relevant issue number if applicable.
 
@@ -24,4 +24,4 @@ Thanks for considering contributing to this project! With your help, I'm sure we
 
 * In case of suggestions, ideas or recommendations, [open a new issue](https://github.com/maikdevries/Lunar/issues/new) with the appropriate labels.
 
-* In case of code, open a [new GitHub pull request](https://github.com/maikdevries/Lunar/pull/new/master) and describe your feature in full detail, its use case and proof of functionality.
+* In case of code, open a [new GitHub pull request](https://github.com/maikdevries/Lunar/pull/new/main) and describe your feature in full detail, its use case and proof of functionality.
