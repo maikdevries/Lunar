@@ -1,5 +1,5 @@
 {
-	"welcomeMessage": {
+	"serverMessages": {
 		"welcoming": {
 			"enabled": false,
 			"channel": "",
