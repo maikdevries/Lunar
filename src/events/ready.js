@@ -18,10 +18,8 @@ async function execute (client) {
 		await client.user.setAvatar('./avatar.png');
 	} catch (error) { console.error(`[${Date()}] ERROR: ${error}`) }
 
-	await database.setup(client);
+	await database.connectDatabase(client);
 	await commandHandler.setup(client);
-	twitch.setup(client);
-	youtube.setup(client);
 
 	const eventFiles = (await readdir('./src/events')).filter((file) => file.endsWith('.js'));
 	for (const file of eventFiles) {
@@ -30,6 +28,11 @@ async function execute (client) {
 		if (event.once) client.once(event.name, async (...args) => await event.execute(client, ...args));
 		else client.on(event.name, async (...args) => await event.execute(client, ...args));
 	}
+
+	await database.synchronise(client);
+
+	twitch.setup(client);
+	youtube.setup(client);
 
 	console.log(`${client.user.username} has loaded successfully and is now online!`);
 }

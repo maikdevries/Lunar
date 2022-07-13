@@ -5,16 +5,10 @@ const defaultSettings = require('./defaultSettings.json');
 
 module.exports = {
 	description: 'Establishes a connection to the required databases instances and prepares them for operation',
-	setup
+	connectDatabase, synchronise
 }
 
-async function setup (client) {
-	connectDatabase(client);
-	await syncGuilds(client);
-	await syncSettings(client);
-}
-
-function connectDatabase (client) {
+async function connectDatabase (client) {
 	client.settings = new Josh({
 		name: 'settings',
 		provider,
@@ -46,6 +40,11 @@ function connectDatabase (client) {
 	});
 }
 
+async function synchronise (client) {
+	await syncGuilds(client);
+	await syncSettings(client);
+}
+
 async function syncGuilds (client) {
 	const allGuilds = await client.settings.keys;
 
@@ -55,6 +54,6 @@ async function syncGuilds (client) {
 
 async function syncSettings (client) {
 	const allGuilds = await client.settings.keys;
-	
+
 	for (const guildID of allGuilds) await client.settings.ensure(guildID, defaultSettings);
 }
