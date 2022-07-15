@@ -2,12 +2,12 @@ const { Permissions } = require('discord.js');
 const { checkChannelPermissions } = require('../shared/functions.js');
 
 module.exports = {
-	description: 'Manages messages sent out when members join or leave the server',
+	description: 'Send out a message when certain events happen in a server',
 	execute
 }
 
 async function execute (client, guildMember, action) {
-	const guildSettings = await client.settings.get(`${guildMember.guild.id}.welcomeMessage[${action}]`);
+	const guildSettings = await client.settings.get(`${guildMember.guild.id}.serverMessages[${action}]`);
 	if (!guildSettings.enabled) return;
 
 	let channel;

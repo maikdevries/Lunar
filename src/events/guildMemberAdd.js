@@ -1,4 +1,4 @@
-const welcomeMessage = require('../features/welcomeMessage.js');
+const serverMessages = require('../features/serverMessages.js');
 
 module.exports = {
 	name: 'guildMemberAdd',
@@ -7,5 +7,5 @@ module.exports = {
 }
 
 async function execute (client, guildMember) {
-	await welcomeMessage.execute(client, guildMember, 'welcoming');
+	await serverMessages.execute(client, guildMember, 'welcoming');
 }
