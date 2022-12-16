@@ -1,4 +1,4 @@
-const { MessageEmbed, Permissions } = require('discord.js');
+const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const { getTwitch, hasTwitchToken, getTwitchToken, validateTwitchToken } = require('../shared/https.js');
 const { checkChannelPermissions } = require('../shared/functions.js');
 
@@ -57,7 +57,7 @@ async function sendStreamAnnouncement (client, channelSettings) {
 	const [userData, streamData, gameData, videoData] = await getData(channelSettings.settings.username, channelSettings.settings.username, true, null);
 	if (!userData?.data?.[0] || !streamData?.data?.[0] || !gameData?.data?.[0]) return;
 
-	const embed = new MessageEmbed()
+	const embed = new EmbedBuilder()
 		.setAuthor({ name: `${userData.data[0].display_name} is now LIVE on Twitch!`, url: `https://twitch.tv/${userData.data[0].login}`, iconURL: userData.data[0].profile_image_url })
 		.setTitle(streamData.data[0].title)
 		.setURL(`https://twitch.tv/${userData.data[0].login}`)
@@ -72,7 +72,7 @@ async function sendStreamAnnouncement (client, channelSettings) {
 	try { channel = await client.channels.fetch(channelSettings.settings.channel) }
 	catch { return }
 
-	if (!checkChannelPermissions(client, channel, [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.MENTION_EVERYONE])) return;
+	if (!checkChannelPermissions(client, channel, [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.MentionEveryone])) return;
 
 	channel.send({ content: channelSettings.settings.message || ' ', embeds: [embed] }).then(async (message) => await client.twitch.set(`${channelSettings.settings.guildID}.${channelSettings.settings.username}.sentMessage`, { channelID: channel.id, messageID: message.id }));
 	return await client.twitch.set(`${channelSettings.settings.guildID}.${channelSettings.settings.username}.streaming`, true);
@@ -88,7 +88,7 @@ async function updateStreamAnnouncement (client, channelSettings) {
 
 	if (!message?.embeds?.[0]) { return }
 
-	const updatedEmbed = new MessageEmbed(message.embeds[0])
+	const updatedEmbed = EmbedBuilder.from(message.embeds[0])
 		.setTitle(streamData.data[0].title)
 		.setDescription(`**${userData.data[0].display_name}** is playing **${gameData.data[0].name}** with **${streamData.data[0].viewer_count}** people watching!\n\n[**Come watch the stream!**](https://twitch.tv/${userData.data[0].login})`)
 		.setThumbnail((gameData.data[0].box_art_url).replace('{width}', '300').replace('{height}', '400'))
@@ -107,7 +107,7 @@ async function sendVODAnnouncement (client, channelSettings) {
 
 	if (!message?.embeds?.[0]) return;
 
-	const updatedEmbed = new MessageEmbed(message.embeds[0])
+	const updatedEmbed = EmbedBuilder.from(message.embeds[0])
 		.setAuthor({ name: `${userData.data[0].display_name} was LIVE on Twitch!`, url: videoData.data[0].url, iconURL: userData.data[0].profile_image_url })
 		.setTitle(videoData.data[0].title)
 		.setURL(videoData.data[0].url)

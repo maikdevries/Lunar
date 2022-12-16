@@ -1,11 +1,10 @@
-const { Permissions } = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { PermissionFlagsBits, SlashCommandBuilder } = require('discord.js');
 const { inviteCreated } = require('../shared/messages.js');
 
 module.exports = {
-	memberPermissions: [Permissions.FLAGS.CREATE_INSTANT_INVITE],
+	memberPermissions: [PermissionFlagsBits.CreateInstantInvite],
 	guildPermissions: [],
-	channelPermissions: [Permissions.FLAGS.CREATE_INSTANT_INVITE],
+	channelPermissions: [PermissionFlagsBits.CreateInstantInvite],
 	data: new SlashCommandBuilder()
 		.setName('invite')
 		.setDescription('Create an invite link to the current channel'),

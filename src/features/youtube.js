@@ -1,4 +1,4 @@
-const { MessageEmbed, Permissions } = require('discord.js');
+const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const { getYouTube } = require('../shared/https.js');
 const { checkChannelPermissions } = require('../shared/functions.js');
 
@@ -45,7 +45,7 @@ async function sendVideoAnnouncement (client, channelSettings, channelData, vide
 	const description = videoData.items[0].snippet.description.replace(/^([\s\S]{237}[^\s]*)[\s\S]*/, '$1');
 	const thumbnail = videoData.items[0].snippet.thumbnails.maxres || videoData.items[0].snippet.thumbnails.standard || videoData.items[0].snippet.thumbnails.high;
 
-	const embed = new MessageEmbed()
+	const embed = new EmbedBuilder()
 		.setAuthor({ name: `${channelData.items[0].snippet.title} has uploaded a new YouTube video!`, url: `https://youtube.com/watch?v=${videoData.items[0].snippet.resourceId.videoId}`, iconURL: channelData.items[0].snippet.thumbnails.high.url })
 		.setTitle(videoData.items[0].snippet.title)
 		.setURL(`https://youtube.com/watch?v=${videoData.items[0].snippet.resourceId.videoId}`)
@@ -59,7 +59,7 @@ async function sendVideoAnnouncement (client, channelSettings, channelData, vide
 	try { channel = await client.channels.fetch(channelSettings.settings.channel) }
 	catch { return }
 
-	if (!checkChannelPermissions(client, channel, [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.MENTION_EVERYONE])) return;
+	if (!checkChannelPermissions(client, channel, [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.MentionEveryone])) return;
 
 	await channel.send({ content: channelSettings.settings.message || ' ', embeds: [embed] });
 	return await client.youtube.set(`${channelSettings.settings.guildID}.${channelSettings.settings.username}.latestVideo`, videoData.items[0].snippet.resourceId.videoId);

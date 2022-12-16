@@ -1,5 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { hasSpotifyToken, getSpotifyToken, validateSpotifyToken, getSpotify } = require('../shared/https.js');
 const { failure, noResults } = require('../shared/messages.js');
 
@@ -44,18 +43,20 @@ async function execute (interaction) {
 	data = data[`${type}s`].items[0];
 	const duration = data.type === 'track' ? ['Duration', `${new Date(data.duration_ms).getMinutes()} minutes and ${new Date(data.duration_ms).getSeconds()} seconds`] : ['Number of tracks', data.total_tracks];
 
-	const embed = new MessageEmbed()
+	const embed = new EmbedBuilder()
 		.setAuthor({ name: 'Spotify', url: data.external_urls.spotify, iconURL: 'https://i.imgur.com/88huJuY.png' })
 		.setTitle(data.name)
 		.setURL(data.external_urls.spotify)
 		.setDescription(`by **${data.artists[0].name}**`)
-		.addField('Release date', new Date(data.album?.release_date || data.release_date).toDateString(), true)
-		.addField(duration[0], String(duration[1]), true)
-		.addField('Listen on Spotify', data.external_urls.spotify)
+		.addFields(
+			{ name: 'Release date', value: new Date(data.album?.release_date || data.release_date).toDateString(), inline: true },
+			{ name:  duration[0], value: String(duration[1]), inline: true },
+			{ name: 'Listen on Spotify', value: data.external_urls.spotify, inline: false },
+		)
 		.setColor('#1DB954')
 		.setThumbnail(data.album?.images[0].url || data.images[0].url)
 		.setFooter({ text: `Powered by ${interaction.client.user.username}`, iconURL: interaction.client.user.avatarURL() })
-		.setTimestamp(Date());
+		.setTimestamp();
 
 	return await interaction.reply({ embeds: [embed] });
 }

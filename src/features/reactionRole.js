@@ -1,4 +1,4 @@
-const { Permissions } = require('discord.js');
+const { PermissionFlagsBits } = require('discord.js');
 const { checkGuildPermissions, checkRolePosition } = require('../shared/functions.js');
 
 module.exports = {
@@ -16,7 +16,7 @@ async function execute (client, messageReaction, user, action) {
 	const roles = guildSettings.channels[messageReaction.message.channel.id]?.[messageReaction.message.id]?.[messageReaction.emoji.id || messageReaction.emoji.name];
 	if (!roles) return;
 
-	if (!await checkGuildPermissions(client, messageReaction.message.guild, [Permissions.FLAGS.MANAGE_ROLES])) return;
+	if (!await checkGuildPermissions(client, messageReaction.message.guild, [PermissionFlagsBits.ManageRoles])) return;
 
 	let member;
 	try { member = await messageReaction.message.guild.members.fetch(user.id) }

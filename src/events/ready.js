@@ -1,3 +1,4 @@
+const { ActivityType } = require('discord.js');
 const { readdir } = require('fs/promises');
 
 const database = require('../database/setup.js');
@@ -14,7 +15,7 @@ module.exports = {
 async function execute (client) {
 	try {
 		await client.user.setUsername(process.env.DISCORD_USERNAME);
-		client.user.setPresence({ activities: [{ name: process.env.DISCORD_ACTIVITY, type: 'PLAYING' }] });
+		client.user.setPresence({ activities: [{ name: process.env.DISCORD_ACTIVITY, type: ActivityType.Playing }] });
 		await client.user.setAvatar('./avatar.png');
 	} catch (error) { console.error(`[${Date()}] ERROR: ${error}`) }
 

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 
 const messages = ['The answer is yes.', 'Yep, that is true.', 'You can be certain.', 'Without a doubt.', 'Yes.', 'You are not wrong.', 'Sure thing.', 'I would not advise against it.',
 	'There is a chance.', 'Uhh, I guess?', 'The stars are aligned.', 'No.', 'My answer is no.', 'Nah, that is where you are wrong.', 'Most certainly not.', 'Definitely not.',
