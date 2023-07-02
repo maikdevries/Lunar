@@ -61,7 +61,7 @@ async function sendStreamAnnouncement (client, channelSettings) {
 		.setAuthor({ name: `${userData.data[0].display_name} is now LIVE on Twitch!`, url: `https://twitch.tv/${userData.data[0].login}`, iconURL: userData.data[0].profile_image_url })
 		.setTitle(streamData.data[0].title)
 		.setURL(`https://twitch.tv/${userData.data[0].login}`)
-		.setDescription(`**${userData.data[0].display_name}** is playing **${gameData.data[0].name}** with **${streamData.data[0].viewer_count}** people watching!\n\n[**Come watch the stream!**](https://twitch.tv/${userData.data[0].login})`)
+		.setDescription(`**${userData.data[0].display_name}** is playing **${gameData.data[0].name}** with ${(streamData.data[0].viewer_count === 1 ? `**1** viewer` : `**${streamData.data[0].viewer_count}** viewers`)} watching!\n\n[**Come watch the stream!**](https://twitch.tv/${userData.data[0].login})`)
 		.setColor('#6441A5')
 		.setThumbnail((gameData.data[0].box_art_url).replace('{width}', '300').replace('{height}', '400'))
 		.setImage(`${(streamData.data[0].thumbnail_url).replace('{width}', '1920').replace('{height}', '1080')}?date=${Date.now()}`)

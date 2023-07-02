@@ -1,6 +1,6 @@
 {
 	"name": "lunar",
-	"version": "3.1.0",
+	"version": "3.2.0",
 	"description": "Lunar is a public Discord bot written in NodeJS that allows for easy customisation to serve your needs.",
 	"engines": {
 		"node": ">=16.9.0"
@@ -19,7 +19,7 @@
 	"dependencies": {
 		"@joshdb/core": "^1.2.7",
 		"@joshdb/mongo": "^1.1.6",
-		"discord.js": "^14.7.1",
-		"dotenv": "^16.0.3"
+		"discord.js": "^14.11.0",
+		"dotenv": "^16.3.1"
 	}
 }
