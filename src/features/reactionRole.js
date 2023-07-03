@@ -23,7 +23,7 @@ async function execute (client, messageReaction, user, action) {
 	catch { return }
 
 	for (const role of roles) {
-		if (!checkRolePosition(client, messageReaction.message.guild, role)) continue;
+		if (!await checkRolePosition(client, messageReaction.message.guild, role)) continue;
 
 		if (action === 'ADD') await member.roles.add(role);
 		else await member.roles.remove(role);
