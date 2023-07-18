@@ -16,7 +16,7 @@ async function execute (client) {
 	try {
 		await client.user.setUsername(process.env.DISCORD_USERNAME);
 		client.user.setPresence({ activities: [{ name: process.env.DISCORD_ACTIVITY, type: ActivityType.Playing }] });
-		await client.user.setAvatar('./avatar.png');
+		await client.user.setAvatar('./resources/avatar.png');
 	} catch (error) { console.error(`[${Date()}] ERROR: ${error}`) }
 
 	await database.connectDatabase(client);
