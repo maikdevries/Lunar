@@ -1,5 +1,3 @@
-const https = require('https');
-
 module.exports = {
 	description: 'All outgoing HTTPS requests to various APIs are taken care of within this file',
 	getYouTube,
@@ -10,19 +8,20 @@ module.exports = {
 let twitchToken, spotifyToken;
 
 async function getYouTube (path) {
+	const url = new URL(`https://www.googleapis.com/youtube/v3/${path}`);
+
 	const options = {
-		host: 'www.googleapis.com',
-		path: `/youtube/v3/${path}`,
 		method: 'GET'
 	}
 
-	return await createRequest(options);
+	try { return await createRequest(url, options) }
+	catch (error) { return null }
 }
 
 async function getTwitch (path) {
+	const url = new URL(`https://api.twitch.tv/helix/${path}`);
+
 	const options = {
-		host: 'api.twitch.tv',
-		path: `/helix/${path}`,
 		method: 'GET',
 		headers: {
 			'Client-ID': process.env.TWITCH_ID,
@@ -30,7 +29,8 @@ async function getTwitch (path) {
 		}
 	}
 
-	return await createRequest(options);
+	try { return await createRequest(url, options) }
+	catch (error) { return null }
 }
 
 function hasTwitchToken () {
@@ -38,39 +38,40 @@ function hasTwitchToken () {
 }
 
 async function getTwitchToken () {
+	const url = new URL(`https://id.twitch.tv/oauth2/token?client_id=${process.env.TWITCH_ID}&client_secret=${process.env.TWITCH_SECRET}&grant_type=client_credentials`);
+
 	const options = {
-		host: 'id.twitch.tv',
-		path: `/oauth2/token?client_id=${process.env.TWITCH_ID}&client_secret=${process.env.TWITCH_SECRET}&grant_type=client_credentials`,
 		method: 'POST'
 	}
 
-	return twitchToken = (await createRequest(options)).access_token;
+	return (twitchToken = (await createRequest(url, options))?.access_token);
 }
 
 async function validateTwitchToken () {
+	const url = new URL('https://id.twitch.tv/oauth2/validate');
+
 	const options = {
-		host: 'id.twitch.tv',
-		path: '/oauth2/validate',
 		method: 'GET',
 		headers: {
 			'Authorization': `OAuth ${twitchToken}`
 		}
 	}
 
-	return await createRequest(options);
+	return await createRequest(url, options);
 }
 
 async function getSpotify (path) {
+	const url = new URL(`https://api.spotify.com/v1/${path}`);
+
 	const options = {
-		host: 'api.spotify.com',
-		path: `/v1/${path}`,
 		method: 'GET',
 		headers: {
 			'Authorization': `Bearer ${spotifyToken}`
 		}
 	}
 
-	return await createRequest(options);
+	try { return await createRequest(url, options) }
+	catch (error) { return null }
 }
 
 function hasSpotifyToken () {
@@ -78,50 +79,36 @@ function hasSpotifyToken () {
 }
 
 async function getSpotifyToken () {
-	const data = `${encodeURIComponent('grant_type')}=${encodeURIComponent('client_credentials')}`;
+	const url = new URL('https://accounts.spotify.com/api/token');
 
 	const options = {
-		host: 'accounts.spotify.com',
-		path: '/api/token',
 		method: 'POST',
 		headers: {
 			'Authorization': `Basic ${Buffer.from(`${process.env.SPOTIFY_ID}:${process.env.SPOTIFY_SECRET}`).toString('base64')}`,
-			'Content-Type': 'application/x-www-form-urlencoded',
-			'Content-Length': Buffer.byteLength(data)
-		}
+			'Content-Type': 'application/x-www-form-urlencoded'
+		},
+		body: `${encodeURIComponent('grant_type')}=${encodeURIComponent('client_credentials')}`
 	}
 
-	return spotifyToken = (await createRequest(options, data)).access_token;
+	return (spotifyToken = (await createRequest(url, options))?.access_token);
 }
 
 async function validateSpotifyToken () {
+	const url = new URL('https://api.spotify.com/v1/search?q=mac+miller&type=artist');
+
 	const options = {
-		host: 'api.spotify.com',
-		path: '/v1/search?q=mac+miller&type=artist',
 		method: 'GET',
 		headers: {
 			'Authorization': `Bearer ${spotifyToken}`
 		}
 	}
 
-	return await createRequest(options);
+	return await createRequest(url, options);
 }
 
-async function createRequest (options, data = null) {
-	return new Promise((resolve, reject) => {
-		const request = https.request(options, (res) => {
-			if (res.statusCode === 401) return reject('UNAUTHORISED');
-			if (res.statusCode !== 200) return resolve(false);
-
-			const rawData = [];
-			res.on('data', (chunk) => rawData.push(chunk));
-			res.on('end', () => {
-				try { return resolve(JSON.parse(Buffer.concat(rawData))) }
-				catch { return resolve(false) }
-			});
-		}).on('error', () => resolve(false));
-
-		if (data) request.write(data);
-		request.end();
-	});
+async function createRequest (url, options) {
+	try {
+		const response = await fetch(url, options);
+		return response.ok ? await response.json() : (() => { throw new Error(`Fetch API failed with status ${response.status}. URL: ${response.url}`) })();
+	} catch (error) { console.error(error); throw error.toString() }
 }
